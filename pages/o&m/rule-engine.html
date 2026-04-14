@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RunDo Energy Carbon Platform | Alarm Rule Configuration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-base: #0b1220;
+        --bg-surface: #172131;
+        --bg-elevated: #253247;
+        --bg-content: #111a28;
+        --bg-card: #162233;
+        --text-primary: #F8FAFC;
+        --text-secondary: #94A3B8;
+        --text-muted: #64748B;
+        --accent-green: #22C55E;
+        --accent-blue: #3B82F6;
+        --accent-cyan: #06B6D4;
+        --accent-amber: #F59E0B;
+        --accent-red: #EF4444;
+        --accent-purple: #8B5CF6;
+        --border: #334155;
+        --border-light: #475569;
+        --font-ui: 'Fira Sans', sans-serif;
+        --font-data: 'Fira Code', monospace;
+        --radius: 8px;
+        --radius-lg: 12px;
+        --nav-right-w: 64px;
+        --topbar-h: 60px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: var(--font-ui);
+        background: var(--bg-base);
+        color: var(--text-primary);
+        overflow: hidden;
+        height: 100vh;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
+
+    /* ===== TOP BAR ===== */
+    .topbar {
+        height: var(--topbar-h);
+        background: #152031;
+        border-bottom: 1px solid rgba(71, 85, 105, 0.72);
+        display: flex; align-items: center; padding: 0 16px;
+        position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    }
+    .topbar-brand { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
+    .topbar-brand .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+    .topbar-brand .brand-name { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+    .topbar-brand .sys-name { font-size: 11px; color: var(--text-muted); }
+    .topbar-menu { display: flex; align-items: center; gap: 4px; }
+    .topbar-menu .module-name { font-weight: 600; font-size: 14px; color: var(--accent-green); margin-right: 8px; }
+    .topbar-menu .sub-menu { padding: 6px 12px; font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all .2s; border-bottom: 2px solid transparent; }
+    .topbar-menu .sub-menu:hover { color: var(--text-secondary); }
+    .topbar-menu .sub-menu.active { color: var(--text-primary); border-bottom-color: var(--accent-green); font-weight: 500; }
+    .topbar-tools { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-secondary); }
+    .topbar-tools .tool-item { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: color .2s; }
+    .topbar-tools .tool-item:hover { color: var(--text-primary); }
+    .topbar-tools .user-block { display: flex; flex-direction: row-reverse; align-items: center; gap: 8px; cursor: pointer; }
+    .topbar-tools .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
+    .topbar-tools .user-info { display: flex; flex-direction: column; line-height: 1.2; text-align: right; }
+    .topbar-tools .user-name { font-size: 12px; color: var(--text-primary); font-weight: 500; }
+    .topbar-tools .user-role { font-size: 10px; color: var(--text-muted); }
+
+    /* ===== RIGHT NAV ===== */
+    .right-nav {
+        position: fixed; top: var(--topbar-h); left: 0;
+        width: var(--nav-right-w); height: calc(100vh - var(--topbar-h));
+        background: #0b1220; border-right: 1px solid rgba(51, 65, 85, 0.9);
+        display: flex; flex-direction: column; align-items: center;
+        padding: 16px 0; gap: 4px; z-index: 90;
+    }
+    .right-nav .nav-item {
+        width: 48px; padding: 10px 0;
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+        border-radius: var(--radius); cursor: pointer; transition: all .2s;
+        font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.3;
+    }
+    .right-nav .nav-item:hover { color: var(--text-secondary); background: var(--bg-elevated); }
+    .right-nav .nav-item.active { color: var(--accent-green); background: rgba(34, 197, 94, .1); }
+    .right-nav .nav-item svg { width: 20px; height: 20px; }
+    .nav-item-group { position: relative; display: flex; justify-content: center; width: 100%; }
+    .nav-flyout {
+        position: absolute; top: 50%; left: calc(100% + 14px);
+        transform: translateY(-50%) translateX(-8px);
+        min-width: 188px; padding: 10px; border-radius: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        background: linear-gradient(180deg, rgba(17, 25, 37, 0.82), rgba(12, 19, 30, 0.76));
+        box-shadow: 0 18px 42px rgba(2, 6, 23, 0.34);
+        backdrop-filter: blur(16px) saturate(120%);
+        opacity: 0; visibility: hidden; pointer-events: none;
+        transition: all .22s ease; z-index: 120;
+    }
+    .nav-item-group:hover .nav-flyout {
+        opacity: 1; visibility: visible; pointer-events: auto;
+        transform: translateY(-50%) translateX(0);
+    }
+    .nav-flyout::after {
+        content: ""; position: absolute; left: -7px; top: 50%;
+        width: 14px; height: 14px; transform: translateY(-50%) rotate(45deg);
+        border-left: 1px solid rgba(148, 163, 184, 0.14);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+        background: rgba(15, 23, 34, 0.84);
+    }
+    .nav-flyout-title {
+        font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
+        color: rgba(148, 163, 184, 0.72);
+        margin-bottom: 8px; padding: 4px 8px 8px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .nav-flyout-item {
+        display: flex; align-items: center; position: relative;
+        padding: 10px 12px 10px 16px; margin: 4px 0;
+        border-radius: 10px; color: #c4d0df;
+        cursor: pointer; transition: all .2s ease;
+        font-size: 12px; line-height: 1.35; font-weight: 500; white-space: nowrap;
+    }
+    .nav-flyout-item:hover { background: rgba(30, 41, 59, 0.54); color: var(--text-primary); }
+    .nav-flyout-item.active { background: rgba(34, 197, 94, 0.08); color: var(--text-primary); }
+    .nav-flyout-item.active::before {
+        content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px;
+        width: 3px; border-radius: 999px;
+        background: linear-gradient(180deg, rgba(74, 222, 128, 0.95), rgba(34, 197, 94, 0.72));
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main-wrap {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex; 
+        flex-direction: column; 
+        overflow: hidden;
+    }
+
+    /* ===== CONTENT HEADER ===== */
+    .content-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+        background: rgba(19, 29, 44, 0.98); flex-shrink: 0;
+    }
+    .content-breadcrumb { font-size: 12px; color: var(--text-muted); }
+    .content-breadcrumb span { color: var(--text-secondary); }
+    .content-breadcrumb .sep { margin: 0 6px; }
+    .content-actions { display: flex; gap: 8px; align-items: center; }
+    .action-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 12px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(21, 29, 42, 0.92); color: var(--text-secondary);
+        font-size: 11px; font-weight: 600; cursor: pointer;
+        transition: all .18s; font-family: var(--font-ui);
+    }
+    .action-btn:hover { border-color: rgba(96, 165, 250, 0.24); color: var(--text-primary); }
+    .action-btn.create { background: rgba(34, 197, 94, 0.14); border-color: rgba(34, 197, 94, 0.2); color: #bbf7d0; }
+    .action-btn.create:hover { background: rgba(34, 197, 94, 0.22); }
+    .action-btn svg { width: 13px; height: 13px; }
+
+    /* ===== TOOLBAR ===== */
+    .toolbar {
+        display: flex; align-items: center; gap: 10px;
+        padding: 12px 20px; background: var(--bg-base); flex-shrink: 0; flex-wrap: wrap;
+    }
+    .search-box {
+        display: flex; align-items: center; gap: 8px;
+        padding: 7px 12px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.96); min-width: 220px;
+    }
+    .search-box svg { width: 14px; height: 14px; color: var(--text-muted); flex-shrink: 0; }
+    .search-box input {
+        border: none; background: transparent; color: var(--text-primary);
+        font-size: 12px; outline: none; width: 100%; font-family: var(--font-ui);
+    }
+    .search-box input::placeholder { color: var(--text-muted); }
+    .filter-select {
+        padding: 7px 28px 7px 10px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.96); color: var(--text-primary);
+        font-size: 12px; outline: none; font-family: var(--font-ui);
+        cursor: pointer; appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: right 8px center;
+    }
+    .filter-select:focus { border-color: rgba(96, 165, 250, 0.3); }
+    .filter-chip {
+        padding: 5px 10px; border-radius: 6px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: transparent; color: var(--text-muted);
+        font-size: 11px; font-weight: 600; cursor: pointer;
+        transition: all .15s; font-family: var(--font-ui);
+    }
+    .filter-chip:hover { border-color: rgba(96, 165, 250, 0.2); color: var(--text-primary); }
+    .filter-chip.active { background: rgba(34, 197, 94, 0.12); border-color: rgba(34, 197, 94, 0.2); color: #86efac; }
+    .toolbar-spacer { flex: 1; }
+
+    /* ===== TABLE ===== */
+    .table-wrap {
+        flex: 1; min-height: 0; margin: 0 20px 20px;
+        border-radius: var(--radius-lg); border: 1px solid var(--border);
+        background: var(--bg-surface); overflow: hidden;
+        display: flex; flex-direction: column;
+    }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table thead { position: sticky; top: 0; z-index: 2; background: rgba(19, 29, 44, 0.98); }
+    .data-table th {
+        padding: 12px 16px; font-size: 11px; color: #8fa1b7;
+        text-transform: uppercase; letter-spacing: .06em;
+        border-bottom: 1px solid var(--border); text-align: left;
+        font-weight: 700; white-space: nowrap;
+    }
+    .data-table td {
+        padding: 12px 16px; font-size: 13px; color: var(--text-secondary);
+        border-bottom: 1px solid rgba(120, 142, 180, 0.06); vertical-align: middle;
+    }
+    .data-table tbody tr { transition: background .12s; }
+    .data-table tbody tr:hover { background: rgba(30, 41, 59, 0.4); }
+    .data-table .rule-name { color: var(--text-primary); font-weight: 600; }
+    .data-table .mono { font-family: var(--font-data); font-size: 12px; }
+    .data-table .actions { display: flex; gap: 6px; align-items: center; }
+
+    /* ===== BADGES ===== */
+    .badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 3px 10px; border-radius: 6px;
+        font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .badge-info { background: rgba(59, 130, 246, 0.12); color: #bfdbfe; }
+    .badge-success { background: rgba(34, 197, 94, 0.12); color: #bbf7d0; }
+    .badge-warning { background: rgba(245, 158, 11, 0.12); color: #fde68a; }
+    .badge-danger { background: rgba(239, 68, 68, 0.12); color: #fecaca; }
+    .badge-dim { background: rgba(139, 92, 246, 0.12); color: #ddd6fe; }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .badge-critical { background: rgba(239, 68, 68, 0.12); color: #fecaca; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 8px 14px; border-radius: 10px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(21, 29, 42, 0.92); color: #b5c0d3;
+        cursor: pointer; transition: .18s ease;
+        font-family: var(--font-ui); font-size: 12px; font-weight: 600; white-space: nowrap;
+    }
+    .btn:hover { border-color: rgba(96, 165, 250, 0.24); color: var(--text-primary); }
+    .btn-primary { background: rgba(59, 130, 246, 0.14); border-color: rgba(96, 165, 250, 0.2); color: #dbeafe; }
+    .btn-primary:hover { background: rgba(59, 130, 246, 0.22); }
+    .btn-danger { border-color: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.12); }
+    .btn-success { border-color: rgba(34, 197, 94, 0.2); color: #bbf7d0; }
+    .btn-success:hover { background: rgba(34, 197, 94, 0.12); }
+    .btn-warning { border-color: rgba(245, 158, 11, 0.2); color: #fde68a; }
+    .btn-warning:hover { background: rgba(245, 158, 11, 0.12); }
+    .btn-cyan { border-color: rgba(6, 182, 212, 0.2); color: #67e8f9; }
+    .btn-cyan:hover { background: rgba(6, 182, 212, 0.12); }
+    .btn-sm { padding: 5px 10px; font-size: 11px; }
+    .btn svg { width: 14px; height: 14px; }
+
+    /* ===== DRAWER ===== */
+    .drawer-overlay {
+        position: fixed;
+        inset: 0;
+        top: var(--topbar-h);
+        left: var(--nav-right-w);
+        background: rgba(2, 6, 23, 0.42);
+        z-index: 260;
+        display: none;
+    }
+    .drawer-overlay.open { display: block; }
+    .drawer-panel {
+        position: fixed;
+        top: var(--topbar-h);
+        right: 0;
+        width: min(600px, 92vw);
+        height: calc(100vh - var(--topbar-h));
+        border-left: 1px solid rgba(120, 142, 180, 0.12);
+        transform: translateX(100%);
+        transition: transform .22s ease;
+        z-index: 261;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-card);
+        box-shadow: -20px 0 48px rgba(2, 6, 23, 0.36);
+    }
+    .drawer-panel.open { transform: translateX(0); }
+    .drawer-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+        background: linear-gradient(180deg, rgba(19, 29, 44, 0.98), rgba(22, 34, 51, 0.96));
+        flex-shrink: 0;
+    }
+    .drawer-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    .drawer-close {
+        width: 28px; height: 28px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 6px; border: none; background: transparent;
+        color: var(--text-muted); cursor: pointer; transition: all .15s;
+    }
+    .drawer-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+    .drawer-foot {
+        display: flex; justify-content: flex-end; gap: 10px;
+        padding: 14px 20px; border-top: 1px solid rgba(120, 142, 180, 0.1);
+        background: rgba(22, 34, 51, 0.96);
+        flex-shrink: 0;
+    }
+
+    /* ===== FORM ===== */
+    .form-group label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--text-secondary); }
+    .form-group label .req { color: var(--accent-red); margin-left: 2px; }
+    .form-input, .form-select, .form-textarea {
+        width: 100%; padding: 9px 12px; border-radius: 10px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.96); color: var(--text-primary);
+        font-size: 13px; outline: none; font-family: var(--font-ui);
+        transition: border-color .18s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(96, 165, 250, 0.3); }
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-select {
+        cursor: pointer; appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px;
+    }
+    .form-textarea { min-height: 50px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+    /* ===== CARD BLOCK ===== */
+    .card-block {
+        border-radius: 12px;
+        border: 1px solid rgba(120, 142, 180, 0.1);
+        background: rgba(16, 22, 34, 0.6);
+        overflow: hidden;
+        margin-bottom: 14px;
+    }
+    .card-block:last-child { margin-bottom: 0; }
+    .card-block-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(120, 142, 180, 0.08);
+        background: rgba(19, 29, 44, 0.5);
+    }
+    .card-block-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .card-block-sub { font-size: 11px; color: var(--text-muted); }
+    .card-block-body { padding: 14px 16px; }
+
+    /* ===== DIMENSION SELECTOR ===== */
+    .dim-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .dim-option {
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        padding: 12px 8px; border-radius: 10px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: transparent; color: var(--text-secondary);
+        cursor: pointer; transition: all .15s;
+    }
+    .dim-option:hover { border-color: rgba(96, 165, 250, 0.2); color: var(--text-primary); }
+    .dim-option.active { border-color: rgba(34, 197, 94, 0.3); background: rgba(34, 197, 94, 0.06); color: var(--accent-green); }
+    .dim-option svg { width: 18px; height: 18px; }
+    .dim-option span { font-size: 11px; font-weight: 600; }
+
+    /* ===== CONDITION BUILDER ===== */
+    .condition-list { display: flex; flex-direction: column; gap: 10px; }
+    .condition-item {
+        display: flex;
+        align-items: stretch;
+        gap: 8px;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.96);
+    }
+    .condition-item .form-input,
+    .condition-item .form-select { padding: 7px 10px; font-size: 12px; }
+    .cond-main { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
+    .cond-logic-col { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 44px; }
+    .logic-connector {
+        padding: 4px 10px; border-radius: 6px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: transparent; color: var(--text-muted);
+        font-size: 11px; font-weight: 700; cursor: pointer;
+        transition: all .15s; font-family: var(--font-data);
+    }
+    .logic-connector.and { background: rgba(59, 130, 246, 0.12); border-color: rgba(96, 165, 250, 0.2); color: #93c5fd; }
+    .logic-connector.or { background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.2); color: #fde68a; }
+    .cond-remove {
+        width: 28px; height: 28px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 6px; border: none; background: transparent;
+        color: var(--text-muted); cursor: pointer; transition: all .15s; flex-shrink: 0;
+        align-self: center;
+    }
+    .cond-remove:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+    .add-condition-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 12px; border-radius: 8px;
+        border: 1px dashed rgba(120, 142, 180, 0.2);
+        background: transparent; color: var(--text-muted);
+        font-size: 11px; font-weight: 600; cursor: pointer;
+        transition: all .15s; font-family: var(--font-ui); margin-top: 4px;
+    }
+    .add-condition-btn:hover { border-color: rgba(96, 165, 250, 0.3); color: var(--text-primary); background: rgba(30, 41, 59, 0.4); }
+
+    /* ===== TOGGLE SWITCH ===== */
+    .toggle-row {
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px 16px; border-radius: 10px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.96);
+    }
+    .toggle-switch {
+        width: 40px; height: 22px; border-radius: 11px;
+        background: var(--bg-elevated); cursor: pointer;
+        position: relative; transition: all .2s; flex-shrink: 0;
+    }
+    .toggle-switch.on { background: rgba(34, 197, 94, 0.3); }
+    .toggle-switch::after {
+        content: ''; position: absolute;
+        width: 16px; height: 16px; border-radius: 50%;
+        background: var(--text-muted); top: 3px; left: 3px; transition: all .2s;
+    }
+    .toggle-switch.on::after { left: 21px; background: var(--accent-green); }
+    .toggle-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .toggle-desc { font-size: 11px; color: var(--text-muted); }
+
+    .time-config { display: none; }
+    .time-config.visible { display: block; }
+
+    /* Schedule */
+    .schedule-day {
+        border: 1px solid rgba(120, 142, 180, 0.1);
+        border-radius: 10px;
+        background: rgba(16, 22, 34, 0.6);
+        margin-bottom: 8px;
+        overflow: hidden;
+    }
+    .schedule-day-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 10px 14px;
+        background: rgba(19, 29, 44, 0.5);
+        border-bottom: 1px solid rgba(120, 142, 180, 0.08);
+    }
+    .schedule-day-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+    .schedule-day-toggle {
+        width: 36px; height: 18px; border-radius: 9px;
+        background: var(--bg-elevated); cursor: pointer;
+        position: relative; transition: all .2s;
+    }
+    .schedule-day-toggle.on { background: rgba(34, 197, 94, 0.3); }
+    .schedule-day-toggle::after {
+        content: ''; position: absolute;
+        width: 14px; height: 14px; border-radius: 50%;
+        background: var(--text-muted); top: 2px; left: 2px; transition: all .2s;
+    }
+    .schedule-day-toggle.on::after { left: 20px; background: var(--accent-green); }
+    .schedule-day-body { padding: 10px 14px; }
+    .schedule-day-body.hidden { display: none; }
+
+    .time-range-row {
+        display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+    }
+    .time-range-row .form-input {
+        padding: 6px 10px; font-size: 12px; width: 110px;
+        cursor: pointer;
+    }
+    .time-range-row .time-sep { color: var(--text-muted); font-size: 12px; }
+    .time-range-remove {
+        width: 22px; height: 22px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 4px; border: none; background: transparent;
+        color: var(--text-muted); cursor: pointer; transition: all .15s; flex-shrink: 0;
+        font-size: 14px;
+    }
+    .time-range-remove:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+    .add-time-btn {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 4px 10px; border-radius: 6px;
+        border: 1px dashed rgba(120, 142, 180, 0.2);
+        background: transparent; color: var(--text-muted);
+        font-size: 11px; cursor: pointer;
+        transition: all .15s; font-family: var(--font-ui); margin-top: 4px;
+    }
+    .add-time-btn:hover { border-color: rgba(96, 165, 250, 0.3); color: var(--text-primary); }
+
+    /* Duration */
+    .duration-row { display: flex; gap: 8px; align-items: flex-end; margin-top: 10px; }
+    .duration-row .form-group { flex: 1; }
+    .duration-row .form-input { padding: 6px 10px; font-size: 12px; }
+    .duration-row .form-select { padding: 6px 10px; font-size: 12px; }
+
+    /* ===== RULE PREVIEW ===== */
+    .rule-preview {
+        padding: 14px 16px; border-radius: 10px;
+        background: rgba(16, 22, 34, 0.96);
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        font-family: var(--font-data); font-size: 12px;
+        color: var(--text-secondary); line-height: 1.6;
+    }
+    .rule-preview .kw { color: var(--accent-cyan); font-weight: 600; }
+    .rule-preview .val { color: var(--accent-amber); }
+    .rule-preview .sev { color: var(--accent-red); font-weight: 700; }
+    .rule-preview .obj { color: #67e8f9; }
+
+    /* ===== ENABLED ROW ===== */
+    .enabled-row { display: flex; align-items: center; gap: 12px; }
+    .enabled-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .enabled-desc { font-size: 11px; color: var(--text-muted); }
+
+    /* ===== TEST MODAL ===== */
+    .test-modal-overlay {
+        position: fixed; inset: 0; z-index: 500;
+        display: none; align-items: center; justify-content: center;
+        background: rgba(2, 6, 23, 0.6); backdrop-filter: blur(4px);
+    }
+    .test-modal-overlay.open { display: flex; }
+    .test-modal {
+        width: min(560px, calc(100vw - 48px));
+        border-radius: 16px; border: 1px solid var(--border);
+        background: var(--bg-surface);
+        box-shadow: 0 24px 64px rgba(2, 6, 23, 0.5); overflow: hidden;
+    }
+    .test-modal-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+    }
+    .test-modal-title { font-size: 15px; font-weight: 700; }
+    .test-modal-close {
+        width: 28px; height: 28px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 8px; border: none; background: transparent;
+        color: var(--text-muted); cursor: pointer; transition: all .15s;
+    }
+    .test-modal-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+    .test-modal-body { padding: 20px; }
+    .test-modal-foot {
+        display: flex; justify-content: flex-end; gap: 10px;
+        padding: 14px 20px; border-top: 1px solid rgba(120, 142, 180, 0.1);
+    }
+    .test-result-box {
+        padding: 16px; border-radius: 10px;
+        background: rgba(16, 22, 34, 0.96);
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        font-family: var(--font-data); font-size: 12px; line-height: 1.8;
+        max-height: 320px; overflow-y: auto;
+    }
+    .test-result-box.triggered { border-color: rgba(239, 68, 68, 0.2); }
+    .test-result-box.not-triggered { border-color: rgba(34, 197, 94, 0.2); }
+    .test-result-box.partial { border-color: rgba(245, 158, 11, 0.2); }
+    .result-header { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+    .result-header.pass { color: var(--accent-green); }
+    .result-header.fail { color: var(--accent-red); }
+    .result-header.warn { color: var(--accent-amber); }
+    .result-detail { color: var(--text-secondary); }
+    .result-check { color: var(--accent-green); }
+    .result-cross { color: var(--accent-red); }
+    .result-warn { color: var(--accent-amber); }
+
+    /* ===== CONFIRM MODAL ===== */
+    .confirm-overlay {
+        position: fixed; inset: 0; z-index: 510;
+        display: none; align-items: center; justify-content: center;
+        background: rgba(2, 6, 23, 0.6); backdrop-filter: blur(4px);
+    }
+    .confirm-overlay.open { display: flex; }
+    .confirm-card {
+        width: min(400px, calc(100vw - 48px));
+        border-radius: 16px; border: 1px solid var(--border);
+        background: var(--bg-surface);
+        box-shadow: 0 24px 64px rgba(2, 6, 23, 0.5); overflow: hidden;
+    }
+    .confirm-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+    }
+    .confirm-title { font-size: 15px; font-weight: 700; }
+    .confirm-close {
+        width: 28px; height: 28px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 8px; border: none; background: transparent;
+        color: var(--text-muted); cursor: pointer; transition: all .15s;
+    }
+    .confirm-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+    .confirm-body { padding: 24px 20px; text-align: center; }
+    .confirm-body svg { width: 48px; height: 48px; color: var(--accent-amber); margin-bottom: 12px; }
+    .confirm-body h3 { font-size: 15px; margin-bottom: 8px; }
+    .confirm-body p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+    .confirm-foot {
+        display: flex; justify-content: flex-end; gap: 10px;
+        padding: 14px 20px; border-top: 1px solid rgba(120, 142, 180, 0.1);
+    }
+
+    /* ===== TOAST ===== */
+    .toast-container { position: fixed; top: 72px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+        padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 500;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+        display: flex; align-items: center; gap: 8px; animation: toastIn .3s ease; min-width: 260px;
+    }
+    .toast.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(74, 222, 128, 0.2); color: #bbf7d0; }
+    .toast.error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.2); color: #fecaca; }
+    .toast.info { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(96, 165, 250, 0.2); color: #bfdbfe; }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        flex: 1; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        color: var(--text-muted);
+    }
+    .empty-state svg { width: 48px; height: 48px; opacity: 0.3; margin-bottom: 12px; }
+    .empty-state p { font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- MAIN -->
+<div class="main-wrap">
+    <div class="content-header">
+        <div class="content-breadcrumb">O&amp;M <span class="sep">/</span> <span>Alarm Rule Configuration</span></div>
+        <div class="content-actions">
+            <button class="action-btn create" id="btnNewRule">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Rule
+            </button>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search rules..." id="searchInput">
+        </div>
+        <select class="filter-select" id="filterDim">
+            <option value="">All Dimensions</option>
+            <option value="space">Space</option>
+            <option value="org">Organization</option>
+            <option value="device">Device</option>
+            <option value="meter">Meter</option>
+        </select>
+        <select class="filter-select" id="filterSev">
+            <option value="">All Severities</option>
+            <option value="critical">Critical</option>
+            <option value="warning">Warning</option>
+            <option value="info">Info</option>
+        </select>
+        <button class="filter-chip active" data-status="">All Status</button>
+        <button class="filter-chip" data-status="enabled">Enabled</button>
+        <button class="filter-chip" data-status="disabled">Disabled</button>
+        <div class="toolbar-spacer"></div>
+        <span style="font-size:11px;color:var(--text-muted);" id="ruleCountLabel">0 rules</span>
+    </div>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Rule Name</th>
+                    <th>Dimension</th>
+                    <th>Conditions</th>
+                    <th>Severity</th>
+                    <th>Schedule</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="rulesTbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer-panel" id="drawerPanel">
+    <div class="drawer-head">
+        <span class="drawer-title" id="drawerTitle">New Rule</span>
+        <button class="drawer-close" id="drawerClose">✕</button>
+    </div>
+    <div class="drawer-body">
+        <!-- Basic Info -->
+        <div class="card-block">
+            <div class="card-block-head"><span class="card-block-title">Basic Information</span></div>
+            <div class="card-block-body">
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label>Rule Name <span class="req">*</span></label>
+                    <input type="text" class="form-input" id="drRuleName" placeholder="e.g. High BTSS Consumption">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Severity <span class="req">*</span></label>
+                        <select class="form-select" id="drSeverity">
+                            <option value="critical">Critical</option>
+                            <option value="warning">Warning</option>
+                            <option value="info">Info</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Enabled</label>
+                        <div class="enabled-row" style="margin-top:4px;">
+                            <div class="toggle-switch on" id="drEnabledToggle" onclick="toggleDrawerEnabled()"></div>
+                            <div>
+                                <div class="enabled-label" id="drEnabledLabel">Enabled</div>
+                                <div class="enabled-desc">Rule is active</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dimension -->
+        <div class="card-block">
+            <div class="card-block-head">
+                <span class="card-block-title">Dimension</span>
+                <span class="card-block-sub">Select target type</span>
+            </div>
+            <div class="card-block-body">
+                <div class="dim-selector" id="dimSelector">
+                    <button class="dim-option active" data-dim="space" onclick="selectDimension('space')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        <span>Space</span>
+                    </button>
+                    <button class="dim-option" data-dim="org" onclick="selectDimension('org')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        <span>Organization</span>
+                    </button>
+                    <button class="dim-option" data-dim="device" onclick="selectDimension('device')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        <span>Device</span>
+                    </button>
+                    <button class="dim-option" data-dim="meter" onclick="selectDimension('meter')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+                        <span>Meter</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Condition Logic (with Object + Point selectors inline) -->
+        <div class="card-block">
+            <div class="card-block-head">
+                <span class="card-block-title">Condition Logic</span>
+                <span class="card-block-sub" id="drCondCount">0 conditions</span>
+            </div>
+            <div class="card-block-body">
+                <div class="condition-list" id="drConditionList"></div>
+                <button class="add-condition-btn" onclick="addCondition()">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Add Condition
+                </button>
+            </div>
+        </div>
+
+        <!-- Time Settings -->
+        <div class="card-block">
+            <div class="card-block-head">
+                <span class="card-block-title">Time Settings</span>
+            </div>
+            <div class="card-block-body" style="display:flex;flex-direction:column;gap:14px;">
+                <!-- Part A: Active Schedule -->
+                <div>
+                    <div class="toggle-row" onclick="toggleSchedule()" style="cursor:pointer;margin-bottom:0;">
+                        <div class="toggle-switch" id="drScheduleToggle"></div>
+                        <div>
+                            <div class="toggle-label">Active Schedule</div>
+                            <div class="toggle-desc">Define which days/time periods the rule monitors</div>
+                        </div>
+                    </div>
+                    <div class="time-config" id="drScheduleConfig">
+                        <div id="drScheduleDays"></div>
+                    </div>
+                </div>
+
+                <!-- Part B: Duration Hold -->
+                <div>
+                    <div class="toggle-row" onclick="toggleDuration()" style="cursor:pointer;margin-bottom:0;">
+                        <div class="toggle-switch" id="drDurationToggle"></div>
+                        <div>
+                            <div class="toggle-label">Duration Hold</div>
+                            <div class="toggle-desc">Require conditions to persist before triggering</div>
+                        </div>
+                    </div>
+                    <div class="time-config" id="drDurationConfig">
+                        <div class="duration-row">
+                            <div class="form-group">
+                                <label>Hold Duration</label>
+                                <input type="number" class="form-input" id="drHoldDuration" value="15" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>Unit</label>
+                                <select class="form-select" id="drHoldUnit">
+                                    <option value="seconds">Seconds</option>
+                                    <option value="minutes" selected>Minutes</option>
+                                    <option value="hours">Hours</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rule Preview -->
+        <div class="card-block">
+            <div class="card-block-head">
+                <span class="card-block-title">Rule Preview</span>
+            </div>
+            <div class="card-block-body">
+                <div class="rule-preview" id="drRulePreview">Configure conditions to see preview...</div>
+            </div>
+        </div>
+    </div>
+    <div class="drawer-foot">
+        <button class="btn" onclick="closeDrawer()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveDrawerRule()">Save Rule</button>
+    </div>
+</div>
+
+<!-- TEST MODAL -->
+<div class="test-modal-overlay" id="testModal">
+    <div class="test-modal">
+        <div class="test-modal-head">
+            <span class="test-modal-title">Rule Test Result</span>
+            <button class="test-modal-close" onclick="closeTestModal()">✕</button>
+        </div>
+        <div class="test-modal-body">
+            <div class="test-result-box" id="testResultBox">Running test...</div>
+        </div>
+        <div class="test-modal-foot">
+            <button class="btn" onclick="closeTestModal()">Close</button>
+            <button class="btn btn-primary" onclick="retestRule()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Re-test
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="confirm-overlay" id="confirmModal">
+    <div class="confirm-card">
+        <div class="confirm-head">
+            <span class="confirm-title" id="confirmTitle">Confirm</span>
+            <button class="confirm-close" onclick="closeConfirm()">✕</button>
+        </div>
+        <div class="confirm-body">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <h3 id="confirmHeading">Are you sure?</h3>
+            <p id="confirmMessage">This action cannot be undone.</p>
+        </div>
+        <div class="confirm-foot">
+            <button class="btn" onclick="closeConfirm()">Cancel</button>
+            <button class="btn btn-danger" id="confirmAction">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ===== State =====
+var rules = [];
+var editingRuleId = null;
+var drawerDim = 'space';
+var drawerConditions = [];
+var drawerLogic = 'AND';
+var drawerEnabled = true;
+var scheduleEnabled = false;
+var dailySchedule = {};
+var durationEnabled = false;
+var nextRuleId = 1;
+var testingRuleId = null;
+
+var dimLabels = {space:'Space',org:'Organization',device:'Device',meter:'Meter'};
+var dayNames = {0:'Sunday',1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday',6:'Saturday'};
+var dayShort = {0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thu',5:'Fri',6:'Sat'};
+
+// Object data per dimension
+var objectData = {
+    space: [
+        {id:'btss',name:'Bangunan Tun Tan Siew Sin',type:'Building',meta:'8,204 m²',icon:'🏢'},
+        {id:'acad',name:'Academic Building',type:'Building',meta:'5,600 m²',icon:'🏫'},
+        {id:'res',name:'Student Residence',type:'Building',meta:'3,200 m²',icon:'🏠'},
+        {id:'dcs',name:'Data Center Server Room',type:'Room',meta:'420 m²',icon:'🖥️'},
+        {id:'canteen',name:'Staff Canteen',type:'Building',meta:'1,800 m²',icon:'🍽️'},
+        {id:'library',name:'Library Building',type:'Building',meta:'4,100 m²',icon:'📚'},
+        {id:'gym',name:'Sports Complex',type:'Building',meta:'2,900 m²',icon:'🏋️'},
+    ],
+    org: [
+        {id:'admin',name:'Administration Dept',type:'Department',meta:'45 staff',icon:'🏛️'},
+        {id:'academic',name:'Academic Faculty',type:'Department',meta:'120 staff',icon:'🎓'},
+        {id:'logistics',name:'Logistics Division',type:'Department',meta:'30 staff',icon:'🚚'},
+        {id:'research',name:'Research Institute',type:'Department',meta:'60 staff',icon:'🔬'},
+        {id:'it',name:'IT Services',type:'Department',meta:'25 staff',icon:'💻'},
+    ],
+    device: [
+        {id:'ch1',name:'Chiller CH-1',type:'Chiller',meta:'350 kW',icon:'❄️'},
+        {id:'ch2',name:'Chiller CH-2',type:'Chiller',meta:'350 kW',icon:'❄️'},
+        {id:'chwp1',name:'Chilled Water Pump CHWP-1',type:'Pump',meta:'30 kW',icon:'💧'},
+        {id:'chwp2',name:'Chilled Water Pump CHWP-2',type:'Pump',meta:'30 kW',icon:'💧'},
+        {id:'ahu1',name:'Air Handling Unit AHU-1',type:'AHU',meta:'15 kW',icon:'🌀'},
+        {id:'ahu2',name:'Air Handling Unit AHU-2',type:'AHU',meta:'15 kW',icon:'🌀'},
+        {id:'ct1',name:'Cooling Tower CT-1',type:'Cooling Tower',meta:'7.5 kW',icon:'🗼'},
+        {id:'ltg_main',name:'Main Lighting Circuit',type:'Lighting',meta:'8 kW',icon:'💡'},
+    ],
+    meter: [
+        {id:'ttss_main',name:'TTSS Main Meter',type:'Electricity',meta:'Incoming',icon:'⚡'},
+        {id:'acad_meter',name:'Academic Building Meter',type:'Electricity',meta:'Sub-meter',icon:'⚡'},
+        {id:'res_meter',name:'Residence Meter',type:'Electricity',meta:'Sub-meter',icon:'⚡'},
+        {id:'water_main',name:'Water Main Meter',type:'Water',meta:'Incoming',icon:'💧'},
+        {id:'gas_meter',name:'Gas Meter',type:'Gas',meta:'Boiler',icon:'🔥'},
+    ]
+};
+
+// Point types per dimension
+var pointTypes = {
+    space: [
+        {id:'power',name:'Total Power',type:'Power',unit:'kW',icon:'⚡'},
+        {id:'energy',name:'Energy Consumption',type:'Energy',unit:'kWh',icon:'📊'},
+        {id:'temp',name:'Temperature',type:'Temperature',unit:'°C',icon:'🌡️'},
+        {id:'humi',name:'Humidity',type:'Humidity',unit:'%',icon:'💧'},
+        {id:'cost',name:'Energy Cost',type:'Cost',unit:'MYR',icon:'💰'},
+    ],
+    org: [
+        {id:'energy',name:'Energy Consumption',type:'Energy',unit:'kWh',icon:'📊'},
+        {id:'cost',name:'Energy Cost',type:'Cost',unit:'MYR',icon:'💰'},
+        {id:'per_capita',name:'Per Capita Energy',type:'Energy/Person',unit:'kWh/person',icon:'👤'},
+        {id:'budget_pct',name:'Budget Usage',type:'Percentage',unit:'%',icon:'📈'},
+    ],
+    device: [
+        {id:'power',name:'Power',type:'Power',unit:'kW',icon:'⚡'},
+        {id:'energy',name:'Energy',type:'Energy',unit:'kWh',icon:'📊'},
+        {id:'load_rate',name:'Load Rate',type:'Load',unit:'%',icon:'📈'},
+        {id:'supply_temp',name:'Supply Temperature',type:'Temperature',unit:'°C',icon:'🌡️'},
+        {id:'return_temp',name:'Return Temperature',type:'Temperature',unit:'°C',icon:'🌡️'},
+        {id:'cop',name:'COP / EER',type:'Efficiency',unit:'',icon:'📉'},
+        {id:'runtime',name:'Running Hours',type:'Time',unit:'h',icon:'⏱️'},
+        {id:'fault_count',name:'Fault Count',type:'Counter',unit:'count',icon:'⚠️'},
+    ],
+    meter: [
+        {id:'reading',name:'Current Reading',type:'Reading',unit:'kWh',icon:'📊'},
+        {id:'consumption',name:'Consumption',type:'Consumption',unit:'kWh',icon:'⚡'},
+        {id:'quality',name:'Collection Quality',type:'Quality',unit:'%',icon:'✅'},
+        {id:'comm_status',name:'Communication Status',type:'Status',unit:'',icon:'📡'},
+        {id:'anomaly',name:'Anomaly Count',type:'Counter',unit:'count',icon:'⚠️'},
+    ]
+};
+
+function getDefaultSchedule() {
+    return {
+        1:{enabled:true,ranges:[{start:'08:00',end:'18:00'}]},
+        2:{enabled:true,ranges:[{start:'08:00',end:'18:00'}]},
+        3:{enabled:true,ranges:[{start:'08:00',end:'18:00'}]},
+        4:{enabled:true,ranges:[{start:'08:00',end:'18:00'}]},
+        5:{enabled:true,ranges:[{start:'08:00',end:'18:00'}]},
+        6:{enabled:false,ranges:[{start:'09:00',end:'13:00'}]},
+        0:{enabled:false,ranges:[{start:'09:00',end:'13:00'}]}
+    };
+}
+
+// ===== Init =====
+function init() {
+    initMockRules();
+    bindEvents();
+    renderTable();
+}
+
+function initMockRules() {
+    rules = [
+        {id:1,name:'High BTSS Consumption',desc:'',enabled:true,dim:'space',severity:'critical',
+         conditions:[{objId:'btss',objName:'BTSS Main Building',ptId:'power',ptName:'Total Power',unit:'kW',op:'>',value:500}],logic:'AND',
+         schedule:{enabled:true,schedule:{
+             1:{enabled:true,ranges:[{start:'08:00',end:'18:00'}]},2:{enabled:true,ranges:[{start:'08:00',end:'18:00'}]},
+             3:{enabled:true,ranges:[{start:'08:00',end:'18:00'}]},4:{enabled:true,ranges:[{start:'08:00',end:'18:00'}]},
+             5:{enabled:true,ranges:[{start:'08:00',end:'18:00'}]},6:{enabled:false,ranges:[{start:'09:00',end:'13:00'}]},
+             0:{enabled:false,ranges:[{start:'09:00',end:'13:00'}]}
+         }},
+         duration:{enabled:true,value:15,unit:'minutes'}},
+        {id:2,name:'Chiller Overload Protection',desc:'',enabled:true,dim:'device',severity:'warning',
+         conditions:[{objId:'ch1',objName:'Chiller CH-1',ptId:'load_rate',ptName:'Load Rate',unit:'%',op:'>',value:85},{objId:'ch2',objName:'Chiller CH-2',ptId:'supply_temp',ptName:'Supply Temperature',unit:'°C',op:'>',value:14}],logic:'OR',
+         schedule:{enabled:false},
+         duration:{enabled:true,value:10,unit:'minutes'}},
+        {id:3,name:'Night Energy Watch',desc:'',enabled:false,dim:'space',severity:'info',
+         conditions:[{objId:'btss',objName:'BTSS',ptId:'energy',ptName:'Energy Consumption',unit:'kWh',op:'>',value:200}],logic:'AND',
+         schedule:{enabled:true,schedule:{
+             1:{enabled:true,ranges:[{start:'22:00',end:'06:00'}]},2:{enabled:true,ranges:[{start:'22:00',end:'06:00'}]},
+             3:{enabled:true,ranges:[{start:'22:00',end:'06:00'}]},4:{enabled:true,ranges:[{start:'22:00',end:'06:00'}]},
+             5:{enabled:true,ranges:[{start:'22:00',end:'06:00'}]},6:{enabled:true,ranges:[{start:'22:00',end:'06:00'}]},
+             0:{enabled:true,ranges:[{start:'22:00',end:'06:00'}]}
+         }},
+         duration:{enabled:false}},
+    ];
+    nextRuleId = 4;
+}
+
+// ===== Clock =====
+function updateClock() {
+    var el = document.getElementById('clock');
+    if (el) el.textContent = new Date().toLocaleTimeString('en-US', {hour12:false});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ===== Events =====
+function bindEvents() {
+    document.querySelectorAll('.filter-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+            chip.classList.add('active');
+            renderTable();
+        });
+    });
+    document.getElementById('searchInput').addEventListener('input', renderTable);
+    document.getElementById('filterDim').addEventListener('change', renderTable);
+    document.getElementById('filterSev').addEventListener('change', renderTable);
+    document.getElementById('btnNewRule').addEventListener('click', function() { openDrawer(null); });
+    document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+    document.getElementById('testModal').addEventListener('click', function(e){ if(e.target===this) closeTestModal(); });
+    document.getElementById('confirmModal').addEventListener('click', function(e){ if(e.target===this) closeConfirm(); });
+}
+
+// ===== Render Table =====
+function renderTable() {
+    var search = document.getElementById('searchInput').value.toLowerCase();
+    var dimFilter = document.getElementById('filterDim').value;
+    var sevFilter = document.getElementById('filterSev').value;
+    var statusFilter = document.querySelector('.filter-chip.active') ? document.querySelector('.filter-chip.active').dataset.status : '';
+
+    var sevLabels = {critical:'Critical',warning:'Warning',info:'Info'};
+    var sevBadge = {critical:'badge-critical',warning:'badge-warning',info:'badge-info'};
+
+    var filtered = rules.filter(function(r) {
+        if (search && r.name.toLowerCase().indexOf(search) === -1) return false;
+        if (dimFilter && r.dim !== dimFilter) return false;
+        if (sevFilter && r.severity !== sevFilter) return false;
+        if (statusFilter === 'enabled' && !r.enabled) return false;
+        if (statusFilter === 'disabled' && r.enabled) return false;
+        return true;
+    });
+
+    document.getElementById('ruleCountLabel').textContent = filtered.length + ' rule' + (filtered.length !== 1 ? 's' : '');
+
+    var tbody = document.getElementById('rulesTbody');
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>No matching rules found</p></div></td></tr>';
+        return;
+    }
+
+    var rows = filtered.map(function(r) {
+        var statusBadge = r.enabled
+            ? '<span class="badge badge-success"><span class="badge-dot"></span>Enabled</span>'
+            : '<span class="badge badge-warning"><span class="badge-dot"></span>Disabled</span>';
+        var condDesc = r.conditions.map(function(c) { return c.objName + ' → ' + c.ptName + ' ' + c.op + ' ' + c.value; }).join(', ');
+        var schedDesc = r.schedule && r.schedule.enabled ? '📅 Scheduled' : '24/7';
+        var durDesc = r.duration && r.duration.enabled ? '+' + r.duration.value + r.duration.unit[0] : 'Instant';
+        var timeDesc = schedDesc + ' · ' + durDesc;
+        var toggleLabel = r.enabled ? 'Disable' : 'Enable';
+        var toggleClass = r.enabled ? 'btn-warning' : 'btn-success';
+
+        return '<tr>' +
+            '<td><div class="rule-name">' + escHtml(r.name) + '</div></td>' +
+            '<td><span class="badge badge-dim">' + dimLabels[r.dim] + '</span></td>' +
+            '<td class="mono" style="font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + escHtml(condDesc) + '">' + r.conditions.length + ' conditions (' + r.logic + ')</td>' +
+            '<td><span class="badge ' + sevBadge[r.severity] + '">' + sevLabels[r.severity] + '</span></td>' +
+            '<td style="font-size:12px;">' + timeDesc + '</td>' +
+            '<td>' + statusBadge + '</td>' +
+            '<td><div class="actions" style="justify-content:flex-end;">' +
+            '<button class="btn btn-sm btn-cyan" onclick="testRule(' + r.id + ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Test</button>' +
+            '<button class="btn btn-sm" onclick="editRule(' + r.id + ')">Edit</button>' +
+            '<button class="btn btn-sm ' + toggleClass + '" onclick="confirmToggle(' + r.id + ')">' + toggleLabel + '</button>' +
+            '<button class="btn btn-sm btn-danger" onclick="confirmDelete(' + r.id + ')">Delete</button>' +
+            '</div></td></tr>';
+    }).join('');
+
+    tbody.innerHTML = rows;
+}
+
+function escHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+}
+
+// ===== Drawer =====
+function openDrawer(rule) {
+    editingRuleId = rule ? rule.id : null;
+    document.getElementById('drawerTitle').textContent = rule ? 'Edit Rule' : 'New Rule';
+    document.getElementById('drRuleName').value = rule ? rule.name : '';
+    document.getElementById('drSeverity').value = rule ? rule.severity : 'critical';
+    drawerEnabled = rule ? rule.enabled : true;
+    document.getElementById('drEnabledToggle').classList.toggle('on', drawerEnabled);
+    document.getElementById('drEnabledLabel').textContent = drawerEnabled ? 'Enabled' : 'Disabled';
+
+    drawerDim = rule ? rule.dim : 'space';
+    updateDrawerDimOptions();
+
+    drawerConditions = rule ? rule.conditions.map(function(c){return Object.assign({},c);}) : [];
+    drawerLogic = rule ? rule.logic : 'AND';
+
+    // Schedule
+    scheduleEnabled = rule ? (rule.schedule && rule.schedule.enabled) : false;
+    document.getElementById('drScheduleToggle').classList.toggle('on', scheduleEnabled);
+    document.getElementById('drScheduleConfig').classList.toggle('visible', scheduleEnabled);
+    if (scheduleEnabled) {
+        dailySchedule = rule.schedule && rule.schedule.schedule ? JSON.parse(JSON.stringify(rule.schedule.schedule)) : getDefaultSchedule();
+    } else {
+        dailySchedule = getDefaultSchedule();
+    }
+    renderDrawerSchedule();
+
+    // Duration
+    durationEnabled = rule ? (rule.duration && rule.duration.enabled) : false;
+    document.getElementById('drDurationToggle').classList.toggle('on', durationEnabled);
+    document.getElementById('drDurationConfig').classList.toggle('visible', durationEnabled);
+    if (durationEnabled) {
+        document.getElementById('drHoldDuration').value = rule.duration ? rule.duration.value : 15;
+        document.getElementById('drHoldUnit').value = rule.duration ? rule.duration.unit : 'minutes';
+    }
+
+    renderDrawerConditions();
+    updateDrawerPreview();
+
+    document.getElementById('drawerOverlay').classList.add('open');
+    document.getElementById('drawerPanel').classList.add('open');
+}
+
+function closeDrawer() {
+    document.getElementById('drawerOverlay').classList.remove('open');
+    document.getElementById('drawerPanel').classList.remove('open');
+    editingRuleId = null;
+}
+
+function saveDrawerRule() {
+    var name = document.getElementById('drRuleName').value.trim();
+    if (!name) { showToast('Please enter a rule name', 'error'); return; }
+    if (drawerConditions.length === 0) { showToast('Please configure at least one condition', 'error'); return; }
+
+    // Validate conditions
+    for (var i = 0; i < drawerConditions.length; i++) {
+        var c = drawerConditions[i];
+        if (!c.objId || !c.ptId) { showToast('Please select both object and point for all conditions', 'error'); return; }
+        if (!c.value && c.value !== 0) { showToast('Please enter a threshold value for all conditions', 'error'); return; }
+    }
+
+    var ruleData = {
+        name: name,
+        desc: '',
+        enabled: drawerEnabled,
+        dim: drawerDim,
+        severity: document.getElementById('drSeverity').value,
+        conditions: drawerConditions.map(function(c){return Object.assign({},c);}),
+        logic: drawerLogic,
+        schedule: {
+            enabled: scheduleEnabled,
+            schedule: scheduleEnabled ? JSON.parse(JSON.stringify(dailySchedule)) : null
+        },
+        duration: {
+            enabled: durationEnabled,
+            value: durationEnabled ? (parseInt(document.getElementById('drHoldDuration').value) || 15) : 0,
+            unit: durationEnabled ? document.getElementById('drHoldUnit').value : ''
+        }
+    };
+
+    if (editingRuleId) {
+        var idx = -1;
+        for (var i = 0; i < rules.length; i++) {
+            if (rules[i].id === editingRuleId) { idx = i; break; }
+        }
+        if (idx !== -1) {
+            rules[idx] = Object.assign({}, rules[idx], ruleData);
+        }
+        showToast('Rule updated', 'success');
+    } else {
+        rules.push(Object.assign({id: nextRuleId++}, ruleData));
+        showToast('Rule created', 'success');
+    }
+
+    closeDrawer();
+    renderTable();
+}
+
+function editRule(id) {
+    var rule = null;
+    for (var i = 0; i < rules.length; i++) {
+        if (rules[i].id === id) { rule = rules[i]; break; }
+    }
+    if (rule) openDrawer(rule);
+}
+
+// ===== Dimension =====
+function selectDimension(dim) {
+    drawerDim = dim;
+    // Clear conditions when dimension changes
+    drawerConditions = [];
+    updateDrawerDimOptions();
+    renderDrawerConditions();
+    updateDrawerPreview();
+}
+
+function updateDrawerDimOptions() {
+    var opts = document.querySelectorAll('#dimSelector .dim-option');
+    for (var i = 0; i < opts.length; i++) {
+        opts[i].classList.toggle('active', opts[i].getAttribute('data-dim') === drawerDim);
+    }
+}
+
+// ===== Condition Builder =====
+function renderDrawerConditions() {
+    var list = document.getElementById('drConditionList');
+    document.getElementById('drCondCount').textContent = drawerConditions.length + ' condition' + (drawerConditions.length !== 1 ? 's' : '');
+
+    if (drawerConditions.length === 0) {
+        list.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px 0;">Click "Add Condition" to start building your rule.</div>';
+        return;
+    }
+
+    var objs = objectData[drawerDim] || [];
+    var pts = pointTypes[drawerDim] || [];
+
+    var html = '';
+    for (var i = 0; i < drawerConditions.length; i++) {
+        var c = drawerConditions[i];
+
+        // Object options
+        var objOpts = '<option value="">Select object</option>';
+        for (var j = 0; j < objs.length; j++) {
+            objOpts += '<option value="' + objs[j].id + '"' + (c.objId === objs[j].id ? ' selected' : '') + '>' + objs[j].icon + ' ' + escHtml(objs[j].name) + '</option>';
+        }
+        // Point options
+        var ptOpts = '<option value="">Select point</option>';
+        for (var k = 0; k < pts.length; k++) {
+            ptOpts += '<option value="' + pts[k].id + '"' + (c.ptId === pts[k].id ? ' selected' : '') + '>' + pts[k].icon + ' ' + escHtml(pts[k].name) + (pts[k].unit ? ' (' + pts[k].unit + ')' : '') + '</option>';
+        }
+
+        // Find unit for selected point
+        var unit = '';
+        for (var m = 0; m < pts.length; m++) { if (pts[m].id === c.ptId) { unit = pts[m].unit; break; } }
+
+        html += '<div class="condition-item">';
+        html += '<div class="cond-logic-col">';
+        if (i > 0) {
+            html += '<button class="logic-connector ' + drawerLogic.toLowerCase() + '" onclick="toggleDrawerLogic()">' + drawerLogic + '</button>';
+        } else {
+            html += '<span style="font-size:10px;color:var(--text-muted);">IF</span>';
+        }
+        html += '</div>';
+        html += '<div class="cond-main">';
+        html += '<select class="form-select" style="min-width:150px;" onchange="updateCondField(' + i + ',\'objId\',this.value)">' + objOpts + '</select>';
+        html += '<select class="form-select" style="min-width:140px;" onchange="updateCondField(' + i + ',\'ptId\',this.value)">' + ptOpts + '</select>';
+        html += '<select class="form-select" style="width:65px;" onchange="updateCondField(' + i + ',\'op\',this.value)">' +
+            '<option value=">"' + (c.op==='>'?' selected':'') + '>></option>' +
+            '<option value="<"' + (c.op==='<'?' selected':'') + '><</option>' +
+            '<option value=">="' + (c.op==='>='?' selected':'') + '>>=</option>' +
+            '<option value="<="' + (c.op==='<='?' selected':'') + '><=</option>' +
+            '<option value="="' + (c.op==='=='?' selected':'') + '>=</option>' +
+            '<option value="!"' + (c.op==='!='?' selected':'') + '>!=</option></select>';
+        html += '<input type="text" class="form-input" style="width:75px;" value="' + escHtml(String(c.value)) + '" placeholder="Value" oninput="updateCondField(' + i + ',\'value\',this.value)">';
+        if (unit) {
+            html += '<span style="font-size:11px;color:var(--text-muted);min-width:35px;">' + escHtml(unit) + '</span>';
+        }
+        html += '</div>';
+        html += '<button class="cond-remove" onclick="removeCondition(' + i + ')">✕</button>';
+        html += '</div>';
+    }
+    list.innerHTML = html;
+}
+
+function updateCondField(index, field, value) {
+    drawerConditions[index][field] = value;
+    // Update unit display when point changes
+    if (field === 'ptId') {
+        var pts = pointTypes[drawerDim] || [];
+        for (var i = 0; i < pts.length; i++) {
+            if (pts[i].id === value) {
+                drawerConditions[index].unit = pts[i].unit;
+                drawerConditions[index].ptName = pts[i].name;
+                break;
+            }
+        }
+        renderDrawerConditions();
+    }
+    // Update object name
+    if (field === 'objId') {
+        var objs = objectData[drawerDim] || [];
+        for (var i = 0; i < objs.length; i++) {
+            if (objs[i].id === value) {
+                drawerConditions[index].objName = objs[i].name;
+                break;
+            }
+        }
+    }
+    updateDrawerPreview();
+}
+
+function addCondition() {
+    drawerConditions.push({
+        objId: '',
+        objName: '',
+        ptId: '',
+        ptName: '',
+        unit: '',
+        op: '>',
+        value: ''
+    });
+    renderDrawerConditions();
+    updateDrawerPreview();
+}
+
+function removeCondition(i) {
+    drawerConditions.splice(i, 1);
+    renderDrawerConditions();
+    updateDrawerPreview();
+}
+
+function toggleDrawerLogic() {
+    drawerLogic = drawerLogic === 'AND' ? 'OR' : 'AND';
+    renderDrawerConditions();
+    updateDrawerPreview();
+}
+
+// ===== Time Settings =====
+function toggleSchedule() {
+    scheduleEnabled = !scheduleEnabled;
+    document.getElementById('drScheduleToggle').classList.toggle('on', scheduleEnabled);
+    document.getElementById('drScheduleConfig').classList.toggle('visible', scheduleEnabled);
+    if (scheduleEnabled && (!dailySchedule || Object.keys(dailySchedule).length === 0)) {
+        dailySchedule = getDefaultSchedule();
+    }
+    renderDrawerSchedule();
+    updateDrawerPreview();
+}
+
+function toggleDuration() {
+    durationEnabled = !durationEnabled;
+    document.getElementById('drDurationToggle').classList.toggle('on', durationEnabled);
+    document.getElementById('drDurationConfig').classList.toggle('visible', durationEnabled);
+    updateDrawerPreview();
+}
+
+function renderDrawerSchedule() {
+    var container = document.getElementById('drScheduleDays');
+    if (!dailySchedule || Object.keys(dailySchedule).length === 0) dailySchedule = getDefaultSchedule();
+
+    var days = [1,2,3,4,5,6,0];
+    var html = '';
+    for (var d = 0; d < days.length; d++) {
+        var day = days[d];
+        var sd = dailySchedule[day] || {enabled:false,ranges:[{start:'08:00',end:'18:00'}]};
+
+        html += '<div class="schedule-day">';
+        html += '<div class="schedule-day-head">';
+        html += '<span class="schedule-day-label">' + dayNames[day] + '</span>';
+        html += '<div class="schedule-day-toggle' + (sd.enabled ? ' on' : '') + '" onclick="toggleDay(' + day + ')"></div>';
+        html += '</div>';
+        html += '<div class="schedule-day-body' + (sd.enabled ? '' : ' hidden') + '">';
+
+        for (var r = 0; r < sd.ranges.length; r++) {
+            var rng = sd.ranges[r];
+            html += '<div class="time-range-row">';
+            html += '<input type="time" class="form-input" value="' + rng.start + '" onchange="updateDayRange(' + day + ',' + r + ',\'start\',this.value)">';
+            html += '<span class="time-sep">to</span>';
+            html += '<input type="time" class="form-input" value="' + rng.end + '" onchange="updateDayRange(' + day + ',' + r + ',\'end\',this.value)">';
+            if (sd.ranges.length > 1) {
+                html += '<button class="time-range-remove" onclick="removeDayRange(' + day + ',' + r + ')">✕</button>';
+            }
+            html += '</div>';
+        }
+
+        html += '<button class="add-time-btn" onclick="addDayRange(' + day + ')">+ Add Time Slot</button>';
+        html += '</div></div>';
+    }
+    container.innerHTML = html;
+}
+
+function toggleDay(day) {
+    if (!dailySchedule[day]) dailySchedule[day] = {enabled:false,ranges:[{start:'08:00',end:'18:00'}]};
+    dailySchedule[day].enabled = !dailySchedule[day].enabled;
+    renderDrawerSchedule();
+    updateDrawerPreview();
+}
+
+function addDayRange(day) {
+    if (!dailySchedule[day]) dailySchedule[day] = {enabled:true,ranges:[{start:'08:00',end:'18:00'}]};
+    dailySchedule[day].ranges.push({start:'08:00',end:'18:00'});
+    renderDrawerSchedule();
+    updateDrawerPreview();
+}
+
+function removeDayRange(day, rangeIdx) {
+    if (dailySchedule[day] && dailySchedule[day].ranges.length > 1) {
+        dailySchedule[day].ranges.splice(rangeIdx, 1);
+        renderDrawerSchedule();
+        updateDrawerPreview();
+    }
+}
+
+function updateDayRange(day, rangeIdx, field, value) {
+    if (dailySchedule[day] && dailySchedule[day].ranges[rangeIdx]) {
+        dailySchedule[day].ranges[rangeIdx][field] = value;
+        updateDrawerPreview();
+    }
+}
+
+// ===== Preview =====
+function updateDrawerPreview() {
+    var el = document.getElementById('drRulePreview');
+    var name = document.getElementById('drRuleName').value || 'Unnamed';
+    var sev = document.getElementById('drSeverity').value;
+
+    if (drawerConditions.length === 0) {
+        el.innerHTML = '<span class="kw">IF</span> <span style="color:var(--text-muted);">no conditions</span> <span class="kw">THEN</span> Trigger <span class="sev">' + sev + '</span> Alarm';
+        return;
+    }
+
+    var texts = [];
+    for (var i = 0; i < drawerConditions.length; i++) {
+        var c = drawerConditions[i];
+        var objName = c.objName || (c.objId || '?');
+        var ptName = c.ptName || (c.ptId || '?');
+        var unit = c.unit || '';
+        texts.push('<span class="obj">' + escHtml(objName) + '</span> → <span class="obj">' + escHtml(ptName) + '</span> ' + c.op + ' <span class="val">' + escHtml(String(c.value)) + (unit ? ' ' + unit : '') + '</span>');
+    }
+
+    var timeParts = [];
+    if (scheduleEnabled && dailySchedule) {
+        var ad = [];
+        var keys = Object.keys(dailySchedule);
+        for (var m = 0; m < keys.length; m++) {
+            var key = keys[m];
+            if (dailySchedule[key] && dailySchedule[key].enabled) {
+                var ranges = dailySchedule[key].ranges || [];
+                var rangeStr = ranges.map(function(r) { return r.start + '-' + r.end; }).join(', ');
+                ad.push(dayShort[key] + ' ' + rangeStr);
+            }
+        }
+        timeParts.push(ad.length > 0 ? 'Active: ' + ad.join('; ') : 'No active days');
+    }
+    if (durationEnabled) {
+        var dur = document.getElementById('drHoldDuration') ? document.getElementById('drHoldDuration').value : 15;
+        var unit2 = document.getElementById('drHoldUnit') ? document.getElementById('drHoldUnit').value : 'minutes';
+        timeParts.push('Hold: ' + dur + ' ' + unit2);
+    }
+    var timeDesc = timeParts.length > 0 ? ' <span class="val">[' + timeParts.join(' · ') + ']</span>' : '';
+
+    el.innerHTML = '<span class="kw">IF</span> ' + texts.join(' <span class="kw">' + drawerLogic + '</span> ') + ' <span class="kw">THEN</span> Trigger <span class="sev">' + sev + '</span> Alarm' + timeDesc;
+}
+
+// ===== Test =====
+function testRule(id) {
+    var rule = null;
+    for (var i = 0; i < rules.length; i++) { if (rules[i].id === id) { rule = rules[i]; break; } }
+    if (!rule) return;
+    testingRuleId = id;
+
+    var box = document.getElementById('testResultBox');
+    var ts = new Date().toLocaleTimeString();
+    var rate = Math.random();
+    var status, cls, hdr;
+
+    if (rate > 0.6) { status = 'TRIGGERED'; cls = 'triggered'; hdr = 'fail'; }
+    else if (rate > 0.3) { status = 'PARTIAL MATCH'; cls = 'partial'; hdr = 'warn'; }
+    else { status = 'NOT TRIGGERED'; cls = 'not-triggered'; hdr = 'pass'; }
+
+    var condResults = '';
+    for (var i = 0; i < rule.conditions.length; i++) {
+        var c = rule.conditions[i];
+        var sv = (parseFloat(c.value) * (0.7 + Math.random() * 0.6)).toFixed(1);
+        var met = evalCond(parseFloat(sv), c.op, parseFloat(c.value));
+        condResults += '<div class="result-detail">  ' + (met ? '<span class="result-check">✓</span>' : '<span class="result-cross">✗</span>') + ' ' + escHtml(c.objName) + ' → ' + escHtml(c.ptName) + ': ' + sv + (c.unit ? ' ' + c.unit : '') + ' (' + c.op + ' ' + c.value + (c.unit ? ' ' + c.unit : '') + ')</div>';
+    }
+
+    var timeResult = '';
+    if (rule.schedule && rule.schedule.enabled) {
+        var today = new Date().getDay();
+        var sc = rule.schedule.schedule ? rule.schedule.schedule[today] : null;
+        if (sc && sc.enabled) {
+            var ranges = sc.ranges || [];
+            var rangeDesc = ranges.map(function(r) { return r.start + '-' + r.end; }).join(', ');
+            timeResult += '<div class="result-detail">  <span class="result-check">✓</span> Schedule: ' + dayNames[today] + ' ' + rangeDesc + ' (within window)</div>';
+        } else {
+            timeResult += '<div class="result-detail">  <span class="result-warn">⚠</span> Schedule: ' + dayNames[today] + ' (outside active hours)</div>';
+        }
+    }
+    if (rule.duration && rule.duration.enabled) {
+        var dur = Math.floor(Math.random() * 30) + 5;
+        var met2 = dur >= rule.duration.value;
+        timeResult += '<div class="result-detail">  ' + (met2 ? '<span class="result-check">✓</span>' : '<span class="result-cross">✗</span>') + ' Duration: ' + dur + ' ' + rule.duration.unit + ' (threshold: ' + rule.duration.value + ' ' + rule.duration.unit + ')</div>';
+    }
+
+    var logicNote = rule.logic === 'AND'
+        ? '<div class="result-detail" style="margin-top:8px;color:var(--text-muted);">Logic: AND requires ALL conditions</div>'
+        : '<div class="result-detail" style="margin-top:8px;color:var(--text-muted);">Logic: OR requires ANY condition</div>';
+
+    box.className = 'test-result-box ' + cls;
+    box.innerHTML = '<div class="result-header ' + hdr + '">' + (status === 'TRIGGERED' ? '🔴' : status === 'PARTIAL MATCH' ? '🟡' : '🟢') + ' Rule ' + status + '</div>' +
+        '<div style="margin-bottom:12px;">' +
+        '<div class="result-detail">Rule: ' + escHtml(rule.name) + '</div>' +
+        '<div class="result-detail">Severity: ' + rule.severity.toUpperCase() + '</div>' +
+        '<div class="result-detail">Conditions: ' + rule.conditions.length + ' (' + rule.logic + ')</div>' +
+        '</div>' +
+        '<div style="margin-bottom:8px;font-weight:600;color:var(--text-primary);">Condition Details:</div>' +
+        condResults +
+        ((rule.schedule && rule.schedule.enabled) || (rule.duration && rule.duration.enabled) ? '<div style="margin-top:12px;margin-bottom:8px;font-weight:600;color:var(--text-primary);">Time Checks:</div>' + timeResult : '') +
+        logicNote +
+        '<div style="margin-top:12px;font-size:10px;color:var(--text-muted);">Test executed at ' + ts + '</div>';
+
+    document.getElementById('testModal').classList.add('open');
+}
+
+function evalCond(val, op, th) {
+    switch(op) {
+        case '>': return val > th;
+        case '<': return val < th;
+        case '>=': return val >= th;
+        case '<=': return val <= th;
+        case '==': return val === th;
+        case '!=': return val !== th;
+        default: return false;
+    }
+}
+
+function retestRule() {
+    if (testingRuleId) testRule(testingRuleId);
+    else closeTestModal();
+}
+
+function closeTestModal() {
+    document.getElementById('testModal').classList.remove('open');
+}
+
+// ===== Confirm =====
+var pendingAction = null;
+
+function showConfirm(title, heading, message, action) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmHeading').textContent = heading;
+    document.getElementById('confirmMessage').textContent = message;
+    pendingAction = action;
+    document.getElementById('confirmAction').onclick = function() {
+        if (pendingAction) pendingAction();
+    };
+    document.getElementById('confirmModal').classList.add('open');
+}
+
+function closeConfirm() {
+    document.getElementById('confirmModal').classList.remove('open');
+    pendingAction = null;
+}
+
+function confirmDelete(id) {
+    var rule = null;
+    for (var i = 0; i < rules.length; i++) { if (rules[i].id === id) { rule = rules[i]; break; } }
+    if (!rule) return;
+    showConfirm('Delete Rule', 'Delete "' + rule.name + '"?', 'This action cannot be undone. Historical alarm records will be preserved.', function() {
+        rules = rules.filter(function(r) { return r.id !== id; });
+        renderTable();
+        showToast('Rule deleted', 'success');
+        closeConfirm();
+    });
+}
+
+function confirmToggle(id) {
+    var rule = null;
+    for (var i = 0; i < rules.length; i++) { if (rules[i].id === id) { rule = rules[i]; break; } }
+    if (!rule) return;
+    var action = rule.enabled ? 'disable' : 'enable';
+    showConfirm(
+        action.charAt(0).toUpperCase() + action.slice(1) + ' Rule',
+        action.charAt(0).toUpperCase() + action.slice(1) + ' "' + rule.name + '"?',
+        rule.enabled ? 'The rule will no longer trigger alarms.' : 'The rule will become active immediately.',
+        function() {
+            rule.enabled = !rule.enabled;
+            renderTable();
+            showToast('Rule ' + action + 'd', 'success');
+            closeConfirm();
+        }
+    );
+}
+
+// ===== Toast =====
+function showToast(message, type) {
+    if (!type) type = 'info';
+    var container = document.getElementById('toastContainer');
+    var icons = {success: '✓', error: '✕', info: 'ℹ'};
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = '<span>' + (icons[type] || 'ℹ') + '</span> ' + message;
+    container.appendChild(toast);
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(20px)';
+        toast.style.transition = 'all .3s';
+        setTimeout(function() { toast.remove(); }, 300);
+    }, 3000);
+}
+
+// ===== Start =====
+init();
+</script>
+</body>
+</html>

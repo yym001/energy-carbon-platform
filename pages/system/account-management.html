@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RunDo Energy Carbon Platform | Account Management</title>
+    <meta name="description" content="RunDo Energy Carbon Platform - Account Management">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0b1220;
+            --bg-surface: #172131;
+            --bg-elevated: #253247;
+            --bg-content: #111a28;
+            --bg-card: #162233;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --accent-green: #22C55E;
+            --accent-blue: #3B82F6;
+            --accent-cyan: #06B6D4;
+            --accent-amber: #F59E0B;
+            --accent-red: #EF4444;
+            --accent-purple: #8B5CF6;
+            --border: #334155;
+            --border-light: #475569;
+            --font-ui: 'Fira Sans', sans-serif;
+            --font-data: 'Fira Code', monospace;
+            --radius: 8px;
+            --nav-right-w: 64px;
+            --topbar-h: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-ui);
+            background: var(--bg-base);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
+
+        /* ===== TOP BAR ===== */
+        .topbar {
+            height: var(--topbar-h);
+            background: #152031;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.72);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+        }
+        .topbar-brand { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
+        .topbar-brand .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+        .topbar-brand .brand-name { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+        .topbar-brand .sys-name { font-size: 11px; color: var(--text-muted); }
+        .topbar-menu { display: flex; align-items: center; gap: 4px; }
+        .topbar-menu .module-name { font-weight: 600; font-size: 14px; color: var(--accent-green); margin-right: 8px; }
+        .topbar-menu .sub-menu { padding: 6px 12px; font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all .2s; border-bottom: 2px solid transparent; }
+        .topbar-menu .sub-menu:hover { color: var(--text-secondary); }
+        .topbar-menu .sub-menu.active { color: var(--text-primary); border-bottom-color: var(--accent-green); font-weight: 500; }
+        .topbar-tools { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-secondary); }
+        .topbar-tools .tool-item { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: color .2s; }
+        .topbar-tools .tool-item:hover { color: var(--text-primary); }
+        .topbar-tools .user-block { display: flex; flex-direction: row-reverse; align-items: center; gap: 8px; cursor: pointer; }
+        .topbar-tools .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
+        .topbar-tools .user-info { display: flex; flex-direction: column; line-height: 1.2; text-align: right; }
+        .topbar-tools .user-name { font-size: 12px; color: var(--text-primary); font-weight: 500; }
+        .topbar-tools .user-role { font-size: 10px; color: var(--text-muted); }
+
+        /* ===== RIGHT NAV ===== */
+        .right-nav {
+            position: fixed;
+            top: var(--topbar-h);
+            left: 0;
+            width: var(--nav-right-w);
+            height: calc(100vh - var(--topbar-h));
+            background: #0b1220;
+            border-right: 1px solid rgba(51, 65, 85, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0;
+            gap: 4px;
+            z-index: 90;
+        }
+        .right-nav .nav-item {
+            width: 48px;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all .2s;
+            font-size: 10px;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.3;
+        }
+        .right-nav .nav-item:hover { color: var(--text-secondary); background: var(--bg-elevated); }
+        .right-nav .nav-item.active { color: var(--accent-green); background: rgba(34, 197, 94, .1); }
+        .right-nav .nav-item svg { width: 20px; height: 20px; }
+
+        .nav-item-group { position: relative; display: flex; justify-content: center; width: 100%; }
+        .nav-flyout {
+            position: absolute;
+            top: 50%;
+            left: calc(100% + 14px);
+            transform: translateY(-50%) translateX(-8px);
+            min-width: 188px;
+            padding: 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            background: linear-gradient(180deg, rgba(17, 25, 37, 0.82), rgba(12, 19, 30, 0.76));
+            box-shadow: 0 18px 42px rgba(2, 6, 23, 0.34);
+            backdrop-filter: blur(16px) saturate(120%);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all .22s ease;
+            z-index: 120;
+        }
+        .nav-item-group:hover .nav-flyout {
+            opacity: 1; visibility: visible; pointer-events: auto;
+            transform: translateY(-50%) translateX(0);
+        }
+        .nav-flyout::after {
+            content: "";
+            position: absolute;
+            left: -7px; top: 50%;
+            width: 14px; height: 14px;
+            transform: translateY(-50%) rotate(45deg);
+            border-left: 1px solid rgba(148, 163, 184, 0.14);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+            background: rgba(15, 23, 34, 0.84);
+        }
+        .nav-flyout-title {
+            font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
+            color: rgba(148, 163, 184, 0.72);
+            margin-bottom: 8px; padding: 4px 8px 8px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .nav-flyout-item {
+            display: flex; align-items: center;
+            position: relative;
+            padding: 10px 12px 10px 16px;
+            margin: 4px 0;
+            border-radius: 10px;
+            color: #c4d0df;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-size: 12px;
+            line-height: 1.35;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .nav-flyout-item:hover { background: rgba(30, 41, 59, 0.54); color: var(--text-primary); }
+        .nav-flyout-item.active { background: rgba(34, 197, 94, 0.08); color: var(--text-primary); }
+        .nav-flyout-item.active::before {
+            content: "";
+            position: absolute; left: 6px; top: 8px; bottom: 8px;
+            width: 3px; border-radius: 999px;
+            background: linear-gradient(180deg, rgba(74, 222, 128, 0.95), rgba(34, 197, 94, 0.72));
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        /* ===== PAGE CONTENT ===== */
+        .page-content {
+            padding: 24px 28px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== ASSET SHELL LAYOUT (matching RunDo-ECM Organization Management) ===== */
+        .asset-shell {
+            width: 100%;
+            padding: 0;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            min-height: 100%;
+        }
+        .asset-shell.master-flat {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 0;
+        }
+        .asset-shell.master-flat .asset-panel {
+            border-radius: 20px;
+            box-shadow: 0 12px 28px rgba(2, 6, 23, 0.18);
+            margin: 0;
+        }
+        .asset-panel {
+            background: var(--bg-card);
+            border: 1px solid rgba(120, 142, 180, 0.16);
+            border-radius: 16px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .space-workbench-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(19, 29, 44, 0.98);
+        }
+        .space-stat-strip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .space-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .space-stat-item strong {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+        .space-stat-item span {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+        .space-stat-divider {
+            font-size: 18px;
+            color: var(--text-muted);
+            padding: 0 4px;
+        }
+        .asset-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .asset-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 13px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .18s ease;
+            font-family: var(--font-ui);
+        }
+        .asset-btn:hover {
+            border-color: rgba(96, 165, 250, 0.24);
+            color: var(--text-primary);
+        }
+        .asset-btn.primary {
+            background: rgba(34, 197, 94, 0.18);
+            border-color: rgba(34, 197, 94, 0.28);
+            color: #dff8e8;
+        }
+        .asset-btn.primary:hover {
+            background: rgba(34, 197, 94, 0.26);
+        }
+        .space-query-panel {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.08);
+            background: rgba(19, 29, 44, 0.6);
+        }
+        .space-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .space-search-input-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 240px;
+        }
+        .space-search-input-wrap svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        .space-search-input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border-radius: 12px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96);
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            font-family: var(--font-ui);
+        }
+        .space-search-input:focus {
+            border-color: rgba(96, 165, 250, 0.24);
+        }
+        .space-search-input::placeholder {
+            color: var(--text-muted);
+        }
+        .space-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .space-filter-select {
+            padding: 8px 28px 8px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96);
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            font-family: var(--font-ui);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+        }
+        .space-filter-select:focus {
+            border-color: rgba(96, 165, 250, 0.24);
+        }
+        .asset-table-wrap {
+            flex: 1;
+            overflow: auto;
+            min-height: 0;
+        }
+        .asset-table-wrap.space-table-shell {
+            border: none;
+            border-radius: 0;
+            background: transparent;
+        }
+        .asset-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .asset-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 11px;
+            color: #8fa1b7;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            background: rgba(19, 29, 44, 0.98);
+            z-index: 1;
+            white-space: nowrap;
+        }
+        .asset-table th:first-child {
+            border-top-left-radius: 12px;
+        }
+        .asset-table th:last-child {
+            border-top-right-radius: 12px;
+            text-align: right;
+        }
+        .asset-table td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #d5dde8;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.06);
+            white-space: nowrap;
+        }
+        .asset-table tbody tr {
+            transition: background .15s;
+        }
+        .asset-table tbody tr:hover {
+            background: rgba(34, 43, 58, 0.5);
+        }
+        .asset-table tbody tr.active {
+            background: rgba(59, 130, 246, 0.08);
+        }
+        .space-pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-top: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(19, 29, 44, 0.98);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .space-pagination-info {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .space-pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .space-pagination-pages {
+            display: flex;
+            gap: 4px;
+        }
+
+        /* ===== LEGACY STYLES (kept for backward compat) ===== */
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(21, 29, 42, 0.92);
+            color: #b5c0d3;
+            cursor: pointer;
+            transition: .18s ease;
+            font-family: var(--font-ui);
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .btn:hover { border-color: rgba(96, 165, 250, 0.24); color: var(--text-primary); }
+        .btn-primary { background: rgba(59, 130, 246, 0.14); border-color: rgba(96, 165, 250, 0.2); color: #dbeafe; }
+        .btn-primary:hover { background: rgba(59, 130, 246, 0.22); }
+        .btn-danger { border-color: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.12); }
+        .btn-success { border-color: rgba(34, 197, 94, 0.2); color: #bbf7d0; }
+        .btn-success:hover { background: rgba(34, 197, 94, 0.12); }
+        .btn-warning { border-color: rgba(245, 158, 11, 0.2); color: #fde68a; }
+        .btn-warning:hover { background: rgba(245, 158, 11, 0.12); }
+        .btn-sm { padding: 5px 10px; font-size: 11px; }
+        .btn svg { width: 14px; height: 14px; }
+
+        /* ===== TOOLBAR ===== */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .toolbar .spacer { flex: 1; }
+        .toolbar-search {
+            position: relative;
+        }
+        .toolbar-search input {
+            width: 240px;
+            padding: 8px 12px 8px 32px;
+            border-radius: 10px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96);
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            font-family: var(--font-ui);
+        }
+        .toolbar-search input:focus { border-color: rgba(96, 165, 250, 0.3); }
+        .toolbar-search input::placeholder { color: var(--text-muted); }
+        .toolbar-search svg {
+            position: absolute;
+            left: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ===== FILTER BAR ===== */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .filter-bar label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            font-weight: 600;
+        }
+        .filter-select {
+            padding: 7px 30px 7px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96);
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            font-family: var(--font-ui);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        /* ===== TABLE CARD ===== */
+        .table-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(120, 142, 180, 0.12);
+            border-radius: 18px;
+            background: rgba(20, 28, 40, 0.94);
+            box-shadow: 0 14px 32px rgba(2, 6, 23, 0.2);
+            overflow: hidden;
+            min-height: 0;
+        }
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(19, 29, 44, 0.98);
+        }
+        .table-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+        .table-count { font-size: 11px; color: var(--text-muted); }
+        .table-wrap {
+            flex: 1;
+            overflow: auto;
+            min-height: 0;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 11px;
+            color: #8fa1b7;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            background: rgba(19, 29, 44, 0.98);
+            z-index: 1;
+            white-space: nowrap;
+        }
+        .data-table td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #d5dde8;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.06);
+            white-space: nowrap;
+        }
+        .data-table tbody tr { transition: background .15s; }
+        .data-table tbody tr:hover { background: rgba(34, 43, 58, 0.5); }
+        .data-table .user-cell { display: flex; align-items: center; gap: 10px; }
+        .data-table .user-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 600; color: #fff;
+            flex-shrink: 0;
+        }
+        .data-table .user-name-cell { display: flex; flex-direction: column; }
+        .data-table .user-display { font-weight: 600; color: var(--text-primary); font-size: 13px; }
+        .data-table .user-login { font-size: 11px; color: var(--text-muted); font-family: var(--font-data); }
+        .role-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 4px;
+        }
+        .role-tag.admin { background: rgba(139, 92, 246, 0.12); color: #c4b5fd; }
+        .role-tag.energy { background: rgba(59, 130, 246, 0.12); color: #93c5fd; }
+        .role-tag.ops { background: rgba(6, 182, 212, 0.12); color: #67e8f9; }
+        .role-tag.dept { background: rgba(245, 158, 11, 0.12); color: #fcd34d; }
+        .role-tag.viewer { background: rgba(100, 116, 139, 0.12); color: #94a3b8; }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge::before {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+        }
+        .status-badge.active { color: #bbf7d0; }
+        .status-badge.active::before { background: var(--accent-green); box-shadow: 0 0 6px rgba(34, 197, 94, 0.4); }
+        .status-badge.disabled { color: #fca5a5; }
+        .status-badge.disabled::before { background: var(--accent-red); }
+        .status-badge.locked { color: #fde68a; }
+        .status-badge.locked::before { background: var(--accent-amber); }
+        .actions-cell { display: flex; gap: 4px; }
+
+        /* ===== PAGINATION ===== */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-top: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(19, 29, 44, 0.98);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .pagination-pages { display: flex; gap: 4px; }
+        .page-btn {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            font-family: var(--font-ui);
+            transition: all .15s;
+        }
+        .page-btn:hover { border-color: rgba(96, 165, 250, 0.3); color: var(--text-primary); }
+        .page-btn.active { background: rgba(59, 130, 246, 0.14); border-color: rgba(96, 165, 250, 0.2); color: #dbeafe; }
+        .page-btn:disabled { opacity: 0.3; cursor: default; }
+
+        /* ===== DRAWER ===== */
+        .drawer-overlay {
+            position: fixed; inset: 0;
+            display: none;
+            background: rgba(2, 6, 23, 0.42);
+            z-index: 260;
+        }
+        .drawer-overlay.open { display: block; }
+        .drawer-panel {
+            position: fixed;
+            top: var(--topbar-h);
+            right: 0;
+            width: clamp(560px, 46vw, 720px);
+            height: calc(100vh - var(--topbar-h));
+            border-left: 1px solid rgba(120, 142, 180, 0.12);
+            transform: translateX(100%);
+            transition: transform .22s ease;
+            z-index: 261;
+            display: flex;
+            flex-direction: column;
+            background: #162233;
+            box-shadow: -20px 0 48px rgba(2, 6, 23, 0.36);
+        }
+        .drawer-panel.open { transform: translateX(0); }
+        .drawer-panel.narrow { width: clamp(420px, 36vw, 540px); }
+        .drawer-head {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            background: linear-gradient(180deg, rgba(19, 29, 44, 0.98), rgba(22, 34, 51, 0.96));
+        }
+        .drawer-head-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 14px;
+            margin-bottom: 18px;
+        }
+        .drawer-head-row.compact { margin-bottom: 0; }
+        .drawer-title {
+            font-size: 22px; font-weight: 700; letter-spacing: -0.02em;
+        }
+        .drawer-subtitle {
+            margin-top: 6px; font-size: 13px; color: #a7b6c8;
+        }
+        .drawer-close-btn {
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; border: none; background: transparent;
+            color: var(--text-muted); cursor: pointer; transition: all .15s;
+            flex-shrink: 0;
+        }
+        .drawer-close-btn:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .drawer-body {
+            overflow: auto; flex: 1;
+            background: linear-gradient(180deg, rgba(19, 29, 44, 0.98), rgba(15, 23, 36, 1));
+            padding: 20px 24px;
+        }
+        .drawer-foot {
+            display: flex; justify-content: flex-end; gap: 10px;
+            padding: 16px 24px;
+            border-top: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(22, 34, 51, 0.96);
+        }
+        /* Drawer form styles matching RunDo-ECM */
+        .drawer-form-grid { display: grid; gap: 12px; }
+        .drawer-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .drawer-form label {
+            display: block; margin-bottom: 6px;
+            font-size: 12px; color: var(--text-secondary);
+        }
+        .drawer-form label .req { color: var(--accent-red); margin-left: 2px; }
+        .drawer-form input,
+        .drawer-form select,
+        .drawer-form textarea {
+            width: 100%;
+            padding: 11px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96);
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            font-family: var(--font-ui);
+        }
+        .drawer-form select {
+            padding-right: 30px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+        .drawer-form input:focus,
+        .drawer-form select:focus,
+        .drawer-form textarea:focus {
+            border-color: rgba(96, 165, 250, 0.24);
+            box-shadow: none;
+        }
+        .drawer-form textarea { min-height: 74px; resize: vertical; }
+        .drawer-form input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Legacy form compatibility */
+        .form-grid { display: grid; gap: 12px; }
+        .form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--text-secondary); }
+        .form-group label .req { color: var(--accent-red); margin-left: 2px; }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 11px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96);
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            font-family: var(--font-ui);
+            transition: border-color .18s;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(96, 165, 250, 0.24); box-shadow: none; }
+        .form-input::placeholder { color: var(--text-muted); }
+        .form-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+        }
+        .form-textarea { min-height: 74px; resize: vertical; }
+        .form-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Checkbox group */
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; }
+        .checkbox-item {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.6);
+            cursor: pointer;
+            transition: all .15s;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .checkbox-item:hover { border-color: rgba(96, 165, 250, 0.2); }
+        .checkbox-item.checked { background: rgba(59, 130, 246, 0.1); border-color: rgba(96, 165, 250, 0.2); color: var(--text-primary); }
+        .checkbox-item input { display: none; }
+        .checkbox-item .cb-icon {
+            width: 16px; height: 16px;
+            border-radius: 4px;
+            border: 1.5px solid rgba(120, 142, 180, 0.3);
+            display: flex; align-items: center; justify-content: center;
+            transition: all .15s;
+        }
+        .checkbox-item.checked .cb-icon { background: var(--accent-blue); border-color: var(--accent-blue); }
+        .checkbox-item .cb-icon svg { width: 10px; height: 10px; opacity: 0; color: #fff; }
+        .checkbox-item.checked .cb-icon svg { opacity: 1; }
+
+        /* Radio group */
+        .radio-group { display: flex; gap: 16px; }
+        .radio-item {
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .radio-item.selected { color: var(--text-primary); }
+        .radio-dot {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(120, 142, 180, 0.3);
+            display: flex; align-items: center; justify-content: center;
+            transition: all .15s;
+        }
+        .radio-item.selected .radio-dot { border-color: var(--accent-blue); }
+        .radio-item.selected .radio-dot::after {
+            content: '';
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+        }
+
+        /* Space tree in drawer */
+        .drawer-tree {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 6px 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(16, 22, 34, 0.6);
+            margin-top: 8px;
+        }
+        .drawer-tree-node { padding: 0; }
+        .drawer-tree-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background .15s;
+            line-height: 1;
+        }
+        .drawer-tree-row:hover { background: rgba(30, 41, 59, 0.4); }
+        .drawer-tree-row input[type="checkbox"] {
+            accent-color: var(--accent-blue);
+            flex-shrink: 0;
+            margin: 0;
+            width: 14px;
+            height: 14px;
+        }
+        .drawer-tree-row svg {
+            width: 13px;
+            height: 13px;
+            flex-shrink: 0;
+            color: var(--text-muted);
+        }
+        .drawer-tree-row span {
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        /* Confirm dialog inside drawer */
+        .confirm-body { text-align: center; padding: 24px 0; }
+        .confirm-body svg { width: 48px; height: 48px; color: var(--accent-amber); margin-bottom: 12px; }
+        .confirm-body h3 { font-size: 16px; margin-bottom: 8px; }
+        .confirm-body p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* Modal overlay for confirm delete */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(2, 6, 23, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-card {
+            width: min(640px, calc(100vw - 48px));
+            max-height: 85vh;
+            border-radius: 18px;
+            border: 1px solid rgba(120, 142, 180, 0.12);
+            background: #162233;
+            box-shadow: 0 24px 64px rgba(2, 6, 23, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .modal-head {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 24px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+        }
+        .modal-title { font-size: 17px; font-weight: 700; }
+        .modal-close {
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all .15s;
+        }
+        .modal-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+        .modal-foot {
+            display: flex; justify-content: flex-end; gap: 10px;
+            padding: 16px 24px;
+            border-top: 1px solid rgba(120, 142, 180, 0.1);
+        }
+
+        /* Detail Drawer */
+        .detail-drawer {
+            position: fixed;
+            top: var(--topbar-h);
+            right: 0;
+            width: clamp(520px, 44vw, 680px);
+            height: calc(100vh - var(--topbar-h));
+            border-left: 1px solid rgba(120, 142, 180, 0.12);
+            transform: translateX(100%);
+            transition: transform .22s ease;
+            z-index: 261;
+            display: flex;
+            flex-direction: column;
+            background: #162233;
+            box-shadow: -20px 0 48px rgba(2, 6, 23, 0.36);
+        }
+        .detail-drawer.open { transform: translateX(0); }
+        .detail-drawer-head {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            background: linear-gradient(180deg, rgba(19, 29, 44, 0.98), rgba(22, 34, 51, 0.96));
+        }
+        .detail-drawer-head-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 14px;
+        }
+        .detail-drawer-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+        .detail-drawer-close {
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; border: none; background: transparent;
+            color: var(--text-muted); cursor: pointer; transition: all .15s;
+            flex-shrink: 0;
+        }
+        .detail-drawer-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .detail-drawer-body {
+            overflow: auto; flex: 1;
+            background: linear-gradient(180deg, rgba(19, 29, 44, 0.98), rgba(15, 23, 36, 1));
+            padding: 20px 24px;
+        }
+        .detail-drawer-foot {
+            display: flex; justify-content: flex-end; gap: 10px;
+            padding: 16px 24px;
+            border-top: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(22, 34, 51, 0.96);
+        }
+        .detail-field { margin-bottom: 18px; }
+        .detail-field-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+        .detail-field-value { font-size: 14px; color: var(--text-primary); }
+        .detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+        .detail-section-title {
+            font-size: 13px; font-weight: 700; color: var(--text-primary);
+            padding-bottom: 8px; margin-bottom: 14px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+        }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 80px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+        .toast {
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+            display: flex; align-items: center; gap: 8px;
+            animation: toastIn .3s ease;
+            min-width: 260px;
+        }
+        .toast.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(74, 222, 128, 0.2); color: #bbf7d0; }
+        .toast.error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.2); color: #fecaca; }
+        .toast.info { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(96, 165, 250, 0.2); color: #bfdbfe; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Section divider */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 16px 0 12px;
+        }
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(120, 142, 180, 0.1);
+        }
+        .section-divider span {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===== MAIN WRAP ===== -->
+    <div class="main-wrap">
+        <div class="page-content">
+            <!-- Asset Shell Layout (matching Organization Management) -->
+            <div class="asset-shell master-flat">
+                <section class="asset-panel">
+                    <div class="space-workbench-head">
+                        <div class="space-stat-strip">
+                            <div class="space-stat-item">
+                                <strong id="statTotalUsers">0</strong>
+                                <span>Total Users</span>
+                            </div>
+                            <div class="space-stat-divider">/</div>
+                            <div class="space-stat-item">
+                                <strong id="statActiveUsers">0</strong>
+                                <span>Active</span>
+                            </div>
+                        </div>
+                        <div class="asset-actions">
+                            <button class="asset-btn primary" onclick="openAddUser()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                                Add User
+                            </button>
+                            <button class="asset-btn" onclick="showToast('Import feature coming soon', 'info')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Import
+                            </button>
+                            <button class="asset-btn" onclick="exportUsers()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-query-panel">
+                        <div class="space-toolbar">
+                            <div class="space-search-input-wrap">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                <input id="userSearchInput" class="space-search-input" type="text" placeholder="Search username, name, phone or organization" oninput="applyFilters()">
+                            </div>
+                            <div class="space-filter-group">
+                                <select class="space-filter-select" id="filterRole" onchange="applyFilters()">
+                                    <option value="">All Roles</option>
+                                    <option value="ROLE_ADMIN">Super Admin</option>
+                                    <option value="ROLE_ENERGY">Energy Manager</option>
+                                    <option value="ROLE_OPS">O&M Staff</option>
+                                    <option value="ROLE_DEPT">Department Head</option>
+                                    <option value="ROLE_VIEWER">Viewer</option>
+                                </select>
+                                <select class="space-filter-select" id="filterStatus" onchange="applyFilters()">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="disabled">Disabled</option>
+                                    <option value="locked">Locked</option>
+                                </select>
+                                <select class="space-filter-select" id="filterOrg" onchange="applyFilters()">
+                                    <option value="">All Organizations</option>
+                                </select>
+                                <button class="asset-btn" onclick="resetFilters()" style="font-size:11px;padding:7px 10px;">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="asset-table-wrap space-table-shell">
+                        <table class="asset-table space-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)"></th>
+                                    <th>User</th>
+                                    <th>Phone</th>
+                                    <th>Organization</th>
+                                    <th>Roles</th>
+                                    <th>Status</th>
+                                    <th>Last Login</th>
+                                    <th style="min-width:180px;text-align:right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="space-pagination-bar">
+                        <span class="space-pagination-info" id="paginationInfo">Showing 0 of 0</span>
+                        <div class="space-pagination-controls">
+                            <span style="font-size:12px;color:var(--text-muted)">Per page</span>
+                            <select class="space-filter-select" id="pageSize" onchange="changePageSize(this.value)" style="width:64px;padding:4px 24px 4px 8px;font-size:11px">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                            <div class="space-pagination-pages" id="paginationPages"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DRAWER: Add/Edit User ===== -->
+    <div class="drawer-overlay" id="userDrawerOverlay" onclick="closeDrawer('userDrawer')"></div>
+    <aside class="drawer-panel" id="userDrawer">
+        <div class="drawer-head">
+            <div class="drawer-head-row">
+                <div>
+                    <div class="drawer-title" id="userDrawerTitle">Add User</div>
+                    <div class="drawer-subtitle">Create or edit user account credentials and permissions</div>
+                </div>
+                <button class="drawer-close-btn" onclick="closeDrawer('userDrawer')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="drawer-body">
+            <div class="drawer-form-grid">
+                <div class="drawer-form-row">
+                    <div class="drawer-form">
+                        <label>Username<span class="req">*</span></label>
+                        <input id="f_username" placeholder="4-32 chars, letters+numbers">
+                    </div>
+                    <div class="drawer-form">
+                        <label>Full Name<span class="req">*</span></label>
+                        <input id="f_realName" placeholder="Real name">
+                    </div>
+                </div>
+                <div class="drawer-form-row">
+                    <div class="drawer-form">
+                        <label>Phone<span class="req">*</span></label>
+                        <input id="f_phone" placeholder="Phone number">
+                    </div>
+                    <div class="drawer-form">
+                        <label>Email</label>
+                        <input id="f_email" type="email" placeholder="work@email.com">
+                    </div>
+                </div>
+                <div class="drawer-form-row">
+                    <div class="drawer-form">
+                        <label>Organization</label>
+                        <select id="f_organization">
+                            <option value="">Select...</option>
+                        </select>
+                    </div>
+                    <div class="drawer-form">
+                        <label>Country</label>
+                        <select id="f_country">
+                            <option value="">Select...</option>
+                            <option value="Malaysia">Malaysia</option>
+                            <option value="Singapore">Singapore</option>
+                            <option value="China">China</option>
+                            <option value="Thailand">Thailand</option>
+                            <option value="Indonesia">Indonesia</option>
+                            <option value="Vietnam">Vietnam</option>
+                            <option value="Philippines">Philippines</option>
+                            <option value="India">India</option>
+                            <option value="Japan">Japan</option>
+                            <option value="South Korea">South Korea</option>
+                            <option value="Australia">Australia</option>
+                            <option value="United States">United States</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="drawer-form-row">
+                    <div class="drawer-form">
+                        <label>Position</label>
+                        <input id="f_position" placeholder="e.g. Energy Manager">
+                    </div>
+                    <div class="drawer-form"></div>
+                </div>
+
+                <div class="section-divider"><span>Roles</span></div>
+                <div class="drawer-form">
+                    <label>Assigned Roles<span class="req">*</span></label>
+                    <div class="checkbox-group" id="roleCheckboxes"></div>
+                </div>
+
+                <div class="section-divider"><span>Data Scope</span></div>
+                <div class="drawer-form">
+                    <label>Visible Space Range<span class="req">*</span></label>
+                    <div class="radio-group" id="dataScopeRadios">
+                        <div class="radio-item selected" onclick="setDataScope('all')">
+                            <span class="radio-dot"></span>
+                            <span>All Spaces</span>
+                        </div>
+                        <div class="radio-item" onclick="setDataScope('custom')">
+                            <span class="radio-dot"></span>
+                            <span>Custom Range</span>
+                        </div>
+                    </div>
+                    <div class="drawer-tree" id="dataScopeTree" style="display:none"></div>
+                </div>
+
+                <div class="section-divider"><span>Status</span></div>
+                <div class="drawer-form-row">
+                    <div class="drawer-form">
+                        <label>Account Status</label>
+                        <select id="f_status">
+                            <option value="active">Active</option>
+                            <option value="disabled">Disabled</option>
+                            <option value="locked">Locked</option>
+                        </select>
+                    </div>
+                    <div class="drawer-form">
+                        <label>Remark</label>
+                        <input id="f_remark" placeholder="Optional note">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-foot">
+            <button class="btn" onclick="closeDrawer('userDrawer')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveUser()">Save</button>
+        </div>
+    </aside>
+
+    <!-- ===== DRAWER: User Detail View ===== -->
+    <div class="drawer-overlay" id="detailDrawerOverlay" onclick="closeDetailDrawer()"></div>
+    <aside class="detail-drawer" id="detailDrawer">
+        <div class="detail-drawer-head">
+            <div class="detail-drawer-head-row">
+                <div class="detail-drawer-title" id="detailDrawerTitle">User Details</div>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <button class="btn btn-sm" id="detailEditBtn" onclick="editFromDetail()">Edit</button>
+                    <button class="detail-drawer-close" onclick="closeDetailDrawer()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="detail-drawer-body" id="detailDrawerBody"></div>
+        <div class="detail-drawer-foot">
+            <button class="btn" onclick="closeDetailDrawer()">Close</button>
+        </div>
+    </aside>
+
+    <!-- ===== DRAWER: Reset Password ===== -->
+    <div class="drawer-overlay" id="resetPwdDrawerOverlay" onclick="closeDrawer('resetPwdDrawer')"></div>
+    <aside class="drawer-panel narrow" id="resetPwdDrawer">
+        <div class="drawer-head">
+            <div class="drawer-head-row compact">
+                <div class="drawer-title" style="font-size:18px">Reset Password</div>
+                <button class="drawer-close-btn" onclick="closeDrawer('resetPwdDrawer')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="drawer-body">
+            <div class="confirm-body">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <h3 id="resetPwdUser">Reset password for this user?</h3>
+                <p>The user will be notified and required to change the password on next login.</p>
+            </div>
+        </div>
+        <div class="drawer-foot">
+            <button class="btn" onclick="closeDrawer('resetPwdDrawer')">Cancel</button>
+            <button class="btn btn-warning" onclick="confirmResetPassword()">Reset Password</button>
+        </div>
+    </aside>
+
+    <!-- ===== MODAL: Confirm Dialog ===== -->
+    <div class="modal-overlay" id="confirmModal" onclick="if(event.target===this)closeModal('confirmModal')">
+        <div class="modal-card" style="width:min(440px,calc(100vw - 48px))">
+            <div class="modal-head">
+                <span class="modal-title" id="confirmModalTitle">Confirm</span>
+                <button class="modal-close" onclick="closeModal('confirmModal')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-body">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                    <h3 id="confirmTitle">Are you sure?</h3>
+                    <p id="confirmMsg">This action cannot be undone.</p>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn" onclick="closeModal('confirmModal')">Cancel</button>
+                <button class="btn btn-danger" id="confirmActionBtn" onclick="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        /* ===== SVG ICONS ===== */
+        function svgIcon(name) {
+            var s = {
+                'pencil': '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>',
+                'trash-2': '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 6 5 5"/><path d="m19 6-5 5"/><path d="M5 6v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6"/><path d="M19 6H5"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>',
+                'shield': '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+                'eye': '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+                'ban': '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>',
+                'check': '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+                'building': '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>',
+                'map-pin': '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+                'layers': '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>'
+            };
+            return s[name] || '';
+        }
+
+        /* ===== ORGANIZATIONS (from RunDo-ECM mdmOrgNodes) ===== */
+        var organizations = [
+            { key: 'utar', code: 'O-001', name: 'UTAR', type: 'University' },
+            { key: 'foc', code: 'O-010', name: 'Faculty of Computing', type: 'Faculty' },
+            { key: 'software-eng', code: 'O-011', name: 'Software Eng.', type: 'Department' },
+            { key: 'foe', code: 'O-020', name: 'Faculty of Engineering', type: 'Faculty' },
+            { key: 'library', code: 'O-030', name: 'Library', type: 'Division' },
+            { key: 'student-affairs', code: 'O-040', name: 'Student Affairs', type: 'Division' }
+        ];
+
+        /* ===== ROLES ===== */
+        var roles = [
+            { code: 'ROLE_ADMIN', name: 'Super Admin', cls: 'admin' },
+            { code: 'ROLE_ENERGY', name: 'Energy Manager', cls: 'energy' },
+            { code: 'ROLE_OPS', name: 'O&M Staff', cls: 'ops' },
+            { code: 'ROLE_DEPT', name: 'Department Head', cls: 'dept' },
+            { code: 'ROLE_VIEWER', name: 'Viewer', cls: 'viewer' }
+        ];
+
+        /* ===== SPACE TREE (for data scope) ===== */
+        var spaceTree = [
+            { id: 1, name: 'TAR UMT', level: 'campus', children: [
+                { id: 2, name: 'Bangunan Tun Tan Siew Sin', level: 'building', children: [
+                    { id: 5, name: 'Ground Floor', level: 'floor', children: [] },
+                    { id: 6, name: 'Level 1', level: 'floor', children: [] },
+                    { id: 7, name: 'Level 2', level: 'floor', children: [] },
+                    { id: 8, name: 'Level 3', level: 'floor', children: [] },
+                    { id: 9, name: 'Level 4', level: 'floor', children: [] },
+                    { id: 10, name: 'Level 5', level: 'floor', children: [] },
+                    { id: 11, name: 'District Cooling System Room', level: 'floor', children: [] }
+                ]},
+                { id: 3, name: 'Academic Building', level: 'building', children: [
+                    { id: 12, name: 'Ground Floor', level: 'floor', children: [] },
+                    { id: 13, name: 'Level 1', level: 'floor', children: [] },
+                    { id: 14, name: 'Level 2', level: 'floor', children: [] },
+                    { id: 15, name: 'Level 3', level: 'floor', children: [] }
+                ]},
+                { id: 4, name: 'Student Residence', level: 'building', children: [
+                    { id: 16, name: 'Ground Floor', level: 'floor', children: [] },
+                    { id: 17, name: 'Level 1', level: 'floor', children: [] },
+                    { id: 18, name: 'Level 2', level: 'floor', children: [] },
+                    { id: 19, name: 'Level 3', level: 'floor', children: [] },
+                    { id: 20, name: 'Level 4', level: 'floor', children: [] },
+                    { id: 21, name: 'Level 5', level: 'floor', children: [] }
+                ]}
+            ]}
+        ];
+
+        /* ===== USERS DATA ===== */
+        var avatarColors = ['#3B82F6','#22C55E','#F59E0B','#8B5CF6','#06B6D4','#EF4444','#EC4899','#14B8A6'];
+        var users = [
+            { id: 1, username: 'admin', realName: 'Ahmad Razak', phone: '+60 12-345 6789', email: 'ahmad@tarumt.edu.my', organization: 'UTAR', country: 'Malaysia', position: 'System Administrator', roles: ['ROLE_ADMIN'], dataScope: 'all', spaceIds: [], status: 'active', lastLogin: '2 min ago', loginCount: 342, createdAt: '2025-01-15', createdBy: 'System', remark: '' },
+            { id: 2, username: 'energy_mgr', realName: 'Lee Wei Ming', phone: '+60 11-234 5678', email: 'weiming@tarumt.edu.my', organization: 'Faculty of Computing', country: 'Malaysia', position: 'Energy Manager', roles: ['ROLE_ENERGY'], dataScope: 'all', spaceIds: [], status: 'active', lastLogin: '1 hour ago', loginCount: 156, createdAt: '2025-02-20', createdBy: 'admin', remark: '' },
+            { id: 3, username: 'ops_ttss', realName: 'Raj Kumar', phone: '+60 13-456 7890', email: 'raj@tarumt.edu.my', organization: 'Faculty of Engineering', country: 'Malaysia', position: 'Facility Engineer', roles: ['ROLE_OPS'], dataScope: 'custom', spaceIds: [2], status: 'active', lastLogin: '3 hours ago', loginCount: 89, createdAt: '2025-03-10', createdBy: 'admin', remark: 'TTSS building operator' },
+            { id: 4, username: 'ops_acad', realName: 'Tan Mei Ling', phone: '+60 14-567 8901', email: 'meiling@tarumt.edu.my', organization: 'Faculty of Engineering', country: 'Malaysia', position: 'Maintenance Tech', roles: ['ROLE_OPS'], dataScope: 'custom', spaceIds: [3], status: 'active', lastLogin: '1 day ago', loginCount: 67, createdAt: '2025-03-15', createdBy: 'admin', remark: '' },
+            { id: 5, username: 'ops_res', realName: 'Siti Aminah', phone: '+60 16-678 9012', email: 'siti@tarumt.edu.my', organization: 'Student Affairs', country: 'Malaysia', position: 'Residence Supervisor', roles: ['ROLE_OPS'], dataScope: 'custom', spaceIds: [4], status: 'active', lastLogin: '2 days ago', loginCount: 45, createdAt: '2025-04-01', createdBy: 'admin', remark: '' },
+            { id: 6, username: 'dept_energy', realName: 'Dr. Lim Kah Seng', phone: '+60 17-789 0123', email: 'kahseng@tarumt.edu.my', organization: 'Faculty of Computing', country: 'Malaysia', position: 'Head of Energy Dept', roles: ['ROLE_DEPT'], dataScope: 'custom', spaceIds: [], status: 'active', lastLogin: '5 hours ago', loginCount: 123, createdAt: '2025-01-20', createdBy: 'admin', remark: '' },
+            { id: 7, username: 'viewer_ext', realName: 'John Smith', phone: '+60 18-890 1234', email: 'john@visitor.com', organization: 'Student Affairs', country: 'United States', position: 'External Auditor', roles: ['ROLE_VIEWER'], dataScope: 'all', spaceIds: [], status: 'active', lastLogin: '1 week ago', loginCount: 8, createdAt: '2025-06-15', createdBy: 'admin', remark: 'Visiting auditor - expires Dec 2025' },
+            { id: 8, username: 'finance_user', realName: 'Ng Ai Ling', phone: '+60 19-901 2345', email: 'ailing@tarumt.edu.my', organization: 'Library', country: 'Malaysia', position: 'Finance Officer', roles: ['ROLE_DEPT', 'ROLE_VIEWER'], dataScope: 'all', spaceIds: [], status: 'active', lastLogin: '4 hours ago', loginCount: 78, createdAt: '2025-05-10', createdBy: 'admin', remark: '' },
+            { id: 9, username: 'old_user', realName: 'Former Staff', phone: '+60 12-111 2222', email: 'former@tarumt.edu.my', organization: 'UTAR', country: 'Malaysia', position: 'Former Admin', roles: ['ROLE_ADMIN'], dataScope: 'all', spaceIds: [], status: 'disabled', lastLogin: '30 days ago', loginCount: 201, createdAt: '2024-06-01', createdBy: 'System', remark: 'Account disabled - staff left' },
+            { id: 10, username: 'locked_user', realName: 'Test Account', phone: '+60 12-333 4444', email: 'test@tarumt.edu.my', organization: 'UTAR', country: 'China', position: 'Test', roles: ['ROLE_VIEWER'], dataScope: 'all', spaceIds: [], status: 'locked', lastLogin: '15 days ago', loginCount: 12, createdAt: '2025-07-01', createdBy: 'admin', remark: 'Locked due to multiple failed login attempts' },
+            { id: 11, username: 'ops_hvac', realName: 'Wong Chee Keong', phone: '+60 11-444 5555', email: 'cheekeong@tarumt.edu.my', organization: 'Faculty of Engineering', country: 'Malaysia', position: 'HVAC Technician', roles: ['ROLE_OPS'], dataScope: 'custom', spaceIds: [2, 11], status: 'active', lastLogin: '6 hours ago', loginCount: 56, createdAt: '2025-04-20', createdBy: 'admin', remark: 'Specialized in DCS system' },
+            { id: 12, username: 'energy_analyst', realName: 'Priya Sharma', phone: '+60 13-555 6666', email: 'priya@tarumt.edu.my', organization: 'Faculty of Computing', country: 'India', position: 'Energy Analyst', roles: ['ROLE_ENERGY', 'ROLE_VIEWER'], dataScope: 'all', spaceIds: [], status: 'active', lastLogin: '30 min ago', loginCount: 198, createdAt: '2025-02-28', createdBy: 'admin', remark: '' }
+        ];
+
+        var currentPage = 1;
+        var pageSize = 10;
+        var filteredUsers = [];
+        var selectedUserIds = [];
+        var editingUserId = null;
+        var pendingDeleteId = null;
+        var pendingResetPwdId = null;
+        var currentDataScope = 'all';
+        var checkedSpaceIds = [];
+
+        /* ===== FILTER & RENDER ===== */
+        function applyFilters() {
+            var search = (document.getElementById('userSearchInput').value || '').toLowerCase();
+            var role = document.getElementById('filterRole').value;
+            var status = document.getElementById('filterStatus').value;
+            var org = document.getElementById('filterOrg').value;
+
+            filteredUsers = users.filter(function(u) {
+                if (search && u.username.toLowerCase().indexOf(search) === -1 && u.realName.toLowerCase().indexOf(search) === -1 && u.phone.indexOf(search) === -1) return false;
+                if (role && u.roles.indexOf(role) === -1) return false;
+                if (status && u.status !== status) return false;
+                if (org && u.organization !== org) return false;
+                return true;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function resetFilters() {
+            document.getElementById('userSearchInput').value = '';
+            document.getElementById('filterRole').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterOrg').value = '';
+            applyFilters();
+        }
+
+        function changePageSize(val) {
+            pageSize = parseInt(val);
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            var total = filteredUsers.length;
+            var totalPages = Math.max(1, Math.ceil(total / pageSize));
+            if (currentPage > totalPages) currentPage = totalPages;
+            var start = (currentPage - 1) * pageSize;
+            var pageUsers = filteredUsers.slice(start, start + pageSize);
+
+            document.getElementById('statTotalUsers').textContent = total;
+            document.getElementById('statActiveUsers').textContent = users.filter(function(u){ return u.status === 'active'; }).length;
+            document.getElementById('paginationInfo').textContent = 'Showing ' + (total ? start + 1 : 0) + '-' + Math.min(start + pageSize, total) + ' of ' + total;
+
+            var tbody = document.getElementById('userTableBody');
+            if (pageUsers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted)">No users found</td></tr>';
+            } else {
+                var html = '';
+                for (var i = 0; i < pageUsers.length; i++) {
+                    var u = pageUsers[i];
+                    var initials = u.realName.split(' ').map(function(w){ return w[0]; }).join('').substring(0, 2);
+                    var colorIdx = u.id % avatarColors.length;
+                    var stLabel = u.status === 'active' ? 'Active' : u.status === 'disabled' ? 'Disabled' : 'Locked';
+                    var rolesHtml = '';
+                    for (var j = 0; j < u.roles.length; j++) {
+                        var roleObj = roles.find(function(r){ return r.code === u.roles[j]; });
+                        if (roleObj) rolesHtml += '<span class="role-tag ' + roleObj.cls + '">' + roleObj.name + '</span>';
+                    }
+                    var isSelected = selectedUserIds.indexOf(u.id) !== -1;
+
+                    html += '<tr onclick="openDetailDrawer(' + u.id + ')" style="cursor:pointer">' +
+                        '<td onclick="event.stopPropagation()"><input type="checkbox" ' + (isSelected ? 'checked' : '') + ' onchange="toggleSelect(' + u.id + ', this.checked)"></td>' +
+                        '<td><div class="user-cell"><div class="user-name-cell"><span class="user-display">' + esc(u.realName) + '</span><span class="user-login">@' + esc(u.username) + '</span></div></div></td>' +
+                        '<td style="color:var(--text-muted);font-size:12px">' + esc(u.phone) + '</td>' +
+                        '<td style="color:var(--text-secondary)">' + esc(u.organization || '-') + '</td>' +
+                        '<td>' + rolesHtml + '</td>' +
+                        '<td><span class="status-badge ' + u.status + '">' + stLabel + '</span></td>' +
+                        '<td style="color:var(--text-muted);font-size:12px">' + esc(u.lastLogin) + '</td>' +
+                        '<td style="text-align:right;" onclick="event.stopPropagation()"><div class="actions-cell" style="justify-content:flex-end;">' +
+                            '<button class="btn btn-sm" onclick="openEditUser(' + u.id + ')" title="Edit">Edit</button>' +
+                            '<button class="btn btn-sm" onclick="openResetPassword(' + u.id + ')" title="Reset Password">Reset Pwd</button>' +
+                            (u.status === 'active' ? '<button class="btn btn-sm btn-warning" onclick="toggleUserStatus(' + u.id + ', \'disabled\')" title="Disable">Disable</button>' : '<button class="btn btn-sm btn-success" onclick="toggleUserStatus(' + u.id + ', \'active\')" title="Enable">Enable</button>') +
+                            '<button class="btn btn-sm btn-danger" onclick="openDeleteConfirm(' + u.id + ')" title="Delete">Delete</button>' +
+                        '</div></td>' +
+                    '</tr>';
+                }
+                tbody.innerHTML = html;
+            }
+
+            // Pagination
+            var pagesHtml = '';
+            pagesHtml += '<button class="page-btn" onclick="goPage(' + (currentPage - 1) + ')" ' + (currentPage <= 1 ? 'disabled' : '') + '>&lt;</button>';
+            for (var p = 1; p <= totalPages; p++) {
+                if (totalPages > 7) {
+                    if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
+                        pagesHtml += '<button class="page-btn ' + (p === currentPage ? 'active' : '') + '" onclick="goPage(' + p + ')">' + p + '</button>';
+                    } else if (p === currentPage - 2 || p === currentPage + 2) {
+                        pagesHtml += '<button class="page-btn" disabled>…</button>';
+                    }
+                } else {
+                    pagesHtml += '<button class="page-btn ' + (p === currentPage ? 'active' : '') + '" onclick="goPage(' + p + ')">' + p + '</button>';
+                }
+            }
+            pagesHtml += '<button class="page-btn" onclick="goPage(' + (currentPage + 1) + ')" ' + (currentPage >= totalPages ? 'disabled' : '') + '>&gt;</button>';
+            document.getElementById('paginationPages').innerHTML = pagesHtml;
+
+            // Batch disable button - removed from UI
+        }
+
+        function goPage(p) {
+            var totalPages = Math.ceil(filteredUsers.length / pageSize);
+            if (p < 1 || p > totalPages) return;
+            currentPage = p;
+            renderTable();
+        }
+
+        /* ===== SELECTION ===== */
+        function toggleSelect(userId, checked) {
+            var idx = selectedUserIds.indexOf(userId);
+            if (checked && idx === -1) selectedUserIds.push(userId);
+            if (!checked && idx !== -1) selectedUserIds.splice(idx, 1);
+        }
+
+        function toggleSelectAll(checked) {
+            var start = (currentPage - 1) * pageSize;
+            var pageUsers = filteredUsers.slice(start, start + pageSize);
+            for (var i = 0; i < pageUsers.length; i++) {
+                toggleSelect(pageUsers[i].id, checked);
+            }
+            renderTable();
+        }
+
+        /* ===== USER CRUD ===== */
+        function openAddUser() {
+            editingUserId = null;
+            document.getElementById('userDrawerTitle').textContent = 'Add User';
+            clearUserForm();
+            document.getElementById('f_username').removeAttribute('disabled');
+            renderRoleCheckboxes([]);
+            setDataScope('all');
+            openDrawer('userDrawer');
+        }
+
+        function openEditUser(id) {
+            var u = users.find(function(x){ return x.id === id; });
+            if (!u) return;
+            editingUserId = id;
+            document.getElementById('userDrawerTitle').textContent = 'Edit User';
+            document.getElementById('f_username').value = u.username;
+            document.getElementById('f_username').setAttribute('disabled', '');
+            document.getElementById('f_realName').value = u.realName;
+            document.getElementById('f_phone').value = u.phone;
+            document.getElementById('f_email').value = u.email || '';
+            document.getElementById('f_organization').value = u.organization || '';
+            document.getElementById('f_country').value = u.country || '';
+            document.getElementById('f_position').value = u.position || '';
+            document.getElementById('f_status').value = u.status;
+            document.getElementById('f_remark').value = u.remark || '';
+            renderRoleCheckboxes(u.roles);
+            setDataScope(u.dataScope, u.spaceIds || []);
+            openDrawer('userDrawer');
+        }
+
+        function clearUserForm() {
+            var ids = ['f_username','f_realName','f_phone','f_email','f_position','f_remark'];
+            for (var i = 0; i < ids.length; i++) { var el = document.getElementById(ids[i]); if (el) el.value = ''; }
+            document.getElementById('f_organization').selectedIndex = 0;
+            document.getElementById('f_country').selectedIndex = 0;
+            document.getElementById('f_status').selectedIndex = 0;
+        }
+
+        function renderRoleCheckboxes(selectedCodes) {
+            var container = document.getElementById('roleCheckboxes');
+            var html = '';
+            for (var i = 0; i < roles.length; i++) {
+                var r = roles[i];
+                var isChecked = selectedCodes.indexOf(r.code) !== -1;
+                html += '<div class="checkbox-item ' + (isChecked ? 'checked' : '') + '" onclick="toggleRoleCheckbox(this, \'' + r.code + '\')">' +
+                    '<span class="cb-icon">' + svgIcon('check') + '</span>' +
+                    '<span>' + r.name + '</span>' +
+                    '<input type="checkbox" value="' + r.code + '" ' + (isChecked ? 'checked' : '') + '>' +
+                '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function toggleRoleCheckbox(el, code) {
+            el.classList.toggle('checked');
+            var cb = el.querySelector('input');
+            cb.checked = !cb.checked;
+        }
+
+        function setDataScope(scope, spaceIds) {
+            currentDataScope = scope || 'all';
+            checkedSpaceIds = spaceIds || [];
+            var items = document.querySelectorAll('#dataScopeRadios .radio-item');
+            for (var i = 0; i < items.length; i++) {
+                items[i].classList.toggle('selected', (i === 0 && scope === 'all') || (i === 1 && scope === 'custom'));
+            }
+            document.getElementById('dataScopeTree').style.display = scope === 'custom' ? 'block' : 'none';
+            if (scope === 'custom') renderSpaceTree();
+        }
+
+        function renderSpaceTree() {
+            var container = document.getElementById('dataScopeTree');
+            container.innerHTML = buildSpaceTreeHtml(spaceTree, 0);
+        }
+
+        function buildSpaceTreeHtml(nodes, depth) {
+            var html = '';
+            for (var i = 0; i < nodes.length; i++) {
+                var n = nodes[i];
+                var isChecked = checkedSpaceIds.indexOf(n.id) !== -1;
+                var indent = depth * 18;
+                var icon = n.level === 'campus' ? 'map-pin' : n.level === 'building' ? 'building' : 'layers';
+                html += '<div class="drawer-tree-node">' +
+                    '<div class="drawer-tree-row" style="padding-left:' + (8 + indent) + 'px">' +
+                        '<input type="checkbox" ' + (isChecked ? 'checked' : '') + ' onclick="event.stopPropagation()" onchange="toggleSpaceCheck(' + n.id + ', this.checked)">' +
+                        svgIcon(icon) +
+                        '<span>' + esc(n.name) + '</span>' +
+                    '</div>';
+                if (n.children && n.children.length > 0) {
+                    html += buildSpaceTreeHtml(n.children, depth + 1);
+                }
+                html += '</div>';
+            }
+            return html;
+        }
+
+        function getAllDescendantIds(nodes) {
+            var ids = [];
+            for (var i = 0; i < nodes.length; i++) {
+                ids.push(nodes[i].id);
+                if (nodes[i].children && nodes[i].children.length > 0) {
+                    ids = ids.concat(getAllDescendantIds(nodes[i].children));
+                }
+            }
+            return ids;
+        }
+
+        function findNodeAndChildren(tree, targetId) {
+            for (var i = 0; i < tree.length; i++) {
+                if (tree[i].id === targetId) return tree[i];
+                if (tree[i].children && tree[i].children.length > 0) {
+                    var found = findNodeAndChildren(tree[i].children, targetId);
+                    if (found) return found;
+                }
+            }
+            return null;
+        }
+
+        function toggleSpaceCheck(id, checked) {
+            var idx = checkedSpaceIds.indexOf(id);
+            if (checked && idx === -1) checkedSpaceIds.push(id);
+            if (!checked && idx !== -1) checkedSpaceIds.splice(idx, 1);
+            // Cascade: select/deselect all descendants
+            var node = findNodeAndChildren(spaceTree, id);
+            if (node && node.children && node.children.length > 0) {
+                var descendantIds = getAllDescendantIds(node.children);
+                for (var i = 0; i < descendantIds.length; i++) {
+                    var didx = checkedSpaceIds.indexOf(descendantIds[i]);
+                    if (checked && didx === -1) checkedSpaceIds.push(descendantIds[i]);
+                    if (!checked && didx !== -1) checkedSpaceIds.splice(didx, 1);
+                }
+            }
+            // Update the checkbox visual state
+            renderSpaceTree();
+        }
+
+        function saveUser() {
+            var username = document.getElementById('f_username').value.trim();
+            var realName = document.getElementById('f_realName').value.trim();
+            var phone = document.getElementById('f_phone').value.trim();
+
+            if (!username) { showToast('Please enter a username', 'error'); return; }
+            if (!realName) { showToast('Please enter a full name', 'error'); return; }
+            if (!phone) { showToast('Please enter a phone number', 'error'); return; }
+
+            // Collect roles
+            var selectedRoles = [];
+            var checkboxes = document.querySelectorAll('#roleCheckboxes input:checked');
+            for (var i = 0; i < checkboxes.length; i++) selectedRoles.push(checkboxes[i].value);
+            if (selectedRoles.length === 0) { showToast('Please select at least one role', 'error'); return; }
+
+            if (editingUserId) {
+                var u = users.find(function(x){ return x.id === editingUserId; });
+                if (u) {
+                    u.realName = realName;
+                    u.phone = phone;
+                    u.email = document.getElementById('f_email').value.trim();
+                    u.organization = document.getElementById('f_organization').value;
+                    u.country = document.getElementById('f_country').value;
+                    u.position = document.getElementById('f_position').value.trim();
+                    u.roles = selectedRoles;
+                    u.dataScope = currentDataScope;
+                    u.spaceIds = currentDataScope === 'custom' ? checkedSpaceIds.slice() : [];
+                    u.status = document.getElementById('f_status').value;
+                    u.remark = document.getElementById('f_remark').value.trim();
+                    pendingAction = function() {
+                        showToast('"' + realName + '" updated', 'success');
+                        closeDrawer('userDrawer');
+                        applyFilters();
+                    };
+                    openActionConfirm('Update User', 'Are you sure you want to update "' + realName + '"?', 'Update');
+                }
+            } else {
+                // Check duplicate username
+                if (users.some(function(u){ return u.username === username; })) {
+                    showToast('Username already exists', 'error');
+                    return;
+                }
+                var maxId = 0;
+                for (var j = 0; j < users.length; j++) { if (users[j].id > maxId) maxId = users[j].id; }
+                var newUser = {
+                    id: maxId + 1,
+                    username: username,
+                    realName: realName,
+                    phone: phone,
+                    email: document.getElementById('f_email').value.trim(),
+                    organization: document.getElementById('f_organization').value,
+                    country: document.getElementById('f_country').value,
+                    position: document.getElementById('f_position').value.trim(),
+                    roles: selectedRoles,
+                    dataScope: currentDataScope,
+                    spaceIds: currentDataScope === 'custom' ? checkedSpaceIds.slice() : [],
+                    status: document.getElementById('f_status').value,
+                    lastLogin: 'Never',
+                    loginCount: 0,
+                    createdAt: new Date().toISOString().split('T')[0],
+                    createdBy: 'admin',
+                    remark: document.getElementById('f_remark').value.trim()
+                };
+                pendingAction = function() {
+                    users.push(newUser);
+                    showToast('"' + realName + '" created', 'success');
+                    closeDrawer('userDrawer');
+                    applyFilters();
+                };
+                openActionConfirm('Create User', 'Are you sure you want to create user "' + realName + '"?', 'Create');
+            }
+        }
+
+        function toggleUserStatus(id, newStatus) {
+            var u = users.find(function(x){ return x.id === id; });
+            if (!u) return;
+            pendingAction = function() {
+                u.status = newStatus;
+                showToast(u.realName + ' ' + (newStatus === 'active' ? 'enabled' : 'disabled'), 'success');
+                applyFilters();
+            };
+            var actionText = newStatus === 'active' ? 'enable' : 'disable';
+            openActionConfirm(actionText.charAt(0).toUpperCase() + actionText.slice(1) + ' User', 'Are you sure you want to ' + actionText + ' "' + u.realName + '"?', actionText.charAt(0).toUpperCase() + actionText.slice(1));
+        }
+
+        /* ===== DELETE ===== */
+        function openDeleteConfirm(id) {
+            pendingDeleteId = id;
+            var u = users.find(function(x){ return x.id === id; });
+            pendingAction = function() {
+                users = users.filter(function(x){ return x.id !== pendingDeleteId; });
+                closeModal('confirmModal');
+                pendingDeleteId = null;
+                showToast('"' + (u ? u.realName : '') + '" deleted', 'success');
+                applyFilters();
+            };
+            document.getElementById('confirmTitle').textContent = 'Delete "' + (u ? u.realName : '') + '"?';
+            document.getElementById('confirmMsg').textContent = 'This action cannot be undone. All audit logs will be retained.';
+            openModal('confirmModal');
+        }
+
+        function confirmDelete() {
+            if (pendingAction) { pendingAction(); pendingAction = null; }
+        }
+
+        /* ===== DETAIL DRAWER ===== */
+        var detailUserId = null;
+
+        function openDetailDrawer(id) {
+            detailUserId = id;
+            var u = users.find(function(x){ return x.id === id; });
+            if (!u) return;
+            document.getElementById('detailDrawerTitle').textContent = u.realName;
+
+            var rolesHtml = '';
+            for (var i = 0; i < u.roles.length; i++) {
+                var roleObj = roles.find(function(r){ return r.code === u.roles[i]; });
+                if (roleObj) rolesHtml += '<span class="role-tag ' + roleObj.cls + '">' + roleObj.name + '</span>';
+            }
+
+            var statusLabel = u.status === 'active' ? 'Active' : u.status === 'disabled' ? 'Disabled' : 'Locked';
+            var scopeLabel = u.dataScope === 'all' ? 'All Spaces' : 'Custom Range';
+
+            var body = document.getElementById('detailDrawerBody');
+            body.innerHTML =
+                '<div class="detail-section-title">Basic Information</div>' +
+                '<div class="detail-grid">' +
+                    '<div class="detail-field"><div class="detail-field-label">Username</div><div class="detail-field-value">' + esc(u.username) + '</div></div>' +
+                    '<div class="detail-field"><div class="detail-field-label">Full Name</div><div class="detail-field-value">' + esc(u.realName) + '</div></div>' +
+                    '<div class="detail-field"><div class="detail-field-label">Phone</div><div class="detail-field-value">' + esc(u.phone) + '</div></div>' +
+                    '<div class="detail-field"><div class="detail-field-label">Email</div><div class="detail-field-value">' + esc(u.email || '—') + '</div></div>' +
+                    '<div class="detail-field"><div class="detail-field-label">Organization</div><div class="detail-field-value">' + esc(u.organization || '—') + '</div></div>' +
+                    '<div class="detail-field"><div class="detail-field-label">Country</div><div class="detail-field-value">' + esc(u.country || '—') + '</div></div>' +
+                    '<div class="detail-field"><div class="detail-field-label">Position</div><div class="detail-field-value">' + esc(u.position || '—') + '</div></div>' +
+                '</div>' +
+                '<div class="detail-section-title" style="margin-top:20px">Permissions</div>' +
+                '<div class="detail-field"><div class="detail-field-label">Roles</div><div class="detail-field-value">' + rolesHtml + '</div></div>' +
+                '<div class="detail-field"><div class="detail-field-label">Data Scope</div><div class="detail-field-value">' + scopeLabel + '</div></div>' +
+                '<div class="detail-section-title" style="margin-top:20px">Status & Audit</div>' +
+                '<div class="detail-grid">' +
+                    '<div class="detail-field"><div class="detail-field-label">Status</div><div class="detail-field-value"><span class="status-badge ' + u.status + '">' + statusLabel + '</span></div></div>' +
+                    '<div class="detail-field"><div class="detail-field-label">Last Login</div><div class="detail-field-value">' + esc(u.lastLogin) + '</div></div>' +
+                    '<div class="detail-field"><div class="detail-field-label">Login Count</div><div class="detail-field-value">' + u.loginCount + '</div></div>' +
+                    '<div class="detail-field"><div class="detail-field-label">Created At</div><div class="detail-field-value">' + esc(u.createdAt) + '</div></div>' +
+                    '<div class="detail-field"><div class="detail-field-label">Created By</div><div class="detail-field-value">' + esc(u.createdBy) + '</div></div>' +
+                    '<div class="detail-field"><div class="detail-field-label">Remark</div><div class="detail-field-value">' + esc(u.remark || '—') + '</div></div>' +
+                '</div>';
+
+            var drawer = document.getElementById('detailDrawer');
+            var overlay = document.getElementById('detailDrawerOverlay');
+            if (drawer) drawer.classList.add('open');
+            if (overlay) overlay.classList.add('open');
+        }
+
+        function closeDetailDrawer() {
+            var drawer = document.getElementById('detailDrawer');
+            var overlay = document.getElementById('detailDrawerOverlay');
+            if (drawer) drawer.classList.remove('open');
+            if (overlay) overlay.classList.remove('open');
+            detailUserId = null;
+        }
+
+        function editFromDetail() {
+            if (detailUserId != null) {
+                var uid = detailUserId;
+                closeDetailDrawer();
+                setTimeout(function() { openEditUser(uid); }, 250);
+            }
+        }
+
+        /* ===== RESET PASSWORD ===== */
+        function openResetPassword(id) {
+            pendingResetPwdId = id;
+            var u = users.find(function(x){ return x.id === id; });
+            document.getElementById('resetPwdUser').textContent = 'Reset password for ' + (u ? u.realName : '') + '?';
+            openDrawer('resetPwdDrawer');
+        }
+
+        function confirmResetPassword() {
+            if (pendingResetPwdId == null) return;
+            var u = users.find(function(x){ return x.id === pendingResetPwdId; });
+            closeDrawer('resetPwdDrawer');
+            pendingAction = function() {
+                pendingResetPwdId = null;
+                showToast('Password reset for ' + (u ? u.realName : ''), 'success');
+            };
+            openActionConfirm('Reset Password', 'Are you sure you want to reset the password for "' + (u ? u.realName : '') + '"?', 'Reset');
+        }
+
+        /* ===== BATCH ===== */
+        function batchDisable() {
+            if (selectedUserIds.length === 0) return;
+            pendingAction = function() {
+                for (var i = 0; i < selectedUserIds.length; i++) {
+                    var u = users.find(function(x){ return x.id === selectedUserIds[i]; });
+                    if (u && u.status === 'active') u.status = 'disabled';
+                }
+                showToast(selectedUserIds.length + ' user(s) disabled', 'success');
+                selectedUserIds = [];
+                applyFilters();
+            };
+            openActionConfirm('Batch Disable', 'Are you sure you want to disable ' + selectedUserIds.length + ' user(s)?', 'Disable');
+        }
+
+        /* ===== EXPORT ===== */
+        function exportUsers() {
+            showToast('Exporting ' + filteredUsers.length + ' users...', 'info');
+            setTimeout(function() { showToast('Export complete', 'success'); }, 1500);
+        }
+
+        /* ===== HELPERS ===== */
+        function openDrawer(id) {
+            var drawer = document.getElementById(id);
+            var overlay = document.getElementById(id + 'Overlay');
+            if (drawer) drawer.classList.add('open');
+            if (overlay) overlay.classList.add('open');
+        }
+        function closeDrawer(id) {
+            var drawer = document.getElementById(id);
+            var overlay = document.getElementById(id + 'Overlay');
+            if (drawer) drawer.classList.remove('open');
+            if (overlay) overlay.classList.remove('open');
+        }
+        function openModal(id) {
+            var modal = document.getElementById(id);
+            if (modal) modal.classList.add('open');
+        }
+        function closeModal(id) {
+            var modal = document.getElementById(id);
+            if (modal) modal.classList.remove('open');
+        }
+
+        /* ===== GENERIC CONFIRM ACTION ===== */
+        var pendingAction = null;
+
+        function openActionConfirm(title, message, btnText) {
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMsg').textContent = message;
+            document.getElementById('confirmActionBtn').textContent = btnText;
+            openModal('confirmModal');
+        }
+
+        function confirmAction() {
+            if (pendingAction) {
+                var action = pendingAction;
+                pendingAction = null;
+                action();
+                closeModal('confirmModal');
+            }
+        }
+
+        function showToast(msg, type) {
+            type = type || 'info';
+            var container = document.getElementById('toastContainer');
+            var toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            var iconSvg = type === 'success' ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>' :
+                          type === 'error' ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>' :
+                          '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+            toast.innerHTML = iconSvg + ' ' + msg;
+            container.appendChild(toast);
+            setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = '.3s'; setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300); }, 3000);
+        }
+
+        function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+        function updateClock() {
+            var el = document.getElementById('clock');
+            if (!el) return;
+            var now = new Date();
+            var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+            el.textContent = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        /* ===== ORGANIZATION POPULATION ===== */
+        function populateOrganizationFilter() {
+            var sel = document.getElementById('filterOrg');
+            if (!sel) return;
+            sel.innerHTML = '<option value="">All Organizations</option>';
+            for (var i = 0; i < organizations.length; i++) {
+                sel.innerHTML += '<option value="' + organizations[i].name + '">' + organizations[i].name + '</option>';
+            }
+        }
+
+        function populateOrganizationSelect() {
+            var sel = document.getElementById('f_organization');
+            if (!sel) return;
+            sel.innerHTML = '<option value="">Select...</option>';
+            for (var i = 0; i < organizations.length; i++) {
+                sel.innerHTML += '<option value="' + organizations[i].name + '">' + organizations[i].name + '</option>';
+            }
+        }
+
+        /* ===== INIT FUNCTION ===== */
+        function init() {
+            populateOrganizationFilter();
+            populateOrganizationSelect();
+            applyFilters();
+        }
+
+        // ===== START =====
+        init();
+    </script>
+</body>
+</html>

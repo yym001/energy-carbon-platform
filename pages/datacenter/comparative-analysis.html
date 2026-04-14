@@ -1,0 +1,2183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RunDo Energy Carbon Platform | Comparative Analysis</title>
+    <meta name="description" content="RunDo Energy Carbon Center - Comparative Analysis">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-base: #0b1220;
+            --bg-surface: #172131;
+            --bg-elevated: #253247;
+            --bg-content: #111a28;
+            --bg-card: #162233;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --accent-green: #22C55E;
+            --accent-blue: #3B82F6;
+            --accent-cyan: #06B6D4;
+            --accent-amber: #F59E0B;
+            --accent-red: #EF4444;
+            --accent-purple: #8B5CF6;
+            --border: #334155;
+            --border-light: #475569;
+            --font-ui: 'Fira Sans', sans-serif;
+            --font-data: 'Fira Code', monospace;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --sidebar-w: 300px;
+            --nav-right-w: 64px;
+            --topbar-h: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-ui);
+            background: #0b1220;
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
+
+        /* ===== TOP BAR ===== */
+        .topbar {
+            height: var(--topbar-h);
+            background: #152031;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.72);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+        }
+        .topbar-brand { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
+        .topbar-brand .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+        .topbar-brand .brand-name { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+        .topbar-brand .sys-name { font-size: 11px; color: var(--text-muted); }
+        .topbar-menu { display: flex; align-items: center; gap: 4px; }
+        .topbar-menu .module-name { font-weight: 600; font-size: 14px; color: var(--accent-green); margin-right: 8px; }
+        .topbar-menu .sub-menu { padding: 6px 12px; font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all .2s; border-bottom: 2px solid transparent; }
+        .topbar-menu .sub-menu:hover { color: var(--text-secondary); }
+        .topbar-menu .sub-menu.active { color: var(--text-primary); border-bottom-color: var(--accent-green); font-weight: 500; }
+        .topbar-tools { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-secondary); }
+        .topbar-tools .tool-item { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: color .2s; }
+        .topbar-tools .tool-item:hover { color: var(--text-primary); }
+        .topbar-tools .user-block { display: flex; flex-direction: row-reverse; align-items: center; gap: 8px; cursor: pointer; }
+        .topbar-tools .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
+        .topbar-tools .user-info { display: flex; flex-direction: column; line-height: 1.2; text-align: right; }
+        .topbar-tools .user-name { font-size: 12px; color: var(--text-primary); font-weight: 500; }
+        .topbar-tools .user-role { font-size: 10px; color: var(--text-muted); }
+
+        /* ===== RIGHT NAV ===== */
+        .right-nav {
+            position: fixed;
+            top: var(--topbar-h);
+            left: 0;
+            width: var(--nav-right-w);
+            height: calc(100vh - var(--topbar-h));
+            background: #0b1220;
+            border-right: 1px solid rgba(51, 65, 85, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0;
+            gap: 4px;
+            z-index: 90;
+        }
+        .right-nav .nav-item {
+            width: 48px;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all .2s;
+            font-size: 10px;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.3;
+        }
+        .right-nav .nav-item:hover { color: var(--text-secondary); background: var(--bg-elevated); }
+        .right-nav .nav-item.active { color: var(--accent-green); background: rgba(34, 197, 94, .1); }
+        .right-nav .nav-item svg { width: 20px; height: 20px; }
+
+        .nav-item-group { position: relative; display: flex; justify-content: center; width: 100%; }
+        .nav-flyout {
+            position: absolute;
+            top: 50%;
+            left: calc(100% + 14px);
+            transform: translateY(-50%) translateX(-8px);
+            min-width: 188px;
+            padding: 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            background: linear-gradient(180deg, rgba(17, 25, 37, 0.82), rgba(12, 19, 30, 0.76));
+            box-shadow: 0 18px 42px rgba(2, 6, 23, 0.34);
+            backdrop-filter: blur(16px) saturate(120%);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all .22s ease;
+            z-index: 120;
+        }
+        .nav-item-group:hover .nav-flyout {
+            opacity: 1; visibility: visible; pointer-events: auto;
+            transform: translateY(-50%) translateX(0);
+        }
+        .nav-flyout::after {
+            content: "";
+            position: absolute;
+            left: -7px; top: 50%;
+            width: 14px; height: 14px;
+            transform: translateY(-50%) rotate(45deg);
+            border-left: 1px solid rgba(148, 163, 184, 0.14);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+            background: rgba(15, 23, 34, 0.84);
+        }
+        .nav-flyout-title {
+            font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
+            color: rgba(148, 163, 184, 0.72);
+            margin-bottom: 8px; padding: 4px 8px 8px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .nav-flyout-item {
+            display: flex; align-items: center;
+            position: relative;
+            padding: 10px 12px 10px 16px;
+            margin: 4px 0;
+            border-radius: 10px;
+            color: #c4d0df;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-size: 12px;
+            line-height: 1.35;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .nav-flyout-item:hover { background: rgba(30, 41, 59, 0.54); color: var(--text-primary); }
+        .nav-flyout-item.active { background: rgba(34, 197, 94, 0.08); color: var(--text-primary); }
+        .nav-flyout-item.active::before {
+            content: "";
+            position: absolute; left: 6px; top: 8px; bottom: 8px;
+            width: 3px; border-radius: 999px;
+            background: linear-gradient(180deg, rgba(74, 222, 128, 0.95), rgba(34, 197, 94, 0.72));
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ===== LEFT SIDEBAR ===== */
+        .config-sidebar {
+            width: var(--sidebar-w);
+            background: var(--bg-surface);
+            border-right: 1px solid rgba(51, 65, 85, 0.9);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .config-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            background: var(--bg-surface);
+        }
+        .config-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+        .config-subtitle { font-size: 10px; color: var(--text-muted); }
+
+        .template-section { flex: 1; padding: 12px 16px; overflow-y: auto; }
+        .template-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .template-section-title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 700; }
+        .template-list { display: flex; flex-direction: column; gap: 4px; }
+        .template-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 10px; border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(16, 22, 34, 0.4);
+            cursor: pointer; transition: all .15s;
+        }
+        .template-item:hover { border-color: rgba(96, 165, 250, 0.2); background: rgba(30, 41, 59, 0.54); }
+        .template-item.active { border-color: rgba(34, 197, 94, 0.24); background: rgba(34, 197, 94, 0.06); }
+        .template-item-icon { font-size: 14px; flex-shrink: 0; }
+        .template-item-info { flex: 1; min-width: 0; }
+        .template-item-name { font-size: 11px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .template-item-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .template-dim-badge { font-size: 9px; padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+        .template-dim-badge.space { background: rgba(59, 130, 246, 0.12); color: #93c5fd; }
+        .template-dim-badge.org { background: rgba(139, 92, 246, 0.12); color: #c4b5fd; }
+        .template-dim-badge.device { background: rgba(245, 158, 11, 0.12); color: #fde68a; }
+        .template-dim-badge.meter { background: rgba(6, 182, 212, 0.12); color: #67e8f9; }
+        .template-item-actions { display: none; gap: 4px; flex-shrink: 0; }
+        .template-item:hover .template-item-actions,
+        .template-item.active .template-item-actions { display: flex; }
+        .template-action-btn {
+            padding: 3px 6px; border-radius: 4px; border: none;
+            background: transparent; color: var(--text-muted);
+            cursor: pointer; transition: all .15s; display: flex; align-items: center;
+        }
+        .template-action-btn:hover { color: var(--text-primary); background: rgba(30, 41, 59, 0.8); }
+        .template-action-btn.analyze:hover { color: var(--accent-green); background: rgba(34, 197, 94, 0.1); }
+        .template-action-btn.delete:hover { color: var(--accent-red); background: rgba(239, 68, 68, 0.1); }
+        .template-action-btn svg { width: 12px; height: 12px; }
+        .template-preset-indicator { font-size: 9px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 2px; }
+
+        .run-section { padding: 14px 16px; border-top: 1px solid rgba(120, 142, 180, 0.1); background: var(--bg-surface); }
+        .run-btn {
+            width: 100%; padding: 10px; border-radius: 10px; border: none;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
+            border: 1px solid rgba(34, 197, 94, 0.24);
+            color: #bbf7d0; font-size: 13px; font-weight: 700; cursor: pointer;
+            transition: all .18s; font-family: var(--font-ui);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .run-btn:hover { background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.15)); }
+        .run-btn svg { width: 16px; height: 16px; }
+        .save-btn {
+            width: 100%; padding: 8px; border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14); background: transparent;
+            color: var(--text-muted); font-size: 11px; font-weight: 600;
+            cursor: pointer; transition: all .18s; font-family: var(--font-ui);
+            margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .save-btn:hover { border-color: rgba(96, 165, 250, 0.3); color: var(--text-secondary); }
+        .save-btn svg { width: 13px; height: 13px; }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+        .content-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(19, 29, 44, 0.98);
+        }
+        .content-breadcrumb { font-size: 12px; color: var(--text-muted); }
+        .content-breadcrumb span { color: var(--text-secondary); }
+        .content-breadcrumb .sep { margin: 0 6px; }
+        .content-actions { display: flex; gap: 8px; align-items: center; }
+        
+        /* Time Selector (matching reference style) */
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+        .time-selector {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .time-nav-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px; height: 28px;
+            background: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .time-nav-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+        .time-nav-btn svg { width: 14px; height: 14px; }
+        #timeSelectorBtn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 12px;
+            font-family: var(--font-ui);
+            cursor: pointer;
+            transition: all .2s;
+        }
+        #timeSelectorBtn:hover {
+            border-color: var(--accent-blue);
+        }
+        #timeDropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 4px;
+            min-width: 160px;
+            z-index: 20;
+            box-shadow: 0 8px 24px rgba(0,0,0,.4);
+        }
+        #timeDropdown.show { display: block; }
+        .time-opt {
+            padding: 7px 12px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all .15s;
+        }
+        .time-opt:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+        .time-opt.active {
+            color: var(--accent-green);
+            font-weight: 500;
+        }
+        .time-separator { height: 1px; background: var(--border); margin: 4px 0; }
+        .custom-time-panel { display: none; padding: 10px; border-top: 1px solid var(--border); margin-top: 4px; flex-direction: column; gap: 8px; }
+        .custom-time-panel.show { display: flex; }
+        .custom-time-panel label { font-size: 10px; color: var(--text-muted); }
+        .custom-time-panel input[type="date"] {
+            padding: 4px;
+            background: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 11px;
+            outline: none;
+            color-scheme: dark;
+        }
+        .custom-time-panel button {
+            margin-top: 4px;
+            padding: 6px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: opacity .2s;
+        }
+        .custom-time-panel button:hover { opacity: 0.85; }
+        .action-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 12px; border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(21, 29, 42, 0.92); color: var(--text-secondary);
+            font-size: 11px; font-weight: 600; cursor: pointer;
+            transition: all .18s; font-family: var(--font-ui);
+        }
+        .action-btn:hover { border-color: rgba(96, 165, 250, 0.24); color: var(--text-primary); }
+        .action-btn svg { width: 13px; height: 13px; }
+
+        /* Results area */
+        .results-area { flex: 1; overflow-y: auto; padding: 16px 20px; }
+
+        /* Empty state */
+        .empty-state {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 80px 20px; color: var(--text-muted); text-align: center;
+        }
+        .empty-state svg { width: 56px; height: 56px; margin-bottom: 16px; opacity: 0.2; }
+        .empty-state h3 { font-size: 16px; color: var(--text-secondary); margin-bottom: 6px; }
+        .empty-state p { font-size: 12px; max-width: 360px; line-height: 1.6; }
+
+        /* ===== KPI CARDS ===== */
+        .kpi-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+        .kpi-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 14px 16px;
+            transition: border-color .2s;
+            display: flex; flex-direction: column; min-height: 100px;
+        }
+        .kpi-card:hover { border-color: var(--border-light); }
+        .kpi-card .kpi-label { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .kpi-card .kpi-value { font-family: var(--font-data); font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .kpi-card .kpi-change { font-size: 10px; display: flex; align-items: center; gap: 4px; margin-top: auto; }
+        .kpi-card .kpi-change.up { color: var(--accent-red); }
+        .kpi-card .kpi-change.down { color: var(--accent-green); }
+        .kpi-card .kpi-change.neutral { color: var(--text-muted); }
+        .kpi-tag { padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 500; }
+        .kpi-tag.good { background: rgba(34, 197, 94, 0.1); color: var(--accent-green); }
+        .kpi-tag.bad { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .kpi-tag.warn { background: rgba(245, 158, 11, 0.1); color: var(--accent-amber); }
+        .kpi-tag.info { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
+
+        .progress-container { width: 100%; height: 5px; background: var(--bg-elevated); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+        .progress-bar { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .progress-bar.green { background: var(--accent-green); }
+        .progress-bar.red { background: var(--accent-red); }
+        .progress-bar.amber { background: var(--accent-amber); }
+
+        /* ===== Section titles ===== */
+        .section-title {
+            font-size: 12px; font-weight: 700; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: .06em;
+            margin-bottom: 12px; padding-bottom: 6px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-title .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-green); }
+
+        /* ===== CHART CARDS (matching reference style) ===== */
+        .chart-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        .chart-header {
+            padding: 14px 16px;
+            min-height: 54px;
+            box-sizing: border-box;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .chart-title {
+            display: block;
+            min-width: 0;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .chart-actions { display: flex; gap: 6px; }
+        .chart-action-btn {
+            padding: 4px 10px;
+            font-size: 11px;
+            background: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all .2s;
+            font-family: var(--font-ui);
+        }
+        .chart-action-btn:hover,
+        .chart-action-btn.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+        .chart-body {
+            padding: 16px;
+            position: relative;
+        }
+        .chart-body canvas {
+            width: 100% !important;
+        }
+
+        /* Two-column charts */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        @media(max-width:1100px) { .charts-row { grid-template-columns: 1fr; } }
+
+        /* Tables */
+        .variance-table { width: 100%; border-collapse: collapse; }
+        .variance-table th {
+            text-align: left; padding: 10px 12px; font-size: 10px; color: #8fa1b7;
+            text-transform: uppercase; letter-spacing: .06em;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1); font-weight: 700;
+            position: sticky; top: 0; background: rgba(19, 29, 44, 0.98); z-index: 1;
+        }
+        .variance-table td {
+            padding: 10px 12px; font-size: 12px; color: #d5dde8;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.06);
+        }
+        .variance-table tbody tr { transition: background .15s; }
+        .variance-table tbody tr:hover { background: rgba(34, 43, 58, 0.5); }
+        .rank-cell { font-family: var(--font-data); font-weight: 700; font-size: 13px; }
+        .rank-1 { color: var(--accent-amber); }
+        .rank-2 { color: var(--text-secondary); }
+        .rank-3 { color: #cd7f32; }
+
+        .change-up { color: var(--accent-red); font-weight: 600; }
+        .change-down { color: var(--accent-green); font-weight: 600; }
+        .change-neutral { color: var(--text-muted); }
+
+        .bar-indicator { display: flex; align-items: center; gap: 8px; }
+        .bar-bg { flex: 1; height: 6px; border-radius: 3px; background: rgba(120, 142, 180, 0.1); overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+        .bar-fill.blue { background: var(--accent-blue); }
+        .bar-fill.green { background: var(--accent-green); }
+        .bar-fill.amber { background: var(--accent-amber); }
+        .bar-fill.purple { background: var(--accent-purple); }
+        .bar-fill.cyan { background: var(--accent-cyan); }
+        .bar-value { font-size: 11px; font-family: var(--font-data); color: var(--text-secondary); min-width: 50px; text-align: right; }
+
+        /* Insight cards */
+        .insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+        .insight-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(120, 142, 180, 0.1);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            border-left: 3px solid var(--accent-blue);
+        }
+        .insight-card.warning { border-left-color: var(--accent-amber); }
+        .insight-card.danger { border-left-color: var(--accent-red); }
+        .insight-card.success { border-left-color: var(--accent-green); }
+        .insight-title { font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+        .insight-text { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 80px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+        .toast {
+            padding: 10px 16px; border-radius: 10px; font-size: 12px; font-weight: 500;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+            display: flex; align-items: center; gap: 8px; animation: toastIn .3s ease; min-width: 240px;
+        }
+        .toast.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(74, 222, 128, 0.2); color: #bbf7d0; }
+        .toast.error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.2); color: #fecaca; }
+        .toast.info { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(96, 165, 250, 0.2); color: #bfdbfe; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* ===== CONFIG DRAWER ===== */
+        .template-drawer-overlay {
+            position: fixed; inset: 0; top: var(--topbar-h); left: var(--nav-right-w);
+            background: rgba(2, 6, 23, 0.42); z-index: 260; display: none;
+        }
+        .template-drawer-overlay.open { display: block; }
+        .template-drawer {
+            position: fixed; top: var(--topbar-h); right: 0;
+            width: clamp(480px, 44vw, 600px);
+            height: calc(100vh - var(--topbar-h));
+            border-left: 1px solid rgba(120, 142, 180, 0.12);
+            transform: translateX(100%); transition: transform .22s ease;
+            z-index: 261; display: flex; flex-direction: column;
+            background: var(--bg-card); box-shadow: -20px 0 48px rgba(2, 6, 23, 0.36);
+        }
+        .template-drawer.open { transform: translateX(0); }
+        .template-drawer-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            background: linear-gradient(180deg, rgba(19, 29, 44, 0.98), rgba(22, 34, 51, 0.96));
+        }
+        .template-drawer-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .template-drawer-close {
+            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+            border-radius: 6px; border: none; background: transparent;
+            color: var(--text-muted); cursor: pointer; transition: all .15s;
+        }
+        .template-drawer-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .template-drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+        .template-drawer-footer {
+            display: flex; justify-content: flex-end; gap: 10px;
+            padding: 14px 20px; border-top: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(22, 34, 51, 0.96);
+        }
+        .drawer-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(21, 29, 42, 0.92); color: #b5c0d3;
+            cursor: pointer; transition: .18s ease; font-family: var(--font-ui);
+            font-size: 12px; font-weight: 600;
+        }
+        .drawer-btn:hover { border-color: rgba(96, 165, 250, 0.24); color: var(--text-primary); }
+        .drawer-btn.primary { background: rgba(59, 130, 246, 0.14); border-color: rgba(96, 165, 250, 0.2); color: #dbeafe; }
+        .drawer-btn.primary:hover { background: rgba(59, 130, 246, 0.22); }
+        .drawer-btn.success { background: rgba(34, 197, 94, 0.14); border-color: rgba(34, 197, 94, 0.2); color: #bbf7d0; }
+        .drawer-btn.success:hover { background: rgba(34, 197, 94, 0.22); }
+        .drawer-btn svg { width: 13px; height: 13px; }
+
+        .drawer-form-section { margin-bottom: 20px; }
+        .drawer-form-section-title {
+            font-size: 12px; font-weight: 700; color: var(--text-primary);
+            margin-bottom: 12px; padding-bottom: 6px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+        }
+        .drawer-form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
+        .drawer-form-row.full { grid-template-columns: 1fr; }
+        .drawer-form-group { display: flex; flex-direction: column; gap: 4px; }
+        .drawer-form-group label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+        .drawer-form-group label .req { color: var(--accent-red); margin-left: 2px; }
+        .drawer-form-input, .drawer-form-select {
+            padding: 8px 10px; border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96); color: var(--text-primary);
+            font-size: 12px; outline: none; font-family: var(--font-ui);
+            transition: border-color .18s;
+        }
+        .drawer-form-input:focus, .drawer-form-select:focus { border-color: rgba(96, 165, 250, 0.3); }
+        .drawer-form-input::placeholder { color: var(--text-muted); }
+        .drawer-form-select {
+            cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 8px center; padding-right: 26px;
+        }
+        .drawer-textarea {
+            padding: 8px 10px; border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96); color: var(--text-primary);
+            font-size: 12px; outline: none; font-family: var(--font-ui);
+            transition: border-color .18s; resize: vertical; min-height: 60px;
+        }
+        .drawer-textarea:focus { border-color: rgba(96, 165, 250, 0.3); }
+        .drawer-textarea::placeholder { color: var(--text-muted); }
+
+        .drawer-radio-group { display: flex; gap: 16px; }
+        .drawer-radio-item { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: var(--text-secondary); }
+        .drawer-radio-item.selected { color: var(--text-primary); }
+        .drawer-radio-dot {
+            width: 14px; height: 14px; border-radius: 50%;
+            border: 1.5px solid rgba(120, 142, 180, 0.3);
+            display: flex; align-items: center; justify-content: center; transition: all .15s;
+        }
+        .drawer-radio-item.selected .drawer-radio-dot { border-color: var(--accent-blue); }
+        .drawer-radio-item.selected .drawer-radio-dot::after {
+            content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-blue);
+        }
+
+        .drawer-checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .drawer-checkbox-item {
+            display: flex; align-items: center; gap: 6px;
+            padding: 5px 10px; border-radius: 6px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.6);
+            cursor: pointer; transition: all .15s; font-size: 11px; color: var(--text-secondary);
+        }
+        .drawer-checkbox-item:hover { border-color: rgba(96, 165, 250, 0.2); }
+        .drawer-checkbox-item.checked { background: rgba(59, 130, 246, 0.1); border-color: rgba(96, 165, 250, 0.2); color: var(--text-primary); }
+        .drawer-checkbox-item .cb-icon {
+            width: 14px; height: 14px; border-radius: 3px;
+            border: 1.5px solid rgba(120, 142, 180, 0.3);
+            display: flex; align-items: center; justify-content: center; transition: all .15s;
+        }
+        .drawer-checkbox-item.checked .cb-icon { background: var(--accent-blue); border-color: var(--accent-blue); }
+        .drawer-checkbox-item .cb-icon svg { width: 9px; height: 9px; opacity: 0; color: #fff; }
+        .drawer-checkbox-item.checked .cb-icon svg { opacity: 1; }
+
+        .dimension-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .dim-chip {
+            padding: 6px 12px; border-radius: 20px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.6); color: var(--text-muted);
+            font-size: 11px; font-weight: 500; cursor: pointer;
+            transition: all .15s; display: flex; align-items: center; gap: 5px;
+        }
+        .dim-chip:hover { border-color: rgba(96, 165, 250, 0.2); color: var(--text-secondary); }
+        .dim-chip.active { background: rgba(59, 130, 246, 0.12); border-color: rgba(96, 165, 250, 0.24); color: var(--accent-blue); }
+        .dim-chip svg { width: 12px; height: 12px; }
+
+        .drawer-object-selector {
+            max-height: 180px; overflow-y: auto;
+            border: 1px solid rgba(120, 142, 180, 0.1);
+            border-radius: 8px; background: rgba(16, 22, 34, 0.6);
+        }
+        .object-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 10px; border-bottom: 1px solid rgba(120, 142, 180, 0.06);
+            cursor: pointer; transition: background .15s; font-size: 11px; color: var(--text-secondary);
+        }
+        .object-item:last-child { border-bottom: none; }
+        .object-item:hover { background: rgba(30, 41, 59, 0.54); }
+        .object-item.selected { background: rgba(59, 130, 246, 0.08); color: var(--text-primary); }
+        .object-check {
+            width: 14px; height: 14px; border-radius: 3px;
+            border: 1.5px solid rgba(120, 142, 180, 0.3);
+            display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0;
+        }
+        .object-item.selected .object-check { background: var(--accent-blue); border-color: var(--accent-blue); }
+        .object-check svg { width: 9px; height: 9px; opacity: 0; color: #fff; }
+        .object-item.selected .object-check svg { opacity: 1; }
+        .object-icon { font-size: 12px; flex-shrink: 0; }
+        .object-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .object-meta { font-size: 10px; color: var(--text-muted); font-family: var(--font-data); flex-shrink: 0; }
+    </style>
+</head>
+
+<body>
+    <!-- ===== MAIN LAYOUT ===== -->
+    <div class="main-wrap">
+        <!-- LEFT SIDEBAR -->
+        <aside class="config-sidebar">
+            <div class="config-header">
+                <div class="config-title">Comparative Analysis</div>
+                <div class="config-subtitle">Select a template or create custom analysis</div>
+            </div>
+            <div class="template-section">
+                <div class="template-section-header">
+                    <span class="template-section-title">Analysis Templates</span>
+                </div>
+                <div class="template-list" id="templateList"></div>
+            </div>
+            <div class="run-section">
+                <button class="run-btn" onclick="openConfigDrawer()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/></svg>
+                    New Custom Analysis
+                </button>
+                <button class="save-btn" onclick="quickRunAll()" id="quickRunBtn" style="display:none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Run Selected Template
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <div class="content-header">
+                <div class="content-breadcrumb">Data Center <span class="sep">/</span> <span id="breadcrumbTitle">Comparative Analysis</span></div>
+                <div class="content-actions">
+                    <!-- Time Selector (matching reference style) -->
+                    <div class="filter-group">
+                        <div class="time-selector" id="timeSelector">
+                            <button id="prevTimeBtn" class="time-nav-btn" title="Previous">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                            </button>
+                            <button id="timeSelectorBtn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-green)"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                <span id="timeSelectorLabel">Today</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted)"><path d="m6 9 6 6 6-6"/></svg>
+                            </button>
+                            <button id="nextTimeBtn" class="time-nav-btn" title="Next">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            </button>
+                            <div id="timeDropdown">
+                                <div class="time-opt active" data-time="today">Today</div>
+                                <div class="time-opt" data-time="week">This Week</div>
+                                <div class="time-opt" data-time="month">This Month</div>
+                                <div class="time-opt" data-time="year">This Year</div>
+                                <div class="time-separator"></div>
+                                <div class="time-opt" data-time="custom" style="display:flex;align-items:center;gap:4px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                                    Custom
+                                </div>
+                                <div class="custom-time-panel" id="customTimePanel">
+                                    <div style="display:flex;flex-direction:column;gap:4px;">
+                                        <label>Start Date</label>
+                                        <input type="date" id="startDateInput">
+                                    </div>
+                                    <div style="display:flex;flex-direction:column;gap:4px;">
+                                        <label>End Date</label>
+                                        <input type="date" id="endDateInput">
+                                    </div>
+                                    <button id="applyCustomTime">Apply Range</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="action-btn" onclick="showToast('Exporting results...', 'info')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Export
+                    </button>
+                    <button class="action-btn" onclick="showToast('Print dialog opened', 'info')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                        Print
+                    </button>
+                </div>
+            </div>
+
+            <div class="results-area" id="resultsArea">
+                <div class="empty-state" id="emptyState">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+                    <h3>Configure Your Comparison</h3>
+                    <p>Select a template from the left panel, or click "New Custom Analysis" to configure your own comparison parameters.</p>
+                </div>
+
+                <div id="resultsContent" style="display:none">
+                    <!-- KPI Strip -->
+                    <div class="kpi-strip" id="kpiStrip"></div>
+
+                    <!-- Section 1: Comparison Overview -->
+                    <div class="section-title"><span class="dot"></span>Comparison Overview</div>
+                    <div class="chart-card" id="comparisonChartCard" style="margin-bottom:16px">
+                        <div class="chart-header">
+                            <span class="chart-title">Energy Consumption Comparison</span>
+                            <div style="display:flex;gap:6px;align-items:center;">
+                                <div class="chart-actions">
+                                    <span class="chart-action-btn active" id="compBarBtn" onclick="switchCompChart('bar')">Bar</span>
+                                    <span class="chart-action-btn" id="compLineBtn" onclick="switchCompChart('line')">Line</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-body" style="height:320px"><canvas id="compChart"></canvas></div>
+                    </div>
+
+                    <div class="charts-row" style="grid-template-columns:2fr 1fr">
+                        <div class="chart-card" id="varianceChartCard">
+                            <div class="chart-header">
+                                <span class="chart-title">Variance Distribution</span>
+                                <div style="display:flex;gap:6px;align-items:center;">
+                                    <div class="chart-actions">
+                                        <span class="chart-action-btn active" id="varBarBtn" onclick="switchVarChart('bar')">Bar</span>
+                                        <span class="chart-action-btn" id="varLineBtn" onclick="switchVarChart('line')">Line</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-body" style="height:280px"><canvas id="varChart"></canvas></div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header"><span class="chart-title">Energy Structure</span></div>
+                            <div class="chart-body" style="height:280px"><canvas id="structureChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Trend Analysis -->
+                    <div class="section-title"><span class="dot"></span>Trend Analysis</div>
+                    <div class="chart-card" id="trendChartCard" style="margin-bottom:16px">
+                        <div class="chart-header">
+                            <span class="chart-title" id="trendChartTitle">Monthly Energy Trend</span>
+                            <div style="display:flex;gap:6px;align-items:center;">
+                                <div class="chart-actions">
+                                    <span class="chart-action-btn active" id="trendLineBtn" onclick="switchTrendChart('line')">Line</span>
+                                    <span class="chart-action-btn" id="trendAreaBtn" onclick="switchTrendChart('area')">Area</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-body" style="height:320px"><canvas id="trendChart"></canvas></div>
+                    </div>
+
+                    <div class="charts-row">
+                        <div class="chart-card">
+                            <div class="chart-header"><span class="chart-title" id="growthChartTitle">Growth Rate</span></div>
+                            <div class="chart-body" style="height:220px"><canvas id="growthChart"></canvas></div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header"><span class="chart-title" id="cumChartTitle">Cumulative Consumption</span></div>
+                            <div class="chart-body" style="height:220px"><canvas id="cumChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Ranking -->
+                    <div class="section-title"><span class="dot"></span>Detailed Ranking</div>
+                    <div class="chart-card" style="margin-bottom:16px">
+                        <div class="chart-header">
+                            <span class="chart-title">Ranking by Consumption</span>
+                            <div class="chart-actions"><button class="chart-action-btn">Export</button></div>
+                        </div>
+                        <div class="chart-body" style="max-height:300px;overflow-y:auto">
+                            <table class="variance-table">
+                                <thead><tr><th style="width:40px">#</th><th>Object</th><th>Current</th><th>Previous</th><th>Delta</th><th>Change</th><th>Share</th><th>Proportion</th></tr></thead>
+                                <tbody id="rankingBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- AI Insights -->
+                    <div class="section-title"><span class="dot"></span>AI Insights</div>
+                    <div class="chart-card">
+                        <div class="chart-body">
+                            <div class="insight-grid" id="insightGrid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== CONFIG DRAWER ===== -->
+    <div class="template-drawer-overlay" id="configDrawerOverlay" onclick="closeConfigDrawer()"></div>
+    <aside class="template-drawer" id="configDrawer">
+        <div class="template-drawer-header">
+            <div>
+                <div class="template-drawer-title" id="configDrawerTitle">New Custom Analysis</div>
+                <div class="config-subtitle" id="configDrawerSubtitle" style="margin-top:2px">Configure analysis parameters</div>
+            </div>
+            <button class="template-drawer-close" onclick="closeConfigDrawer()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <div class="template-drawer-body">
+            <div class="drawer-form-section" id="tplBasicSection">
+                <div class="drawer-form-section-title">Template Information</div>
+                <div class="drawer-form-row">
+                    <div class="drawer-form-group">
+                        <label>Template Name<span class="req">*</span></label>
+                        <input class="drawer-form-input" id="cfg_tpl_name" placeholder="e.g. Building Energy Comparison">
+                    </div>
+                </div>
+                <div class="drawer-form-row full">
+                    <div class="drawer-form-group">
+                        <label>Description</label>
+                        <textarea class="drawer-textarea" id="cfg_tpl_description" placeholder="Optional description..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="drawer-form-section">
+                <div class="drawer-form-section-title">Step 1: Comparison Mode</div>
+                <div class="drawer-form-row">
+                    <div class="drawer-form-group">
+                        <label>Mode</label>
+                        <div class="drawer-radio-group" id="cfgModeRadios">
+                            <div class="drawer-radio-item selected" onclick="setCfgMode('horizontal')"><span class="drawer-radio-dot"></span><span>Horizontal</span></div>
+                            <div class="drawer-radio-item" onclick="setCfgMode('vertical')"><span class="drawer-radio-dot"></span><span>Vertical</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="drawer-form-section">
+                <div class="drawer-form-section-title">Step 2: Comparison Dimension</div>
+                <div class="drawer-form-row full">
+                    <div class="drawer-form-group">
+                        <div class="dimension-chips" id="cfgDimensionChips">
+                            <div class="dim-chip active" data-dim="space" onclick="setCfgDimension('space')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                Space
+                            </div>
+                            <div class="dim-chip" data-dim="org" onclick="setCfgDimension('org')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                Organization
+                            </div>
+                            <div class="dim-chip" data-dim="device" onclick="setCfgDimension('device')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                                Device
+                            </div>
+                            <div class="dim-chip" data-dim="meter" onclick="setCfgDimension('meter')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+                                Meter
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="drawer-form-section">
+                <div class="drawer-form-section-title">
+                    Step 3: Select Objects
+                    <span style="margin-left:auto;font-size:10px;color:var(--text-muted)" id="cfgObjectCount">0 selected</span>
+                </div>
+                <div class="drawer-form-row full" style="margin-bottom:8px">
+                    <div class="drawer-form-group">
+                        <input class="drawer-form-input" type="text" id="cfgObjectSearch" placeholder="Search objects..." oninput="filterCfgObjects(this.value)" style="padding:6px 8px;font-size:11px">
+                    </div>
+                </div>
+                <div class="drawer-object-selector" id="cfgObjectSelector"></div>
+            </div>
+            <div class="drawer-form-section">
+                <div class="drawer-form-section-title">Step 4: Metrics &amp; Indicators</div>
+                <div class="drawer-checkbox-group" id="cfgMetricCheckboxes"></div>
+            </div>
+            <div class="drawer-form-section">
+                <div class="drawer-form-section-title">Step 5: Time Period</div>
+                <div class="drawer-form-row full">
+                    <div class="drawer-form-group">
+                        <label>Granularity</label>
+                        <select class="drawer-form-select" id="cfg_granularity">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly" selected>Monthly</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Use the time selector in the analysis results to adjust the time range.</div>
+            </div>
+        </div>
+        <div class="template-drawer-footer">
+            <button class="drawer-btn" onclick="closeConfigDrawer()">Cancel</button>
+            <button class="drawer-btn success" onclick="runCfgComparison()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Run Analysis
+            </button>
+            <button class="drawer-btn primary" id="cfgSaveTplBtn" onclick="saveCfgAsTemplate()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save as Template
+            </button>
+        </div>
+    </aside>
+
+    <script>
+        /* ===== STATE ===== */
+        var state = {
+            mode: 'horizontal', dimension: 'space', compareType: 'mom',
+            selectedObjects: [], selectedMetrics: ['consumption'],
+            granularity: 'monthly', hasRun: false,
+            activeTemplateId: null, editingTemplateId: null,
+            charts: {}, compType: 'bar', varType: 'bar', trendType: 'line'
+        };
+
+        /* ===== TEMPLATES ===== */
+        var templates = [
+            { id: 'TPL-001', name: 'Building Energy Comparison', description: 'Compare energy usage across campus buildings', isPreset: true, mode: 'horizontal', dimension: 'space', objects: ['btss', 'acad', 'res'], metrics: ['consumption', 'cost'], compareType: 'mom', granularity: 'monthly', lastUsed: '2026-04-07 14:30' },
+            { id: 'TPL-002', name: 'Floor-Level Energy Ranking', description: 'Rank all BTSS floors by energy consumption', isPreset: true, mode: 'horizontal', dimension: 'space', objects: ['gf', 'l1', 'l2', 'l3', 'l4', 'l5', 'dcs'], metrics: ['consumption', 'intensity'], compareType: 'mom', granularity: 'monthly', lastUsed: '2026-04-06 09:15' },
+            { id: 'TPL-003', name: 'Department Cost Analysis', description: 'Cost comparison across departments', isPreset: true, mode: 'horizontal', dimension: 'org', objects: ['admin', 'academic', 'rmd', 'log'], metrics: ['consumption', 'cost', 'perCapita'], compareType: 'yoy', granularity: 'monthly', lastUsed: '2026-04-05 16:00' },
+            { id: 'TPL-004', name: 'Chiller Performance Comparison', description: 'Compare chiller and pump performance metrics', isPreset: true, mode: 'horizontal', dimension: 'device', objects: ['ch1', 'ch2', 'chwp1', 'cwp1', 'ct1'], metrics: ['consumption', 'runtime', 'cop'], compareType: 'mom', granularity: 'monthly', lastUsed: '2026-04-07 11:20' },
+            { id: 'TPL-005', name: 'Lighting System Analysis', description: 'Lighting energy across all floors', isPreset: true, mode: 'horizontal', dimension: 'device', objects: ['lg_gf', 'lg_l1', 'lg_l2', 'lg_l3', 'lg_l4'], metrics: ['consumption', 'runtime'], compareType: 'mom', granularity: 'monthly', lastUsed: '2026-04-04 10:00' },
+            { id: 'TPL-006', name: 'Monthly Energy Trend', description: '6-month trend for main buildings', isPreset: true, mode: 'vertical', dimension: 'space', objects: ['btss'], metrics: ['consumption'], compareType: 'custom', granularity: 'monthly', lastUsed: '2026-04-03 08:45' },
+            { id: 'TPL-007', name: 'Chiller Monthly Trend', description: '6-month energy trend for CH-1 Chiller', isPreset: true, mode: 'vertical', dimension: 'device', objects: ['ch1'], metrics: ['consumption', 'runtime'], compareType: 'custom', granularity: 'monthly', lastUsed: '2026-04-02 15:00' },
+            { id: 'TPL-008', name: 'Meter Data Quality Check', description: 'Check collection quality across all meters', isPreset: true, mode: 'horizontal', dimension: 'meter', objects: ['m_ttss', 'm_ch1', 'm_ch2', 'w_ttss', 'w_dcs'], metrics: ['reading', 'consumption', 'quality'], compareType: 'mom', granularity: 'monthly', lastUsed: '2026-04-02 13:30' }
+        ];
+
+        /* ===== DIMENSION DATA ===== */
+        var dimensionData = {
+            space: { label: 'Space', objects: [
+                { id: 'btss', name: 'Bangunan Tun Tan Siew Sin', icon: '\uD83C\uDFE2', meta: 'Building \u00B7 8,204 m\u00B2', value: 12450, area: 8204 },
+                { id: 'acad', name: 'Academic Building', icon: '\uD83C\uDFEB', meta: 'Building \u00B7 5,120 m\u00B2', value: 6800, area: 5120 },
+                { id: 'res', name: 'Student Residence', icon: '\uD83C\uDFE0', meta: 'Building \u00B7 3,800 m\u00B2', value: 4200, area: 3800 },
+                { id: 'gf', name: 'BTSS Ground Floor', icon: '\uD83C\uDFE2', meta: 'Floor \u00B7 1,320 m\u00B2', value: 2100, area: 1320 },
+                { id: 'l1', name: 'BTSS Level 1', icon: '\uD83C\uDFE2', meta: 'Floor \u00B7 1,280 m\u00B2', value: 1850, area: 1280 },
+                { id: 'l2', name: 'BTSS Level 2', icon: '\uD83C\uDFE2', meta: 'Floor \u00B7 1,100 m\u00B2', value: 1620, area: 1100 },
+                { id: 'l3', name: 'BTSS Level 3', icon: '\uD83C\uDFE2', meta: 'Floor \u00B7 1,050 m\u00B2', value: 1480, area: 1050 },
+                { id: 'l4', name: 'BTSS Level 4', icon: '\uD83C\uDFE2', meta: 'Floor \u00B7 1,020 m\u00B2', value: 1350, area: 1020 },
+                { id: 'l5', name: 'BTSS Level 5', icon: '\uD83C\uDFE2', meta: 'Floor \u00B7 980 m\u00B2', value: 1200, area: 980 },
+                { id: 'dcs', name: 'District Cooling System Room', icon: '\u2744\uFE0F', meta: 'Room \u00B7 1,454 m\u00B2', value: 3800, area: 1454 }
+            ], metrics: [
+                { key: 'consumption', label: 'Energy Consumption (kWh)', active: true },
+                { key: 'cost', label: 'Cost (MYR)', active: true },
+                { key: 'carbon', label: 'Carbon (tCO\u2082e)', active: false },
+                { key: 'intensity', label: 'Intensity (kWh/m\u00B2)', active: false },
+                { key: 'water', label: 'Water Consumption (m\u00B3)', active: false },
+                { key: 'waterIntensity', label: 'Water Intensity (m\u00B3/m\u00B2)', active: false }
+            ]},
+            org: { label: 'Organization', objects: [
+                { id: 'admin', name: 'Administrative Departments', icon: '\uD83C\uDFDB', meta: '50 staff', value: 3200 },
+                { id: 'reg', name: "Registrar's Office", icon: '\uD83D\uDC64', meta: '8 staff', value: 520 },
+                { id: 'fin', name: 'Finance Department', icon: '\uD83D\uDC64', meta: '12 staff', value: 780 },
+                { id: 'hr', name: 'Human Resources', icon: '\uD83D\uDC64', meta: '20 staff', value: 960 },
+                { id: 'audit', name: 'Audit Department', icon: '\uD83D\uDC64', meta: '10 staff', value: 480 },
+                { id: 'academic', name: 'Academic Departments', icon: '\uD83C\uDFEB', meta: '60 staff', value: 8200 },
+                { id: 'focit', name: 'Faculty of Computing &amp; IT', icon: '\uD83D\uDC64', meta: '35 staff', value: 4800 },
+                { id: 'fne', name: 'Faculty of New Energy', icon: '\uD83D\uDC64', meta: '25 staff', value: 3400 },
+                { id: 'rmd', name: 'Research Management Dept', icon: '\uD83D\uDC64', meta: '15 staff', value: 1800 },
+                { id: 'log', name: 'Logistics Department', icon: '\uD83D\uDC64', meta: '15 staff', value: 2100 }
+            ], metrics: [
+                { key: 'consumption', label: 'Energy Consumption (kWh)', active: true },
+                { key: 'cost', label: 'Cost (MYR)', active: true },
+                { key: 'perCapita', label: 'Per Capita (kWh/person)', active: false },
+                { key: 'perCapitaCost', label: 'Per Capita Cost (MYR/person)', active: false },
+                { key: 'budgetUsage', label: 'Budget Usage (%)', active: false },
+                { key: 'carbon', label: 'Carbon (tCO\u2082e)', active: false }
+            ]},
+            device: { label: 'Device', objects: [
+                { id: 'ch1', name: 'CH-1 Chiller', icon: '\u2744\uFE0F', meta: '139 kW \u00B7 Centrifugal', value: 12000 },
+                { id: 'ch2', name: 'CH-2 Chiller', icon: '\u2744\uFE0F', meta: '139 kW \u00B7 Centrifugal', value: 11500 },
+                { id: 'chwp1', name: 'CHWP-1 Pump', icon: '\uD83D\uDD04', meta: '22 kW \u00B7 120 m\u00B3/h', value: 3200 },
+                { id: 'cwp1', name: 'CWP-1 Pump', icon: '\uD83D\uDD04', meta: '15 kW \u00B7 95 m\u00B3/h', value: 2800 },
+                { id: 'ct1', name: 'CT-1 Cooling Tower', icon: '\uD83C\uDF0A', meta: '5.5 kW \u00B7 Cross-flow', value: 1800 },
+                { id: 'fcu1', name: 'GF1 FCU', icon: '\uD83D\uDCA8', meta: '3 kW \u00B7 Fan Coil Unit', value: 850 },
+                { id: 'ahu1', name: 'GF1 AHU', icon: '\uD83D\uDCA8', meta: '11 kW \u00B7 Air Handling Unit', value: 2400 },
+                { id: 'lg_gf', name: 'Ground Floor Lighting', icon: '\uD83D\uDCA1', meta: '11 kW \u00B7 350 lux', value: 1200 },
+                { id: 'lg_l1', name: 'Level 1 Lighting', icon: '\uD83D\uDCA1', meta: '12 kW \u00B7 360 lux', value: 1350 },
+                { id: 'lg_l2', name: 'Level 2 Lighting', icon: '\uD83D\uDCA1', meta: '10 kW \u00B7 340 lux', value: 980 },
+                { id: 'lg_l3', name: 'Level 3 Lighting', icon: '\uD83D\uDCA1', meta: '10.5 kW \u00B7 345 lux', value: 1050 },
+                { id: 'lg_l4', name: 'Level 4 Lighting', icon: '\uD83D\uDCA1', meta: '11.2 kW \u00B7 352 lux', value: 1120 }
+            ], metrics: [
+                { key: 'consumption', label: 'Energy Consumption (kWh)', active: true },
+                { key: 'runtime', label: 'Running Hours (h)', active: true },
+                { key: 'loadRate', label: 'Average Load Rate (%)', active: false },
+                { key: 'cop', label: 'COP / EER', active: false },
+                { key: 'supplyTemp', label: 'Supply Temp (\u00B0C)', active: false },
+                { key: 'returnTemp', label: 'Return Temp (\u00B0C)', active: false },
+                { key: 'faults', label: 'Fault Count', active: false },
+                { key: 'availability', label: 'Availability (%)', active: false }
+            ]},
+            meter: { label: 'Meter', objects: [
+                { id: 'm_ttss', name: 'TTSS Main Electric Meter', icon: '\u26A1', meta: '3-Phase Smart \u00B7 Modbus TCP', value: 15000 },
+                { id: 'm_ch1', name: 'CH-1 Meter', icon: '\u26A1', meta: '3-Phase \u00B7 100/5 CT', value: 8500 },
+                { id: 'm_ch2', name: 'CH-2 Meter', icon: '\u26A1', meta: '3-Phase \u00B7 100/5 CT', value: 8200 },
+                { id: 'm_chwp1', name: 'CHWP-1 Meter', icon: '\u26A1', meta: 'Single-Phase \u00B7 50/5 CT', value: 3200 },
+                { id: 'm_cwp1', name: 'CWP-1 Meter', icon: '\u26A1', meta: 'Single-Phase \u00B7 50/5 CT', value: 2800 },
+                { id: 'm_ct1', name: 'CT-1 Meter', icon: '\u26A1', meta: 'Single-Phase \u00B7 30/5 CT', value: 1800 },
+                { id: 'm_light', name: 'Lighting Meter', icon: '\u26A1', meta: 'Single-Phase \u00B7 100/5 CT', value: 5700 },
+                { id: 'w_ttss', name: 'TTSS Main Water Meter', icon: '\uD83D\uDCA7', meta: 'DN80 Ultrasonic \u00B7 Modbus RTU', value: 856 },
+                { id: 'w_dcs', name: 'DCS Makeup Water', icon: '\uD83D\uDCA7', meta: 'DN50', value: 320 },
+                { id: 'w_dom', name: 'Domestic Water', icon: '\uD83D\uDCA7', meta: 'DN40', value: 280 },
+                { id: 'w_irr', name: 'Irrigation Water', icon: '\uD83D\uDCA7', meta: 'DN25', value: 120 }
+            ], metrics: [
+                { key: 'reading', label: 'Current Reading', active: true },
+                { key: 'consumption', label: 'Consumption (kWh/m\u00B3)', active: true },
+                { key: 'quality', label: 'Collection Success (%)', active: false },
+                { key: 'comm', label: 'Communication Status', active: false },
+                { key: 'abnormal', label: 'Anomaly Count', active: false }
+            ]}
+        };
+
+        /* ===== HELPERS ===== */
+        function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+        function trunc(s, n) { return s.length > n ? s.substring(0, n) + '...' : s; }
+
+        function showToast(msg, type) {
+            type = type || 'info';
+            var container = document.getElementById('toastContainer');
+            var toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            var iconSvg = type === 'success' ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>' :
+                          type === 'error' ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>' :
+                          '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+            toast.innerHTML = iconSvg + ' ' + msg;
+            container.appendChild(toast);
+            setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = '.3s'; setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300); }, 3000);
+        }
+
+        function updateClock() {
+            var el = document.getElementById('clock');
+            if (!el) return;
+            var now = new Date();
+            var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+            el.textContent = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        /* ===== TEMPLATE LIST ===== */
+        function renderTemplateList() {
+            var container = document.getElementById('templateList');
+            if (!container) return;
+            var html = '';
+            for (var i = 0; i < templates.length; i++) {
+                var tpl = templates[i];
+                var isActive = state.activeTemplateId === tpl.id;
+                var dimLabel = tpl.dimension.charAt(0).toUpperCase() + tpl.dimension.slice(1);
+                html += '<div class="template-item' + (isActive ? ' active' : '') + '" data-id="' + tpl.id + '">' +
+                    '<span class="template-item-icon">\uD83D\uDCCB</span>' +
+                    '<div class="template-item-info">' +
+                        '<div class="template-item-name">' + esc(tpl.name) + '</div>' +
+                        '<div class="template-item-meta">' +
+                            '<span class="template-dim-badge ' + tpl.dimension + '">' + dimLabel + '</span>' +
+                            '<span>' + tpl.objects.length + ' obj</span>' +
+                            (tpl.isPreset ? '<span class="template-preset-indicator">\uD83D\uDD12 Preset</span>' : '') +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="template-item-actions">' +
+                        '<button class="template-action-btn analyze" title="Run Analysis" onclick="event.stopPropagation();applyTemplate(\'' + tpl.id + '\')">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>' +
+                        '</button>' +
+                        '<button class="template-action-btn" title="View/Edit" onclick="event.stopPropagation();viewTemplate(\'' + tpl.id + '\')">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+                        '</button>';
+                if (!tpl.isPreset) {
+                    html += '<button class="template-action-btn delete" title="Delete" onclick="event.stopPropagation();deleteTemplate(\'' + tpl.id + '\')">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>' +
+                        '</button>';
+                }
+                html += '</div></div>';
+            }
+            container.innerHTML = html;
+            container.querySelectorAll('.template-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    var id = this.dataset.id;
+                    state.activeTemplateId = state.activeTemplateId === id ? null : id;
+                    renderTemplateList();
+                    document.getElementById('quickRunBtn').style.display = state.activeTemplateId ? 'flex' : 'none';
+                });
+            });
+        }
+
+        function selectTemplate(id) {
+            var tpl = templates.find(function(t) { return t.id === id; });
+            if (!tpl) return;
+            state.activeTemplateId = id;
+            state.mode = tpl.mode; state.dimension = tpl.dimension;
+            state.compareType = tpl.compareType;
+            state.selectedObjects = tpl.objects.slice();
+            state.selectedMetrics = tpl.metrics.slice();
+            state.granularity = tpl.granularity;
+            showToast('Template loaded: ' + tpl.name, 'info');
+        }
+
+        function applyTemplate(id) {
+            selectTemplate(id);
+            state.hasRun = true;
+            renderResults();
+            showToast('Analysis running...', 'success');
+        }
+
+        function quickRunAll() {
+            if (!state.activeTemplateId) { showToast('Please select a template', 'error'); return; }
+            applyTemplate(state.activeTemplateId);
+        }
+
+        function viewTemplate(id) {
+            var tpl = templates.find(function(t) { return t.id === id; });
+            if (!tpl) return;
+            state.editingTemplateId = id;
+            openConfigDrawer(true, tpl);
+        }
+
+        function deleteTemplate(id) {
+            var idx = templates.findIndex(function(t) { return t.id === id; });
+            if (idx === -1) return;
+            var tpl = templates[idx];
+            if (tpl.isPreset) { showToast('Cannot delete preset templates', 'error'); return; }
+            templates.splice(idx, 1);
+            if (state.activeTemplateId === id) { state.activeTemplateId = null; document.getElementById('quickRunBtn').style.display = 'none'; }
+            renderTemplateList();
+            showToast('Template deleted', 'info');
+        }
+
+        /* ===== CONFIG DRAWER ===== */
+        function openConfigDrawer(isTemplateEdit, tplData) {
+            var title = document.getElementById('configDrawerTitle');
+            var subtitle = document.getElementById('configDrawerSubtitle');
+            if (isTemplateEdit && tplData) {
+                title.textContent = 'Edit Template';
+                subtitle.textContent = tplData.name;
+                document.getElementById('cfg_tpl_name').value = tplData.name;
+                document.getElementById('cfg_tpl_description').value = tplData.description || '';
+                setCfgMode(tplData.mode);
+                setCfgDimension(tplData.dimension);
+                document.getElementById('cfg_granularity').value = tplData.granularity;
+                renderCfgObjects();
+                renderCfgMetrics();
+                setTimeout(function() {
+                    tplData.objects.forEach(function(oid) {
+                        var el = document.querySelector('#cfgObjectSelector .cfg-obj-item[data-id="' + oid + '"]');
+                        if (el) el.classList.add('selected');
+                    });
+                    tplData.metrics.forEach(function(mk) {
+                        var el = document.querySelector('#cfgMetricCheckboxes .drawer-checkbox-item[data-key="' + mk + '"]');
+                        if (el) el.classList.add('checked');
+                    });
+                    updateCfgObjectCount();
+                }, 50);
+            } else {
+                title.textContent = 'New Custom Analysis';
+                subtitle.textContent = 'Configure analysis parameters';
+                state.editingTemplateId = null;
+                document.getElementById('cfg_tpl_name').value = '';
+                document.getElementById('cfg_tpl_description').value = '';
+                setCfgMode(state.mode);
+                setCfgDimension(state.dimension);
+                document.getElementById('cfg_granularity').value = state.granularity;
+                renderCfgObjects();
+                renderCfgMetrics();
+            }
+            document.getElementById('configDrawerOverlay').classList.add('open');
+            document.getElementById('configDrawer').classList.add('open');
+        }
+
+        function closeConfigDrawer() {
+            document.getElementById('configDrawerOverlay').classList.remove('open');
+            document.getElementById('configDrawer').classList.remove('open');
+        }
+
+        function setCfgMode(mode) {
+            state.mode = mode;
+            // When switching to vertical, limit to 1 object
+            if (mode === 'vertical' && state.selectedObjects.length > 1) {
+                state.selectedObjects = [state.selectedObjects[0]];
+            }
+            document.querySelectorAll('#cfgModeRadios .drawer-radio-item').forEach(function(item) {
+                item.classList.toggle('selected', item.textContent.trim().toLowerCase().indexOf(mode) !== -1);
+            });
+            renderCfgObjects(document.getElementById('cfgObjectSearch').value);
+        }
+
+        function setCfgDimension(dim) {
+            state.dimension = dim;
+            state.selectedObjects = [];
+            state.selectedMetrics = [dimensionData[dim].metrics[0].key];
+            document.querySelectorAll('#cfgDimensionChips .dim-chip').forEach(function(chip) {
+                chip.classList.toggle('active', chip.dataset.dim === dim);
+            });
+            renderCfgObjects();
+            renderCfgMetrics();
+        }
+
+        function renderCfgObjects(filter) {
+            var dim = dimensionData[state.dimension];
+            var container = document.getElementById('cfgObjectSelector');
+            if (!container || !dim) return;
+            var keyword = (filter || '').toLowerCase();
+            var html = '';
+            var isVert = state.mode === 'vertical';
+            for (var i = 0; i < dim.objects.length; i++) {
+                var obj = dim.objects[i];
+                if (keyword && obj.name.toLowerCase().indexOf(keyword) === -1 && obj.meta.toLowerCase().indexOf(keyword) === -1) continue;
+                var isSelected = state.selectedObjects.indexOf(obj.id) !== -1;
+                html += '<div class="object-item cfg-obj-item' + (isSelected ? ' selected' : '') + '" data-id="' + obj.id + '" onclick="toggleCfgObject(\'' + obj.id + '\')" title="' + (isVert ? 'Vertical mode: only 1 object allowed' : '') + '">' +
+                    '<div class="object-check"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+                    '<span class="object-icon">' + obj.icon + '</span>' +
+                    '<span class="object-name">' + esc(obj.name) + '</span>' +
+                    '<span class="object-meta">' + esc(obj.meta) + '</span>' +
+                '</div>';
+            }
+            if (isVert) {
+                html += '<div style="padding:6px 10px;font-size:10px;color:var(--accent-amber);background:rgba(245,158,11,0.06);border-top:1px solid rgba(120,142,180,0.06)">⚠ Vertical mode: select only 1 object</div>';
+            }
+            container.innerHTML = html;
+            updateCfgObjectCount();
+        }
+
+        function renderCfgMetrics() {
+            var dim = dimensionData[state.dimension];
+            var container = document.getElementById('cfgMetricCheckboxes');
+            if (!container || !dim) return;
+            var html = '';
+            for (var i = 0; i < dim.metrics.length; i++) {
+                var m = dim.metrics[i];
+                var isChecked = state.selectedMetrics.indexOf(m.key) !== -1;
+                html += '<div class="drawer-checkbox-item' + (isChecked ? ' checked' : '') + '" data-key="' + m.key + '" onclick="toggleCfgMetric(\'' + m.key + '\')">' +
+                    '<span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' +
+                    '<span>' + esc(m.label) + '</span>' +
+                '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function toggleCfgObject(id) {
+            // Vertical mode: only allow 1 object (replace selection)
+            if (state.mode === 'vertical') {
+                state.selectedObjects = [id];
+            } else {
+                var idx = state.selectedObjects.indexOf(id);
+                if (idx === -1) { state.selectedObjects.push(id); } else { state.selectedObjects.splice(idx, 1); }
+            }
+            renderCfgObjects(document.getElementById('cfgObjectSearch').value);
+        }
+
+        function toggleCfgMetric(key) {
+            var idx = state.selectedMetrics.indexOf(key);
+            if (idx === -1) { state.selectedMetrics.push(key); }
+            else if (state.selectedMetrics.length > 1) { state.selectedMetrics.splice(idx, 1); }
+            renderCfgMetrics();
+        }
+
+        function filterCfgObjects(query) { renderCfgObjects(query); }
+        function updateCfgObjectCount() {
+            var el = document.getElementById('cfgObjectCount');
+            if (el) el.textContent = state.selectedObjects.length + ' selected';
+        }
+
+
+        function runCfgComparison() {
+            if (state.selectedObjects.length === 0) { showToast('Please select at least one object', 'error'); return; }
+            state.hasRun = true;
+            closeConfigDrawer();
+            renderResults();
+            showToast('Analysis completed', 'success');
+        }
+
+        function saveCfgAsTemplate() {
+            var name = document.getElementById('cfg_tpl_name').value.trim();
+            if (!name) { showToast('Template name is required', 'error'); return; }
+            if (state.selectedObjects.length === 0) { showToast('Select at least one object', 'error'); return; }
+            var tplData = {
+                name: name, description: document.getElementById('cfg_tpl_description').value.trim(),
+                mode: state.mode, dimension: state.dimension,
+                objects: state.selectedObjects.slice(), metrics: state.selectedMetrics.slice(),
+                granularity: document.getElementById('cfg_granularity').value,
+                lastUsed: new Date().toLocaleString()
+            };
+            if (state.editingTemplateId) {
+                var idx = templates.findIndex(function(t) { return t.id === state.editingTemplateId; });
+                if (idx !== -1) { tplData.id = state.editingTemplateId; tplData.isPreset = templates[idx].isPreset; templates[idx] = tplData; }
+                showToast('Template updated: ' + name, 'success');
+            } else {
+                tplData.id = 'TPL-CUSTOM-' + Date.now(); tplData.isPreset = false; templates.push(tplData);
+                showToast('Template saved: ' + name, 'success');
+            }
+            closeConfigDrawer(); renderTemplateList();
+        }
+
+        /* ===== RESULT GENERATION ===== */
+        function generateMockResults() {
+            var dim = dimensionData[state.dimension];
+            if (!dim) return [];
+
+            if (state.mode === 'vertical') {
+                // Vertical mode: single object, generate time series data based on time selector
+                var obj = state.selectedObjects.length > 0 ?
+                    dim.objects.find(function(o) { return state.selectedObjects.indexOf(o.id) !== -1; }) :
+                    dim.objects[0];
+
+                var timeConfig = getTimeConfig(timeState.current, true);
+                var numPeriods = timeConfig.numPeriods;
+                var axisLabels = timeConfig.axisLabels();
+
+                var baseVal = obj.value || Math.floor(Math.random() * 5000 + 1000);
+                var results = [];
+                var totalVal = 0;
+                for (var i = 0; i < numPeriods; i++) {
+                    var periodVal = Math.floor(baseVal / numPeriods * (0.7 + Math.random() * 0.6));
+                    var prevPeriodVal = Math.floor(periodVal * (0.85 + Math.random() * 0.3));
+                    totalVal += periodVal;
+                    results.push({
+                        name: axisLabels[i] || ('P' + (i+1)),
+                        icon: obj.icon, meta: axisLabels[i] || ('Period ' + (i+1)),
+                        current: periodVal, previous: prevPeriodVal,
+                        delta: periodVal - prevPeriodVal,
+                        changePct: (prevPeriodVal > 0 ? ((periodVal - prevPeriodVal) / prevPeriodVal * 100).toFixed(1) : '0.0'),
+                        cost: Math.floor(periodVal * 0.35), prevCost: Math.floor(prevPeriodVal * 0.35),
+                        carbon: (periodVal * 0.0005).toFixed(2), prevCarbon: (prevPeriodVal * 0.0005).toFixed(2),
+                        area: obj.area || 0
+                    });
+                }
+                for (var j = 0; j < results.length; j++) {
+                    results[j].share = (results[j].current / totalVal * 100).toFixed(1);
+                    if (results[j].area > 0) {
+                        results[j].intensity = (results[j].current / results[j].area).toFixed(1);
+                        results[j].prevIntensity = (results[j].previous / results[j].area).toFixed(1);
+                    }
+                }
+                console.log('[DEBUG] Vertical mode - Time series with', numPeriods, 'periods');
+                return results;
+            }
+
+            // Horizontal mode: multiple objects
+            var objs = state.selectedObjects.length > 0 ?
+                dim.objects.filter(function(o) { return state.selectedObjects.indexOf(o.id) !== -1; }) :
+                dim.objects.slice(0, 5);
+            var results = [];
+            var totalVal = 0;
+            for (var i = 0; i < objs.length; i++) {
+                var baseVal = objs[i].value || Math.floor(Math.random() * 5000 + 1000);
+                var prevVal = Math.floor(baseVal * (0.85 + Math.random() * 0.3));
+                totalVal += baseVal;
+                results.push({
+                    name: objs[i].name, icon: objs[i].icon, meta: objs[i].meta,
+                    current: baseVal, previous: prevVal,
+                    delta: baseVal - prevVal,
+                    changePct: ((baseVal - prevVal) / prevVal * 100).toFixed(1),
+                    cost: Math.floor(baseVal * 0.35), prevCost: Math.floor(prevVal * 0.35),
+                    carbon: (baseVal * 0.0005).toFixed(2), prevCarbon: (prevVal * 0.0005).toFixed(2),
+                    area: objs[i].area || 0
+                });
+            }
+            results.sort(function(a, b) { return b.current - a.current; });
+            for (var j = 0; j < results.length; j++) {
+                results[j].share = (results[j].current / totalVal * 100).toFixed(1);
+                if (results[j].area > 0) {
+                    results[j].intensity = (results[j].current / results[j].area).toFixed(1);
+                    results[j].prevIntensity = (results[j].previous / results[j].area).toFixed(1);
+                }
+            }
+            return results;
+        }
+
+        function getMaxVarianceObj(results) {
+            var max = results[0];
+            for (var i = 1; i < results.length; i++) {
+                if (Math.abs(parseFloat(results[i].changePct)) > Math.abs(parseFloat(max.changePct))) max = results[i];
+            }
+            return max;
+        }
+
+        function generateInsights(results, totalCurrent, totalPrev, totalChangePct) {
+            var insights = [];
+            if (parseFloat(totalChangePct) > 5) {
+                insights.push({ type: 'danger', icon: '\u26A0\uFE0F', title: 'Overall Increase Detected',
+                    text: 'Total energy consumption increased by ' + totalChangePct + '% compared to the previous period. The top contributor is ' + results[0].name + ' with ' + results[0].share + '% share.' });
+            } else if (parseFloat(totalChangePct) < -5) {
+                insights.push({ type: 'success', icon: '\u2705', title: 'Significant Reduction Achieved',
+                    text: 'Total consumption decreased by ' + Math.abs(totalChangePct) + '% compared to the previous period. Energy saving measures appear effective.' });
+            } else {
+                insights.push({ type: '', icon: '\u2139\uFE0F', title: 'Stable Consumption Pattern',
+                    text: 'Total consumption changed by ' + totalChangePct + '% compared to the previous period, within normal fluctuation range.' });
+            }
+            insights.push({ type: 'warning', icon: '\uD83D\uDD0D', title: 'Highest Consumer Alert',
+                text: results[0].name + ' accounts for ' + results[0].share + '% of total consumption (' + results[0].current.toLocaleString() + ' kWh).' });
+            var biggestChange = getMaxVarianceObj(results);
+            insights.push({
+                type: parseFloat(biggestChange.changePct) > 0 ? 'danger' : 'success',
+                icon: '\uD83D\uDCC8', title: 'Largest Variance: ' + biggestChange.name,
+                text: (parseFloat(biggestChange.changePct) > 0 ? 'Increased' : 'Decreased') + ' by ' + Math.abs(biggestChange.changePct) + '% (' + Math.abs(biggestChange.delta).toLocaleString() + ' kWh).'
+            });
+            var highConsumers = results.filter(function(r) { return parseFloat(r.share) > 20; });
+            if (highConsumers.length > 0) {
+                insights.push({ type: 'warning', icon: '\uD83D\uDCA1', title: 'Optimization Opportunity',
+                    text: highConsumers.map(function(h) { return h.name; }).join(', ') + ' each consume more than 20%. Consider targeted energy efficiency audits.' });
+            }
+            return insights;
+        }
+
+        function renderResults() {
+            var results = generateMockResults();
+            console.log('[DEBUG] renderResults called, mode:', state.mode, 'dimension:', state.dimension);
+            console.log('[DEBUG] Generated results length:', results.length);
+            if (results.length > 0) {
+                console.log('[DEBUG] First result:', results[0]);
+            }
+            if (results.length === 0) return;
+
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('resultsContent').style.display = 'block';
+
+            var isVertical = state.mode === 'vertical';
+
+            // Update section titles based on mode
+            var overviewTitle = document.querySelector('#resultsContent .section-title:nth-of-type(1)');
+            if (overviewTitle) {
+                overviewTitle.innerHTML = '<span class="dot"></span>' + (isVertical ? 'Time Series Comparison' : 'Comparison Overview');
+            }
+            var trendTitle = document.querySelector('#resultsContent .section-title:nth-of-type(2)');
+            if (trendTitle) {
+                trendTitle.innerHTML = '<span class="dot"></span>' + (isVertical ? 'Historical Trend' : 'Trend Analysis');
+            }
+
+            // Update chart card titles based on mode
+            var trendChartTitle = document.getElementById('trendChartTitle');
+            if (trendChartTitle) {
+                trendChartTitle.textContent = isVertical ? 'Monthly Energy Trend' : 'Monthly Energy Trend';
+            }
+            var growthChartTitle = document.getElementById('growthChartTitle');
+            if (growthChartTitle) {
+                growthChartTitle.textContent = isVertical ? 'Growth Rate' : 'Growth Rate';
+            }
+            var cumChartTitle = document.getElementById('cumChartTitle');
+            if (cumChartTitle) {
+                cumChartTitle.textContent = isVertical ? 'Cumulative Consumption' : 'Cumulative Consumption';
+            }
+
+            var totalCurrent = 0, totalPrev = 0, totalCost = 0, totalPrevCost = 0, totalCarbon = 0, totalPrevCarbon = 0;
+            for (var i = 0; i < results.length; i++) {
+                totalCurrent += results[i].current; totalPrev += results[i].previous;
+                totalCost += results[i].cost; totalPrevCost += results[i].prevCost;
+                totalCarbon += parseFloat(results[i].carbon); totalPrevCarbon += parseFloat(results[i].prevCarbon);
+            }
+            var totalDelta = totalCurrent - totalPrev;
+            var totalChangePct = (totalPrev > 0 ? (totalDelta / totalPrev * 100).toFixed(1) : '0.0');
+            var costDelta = totalCost - totalPrevCost;
+            var costChangePct = (totalPrevCost > 0 ? (costDelta / totalPrevCost * 100).toFixed(1) : '0.0');
+            var carbonDelta = totalCarbon - totalPrevCarbon;
+            var carbonChangePct = (totalPrevCarbon > 0 ? (carbonDelta / totalPrevCarbon * 100).toFixed(1) : '0.0');
+            var maxObj = results[0], minObj = results[results.length - 1];
+            var avgVal = Math.round(totalCurrent / results.length);
+            var totalArea = results.reduce(function(s, r) { return s + (r.area || 0); }, 0);
+            var avgIntensity = totalArea > 0 ? (totalCurrent / totalArea).toFixed(1) : 'N/A';
+
+            // KPI Strip - different for horizontal vs vertical
+            var kpiHtml = '';
+            if (isVertical) {
+                // Vertical: single object, focus on time comparison
+                kpiHtml += '<div class="kpi-card">' +
+                    '<div class="kpi-label">Current Period</div>' +
+                    '<div class="kpi-value">' + totalCurrent.toLocaleString() + '</div>' +
+                    '<div class="kpi-change ' + (totalDelta >= 0 ? 'up' : 'down') + '">' +
+                        (totalDelta >= 0 ? '\u2191' : '\u2193') + ' ' + Math.abs(totalDelta).toLocaleString() + ' (' + (totalDelta >= 0 ? '+' : '') + totalChangePct + '%)' +
+                    '</div><div class="progress-container"><div class="progress-bar ' + (parseFloat(totalChangePct) > 5 ? 'red' : parseFloat(totalChangePct) < 0 ? 'green' : 'amber') + '" style="width:' + Math.min(100, Math.abs(parseFloat(totalChangePct)) * 5) + '%"></div></div>' +
+                '</div>';
+                kpiHtml += '<div class="kpi-card">' +
+                    '<div class="kpi-label">Previous Period</div>' +
+                    '<div class="kpi-value">' + totalPrev.toLocaleString() + '</div>' +
+                    '<div class="kpi-change neutral">Baseline period</div>' +
+                '</div>';
+                kpiHtml += '<div class="kpi-card">' +
+                    '<div class="kpi-label">Object</div>' +
+                    '<div class="kpi-value" style="font-size:14px">' + results[0].icon + ' ' + esc(trunc(results[0].name, 16)) + '</div>' +
+                    '<div class="kpi-change neutral">' + results[0].meta + '</div>' +
+                '</div>';
+                kpiHtml += '<div class="kpi-card">' +
+                    '<div class="kpi-label">Carbon</div>' +
+                    '<div class="kpi-value">' + totalCarbon.toFixed(1) + ' <small style="font-size:10px;color:var(--text-muted)">tCO\u2082e</small></div>' +
+                    '<div class="kpi-change ' + (carbonDelta >= 0 ? 'up' : 'down') + '">' +
+                        (carbonDelta >= 0 ? '\u2191' : '\u2193') + ' ' + Math.abs(carbonDelta).toFixed(1) + ' (' + (carbonDelta >= 0 ? '+' : '') + carbonChangePct + '%)' +
+                    '</div>' +
+                '</div>';
+                kpiHtml += '<div class="kpi-card">' +
+                    '<div class="kpi-label">Cost</div>' +
+                    '<div class="kpi-value">RM ' + totalCost.toLocaleString() + '</div>' +
+                    '<div class="kpi-change ' + (costDelta >= 0 ? 'up' : 'down') + '">' +
+                        (costDelta >= 0 ? '\u2191' : '\u2193') + ' RM ' + Math.abs(costDelta).toLocaleString() + ' (' + (costDelta >= 0 ? '+' : '') + costChangePct + '%)' +
+                    '</div>' +
+                '</div>';
+                kpiHtml += '<div class="kpi-card">' +
+                    '<div class="kpi-label">Avg Monthly</div>' +
+                    '<div class="kpi-value">' + avgVal.toLocaleString() + '</div>' +
+                    '<div class="kpi-change neutral">Per period average</div>' +
+                '</div>';
+            } else {
+                // Horizontal: multiple objects, focus on ranking
+                kpiHtml += '<div class="kpi-card">' +
+                    '<div class="kpi-label">Total Energy</div>' +
+                    '<div class="kpi-value">' + totalCurrent.toLocaleString() + '</div>' +
+                    '<div class="kpi-change ' + (totalDelta >= 0 ? 'up' : 'down') + '">' +
+                        (totalDelta >= 0 ? '\u2191' : '\u2193') + ' ' + Math.abs(totalDelta).toLocaleString() + ' (' + (totalDelta >= 0 ? '+' : '') + totalChangePct + '%)' +
+                    '</div><div class="progress-container"><div class="progress-bar ' + (parseFloat(totalChangePct) > 5 ? 'red' : parseFloat(totalChangePct) < 0 ? 'green' : 'amber') + '" style="width:' + Math.min(100, Math.abs(parseFloat(totalChangePct)) * 5) + '%"></div></div>' +
+                '</div>';
+                kpiHtml += '<div class="kpi-card">' +
+                    '<div class="kpi-label">Total Cost</div>' +
+                    '<div class="kpi-value">RM ' + totalCost.toLocaleString() + '</div>' +
+                    '<div class="kpi-change ' + (costDelta >= 0 ? 'up' : 'down') + '">' +
+                        (costDelta >= 0 ? '\u2191' : '\u2193') + ' RM ' + Math.abs(costDelta).toLocaleString() + ' (' + (costDelta >= 0 ? '+' : '') + costChangePct + '%)' +
+                    '</div><span class="kpi-tag ' + (parseFloat(costChangePct) > 5 ? 'bad' : 'good') + '" style="margin-top:4px;display:inline-block;width:fit-content">' + (parseFloat(costChangePct) > 5 ? 'Over Budget' : 'Within Budget') + '</span>' +
+                '</div>';
+                kpiHtml += '<div class="kpi-card">' +
+                    '<div class="kpi-label">Carbon</div>' +
+                    '<div class="kpi-value">' + totalCarbon.toFixed(1) + ' <small style="font-size:10px;color:var(--text-muted)">tCO\u2082e</small></div>' +
+                    '<div class="kpi-change ' + (carbonDelta >= 0 ? 'up' : 'down') + '">' +
+                        (carbonDelta >= 0 ? '\u2191' : '\u2193') + ' ' + Math.abs(carbonDelta).toFixed(1) + ' (' + (carbonDelta >= 0 ? '+' : '') + carbonChangePct + '%)' +
+                    '</div>' +
+                '</div>';
+                kpiHtml += '<div class="kpi-card">' +
+                    '<div class="kpi-label">Avg Intensity</div>' +
+                    '<div class="kpi-value">' + avgIntensity + '</div>' +
+                    '<div class="kpi-change neutral">Across ' + results.length + ' objects</div>' +
+                '</div>';
+                kpiHtml += '<div class="kpi-card">' +
+                    '<div class="kpi-label">Highest</div>' +
+                    '<div class="kpi-value" style="font-size:14px">' + maxObj.icon + ' ' + esc(trunc(maxObj.name, 14)) + '</div>' +
+                    '<div class="kpi-change neutral">' + maxObj.current.toLocaleString() + ' (' + maxObj.share + '%)</div>' +
+                    '<span class="kpi-tag warn" style="margin-top:4px;display:inline-block;width:fit-content">Top</span>' +
+                '</div>';
+                kpiHtml += '<div class="kpi-card">' +
+                    '<div class="kpi-label">Average</div>' +
+                    '<div class="kpi-value">' + avgVal.toLocaleString() + '</div>' +
+                    '<div class="kpi-change neutral">Mean consumption</div>' +
+                '</div>';
+            }
+            document.getElementById('kpiStrip').innerHTML = kpiHtml;
+
+            // Ranking Table - update title based on mode
+            var rankingTitle = document.querySelector('#resultsContent .section-title:nth-of-type(3)');
+            if (rankingTitle) {
+                rankingTitle.innerHTML = '<span class="dot"></span>' + (isVertical ? 'Monthly Breakdown' : 'Detailed Ranking');
+            }
+            var rankingHtml = '';
+            var barColors = ['blue', 'green', 'amber', 'purple', 'cyan', 'blue', 'green', 'amber', 'purple', 'cyan', 'blue', 'green'];
+            for (var j = 0; j < results.length; j++) {
+                var r = results[j];
+                var rankCls = j < 3 ? 'rank-' + (j + 1) : '';
+                var changeCls = parseFloat(r.changePct) > 0 ? 'change-up' : parseFloat(r.changePct) < 0 ? 'change-down' : 'change-neutral';
+                var barColor = barColors[j % barColors.length];
+                rankingHtml += '<tr>' +
+                    '<td class="rank-cell ' + rankCls + '">' + (j + 1) + '</td>' +
+                    '<td>' + r.icon + ' ' + esc(r.name) + '</td>' +
+                    '<td style="font-family:var(--font-data);font-weight:600">' + r.current.toLocaleString() + '</td>' +
+                    '<td style="font-family:var(--font-data)">' + r.previous.toLocaleString() + '</td>' +
+                    '<td class="' + changeCls + '">' + (r.delta > 0 ? '+' : '') + r.delta.toLocaleString() + '</td>' +
+                    '<td class="' + changeCls + '">' + (parseFloat(r.changePct) > 0 ? '\u2191 +' : '\u2193 ') + r.changePct + '%</td>' +
+                    '<td>' + r.share + '%</td>' +
+                    '<td><div class="bar-indicator"><div class="bar-bg"><div class="bar-fill ' + barColor + '" style="width:' + r.share + '%"></div></div><span class="bar-value">' + r.share + '%</span></div></td>' +
+                '</tr>';
+            }
+            document.getElementById('rankingBody').innerHTML = rankingHtml;
+
+            // AI Insights
+            var insights = generateInsights(results, totalCurrent, totalPrev, totalChangePct);
+            var insightHtml = '';
+            for (var l = 0; l < insights.length; l++) {
+                var ins = insights[l];
+                insightHtml += '<div class="insight-card ' + ins.type + '">' +
+                    '<div class="insight-title">' + ins.icon + ' ' + ins.title + '</div>' +
+                    '<div class="insight-text">' + ins.text + '</div></div>';
+            }
+            document.getElementById('insightGrid').innerHTML = insightHtml;
+
+            // Render all charts
+            console.log('[DEBUG] About to call renderCharts with', results.length, 'results');
+            renderCharts(results, totalCurrent, totalPrev, totalCost, totalPrevCost);
+            console.log('[DEBUG] renderCharts completed');
+        }
+
+        /* ===== CHART SWITCHING ===== */
+        function switchCompChart(type) {
+            state.compType = type;
+            document.getElementById('compBarBtn').classList.toggle('active', type === 'bar');
+            document.getElementById('compLineBtn').classList.toggle('active', type === 'line');
+            if (state.charts.compChart && state.mode !== 'vertical') {
+                state.charts.compChart.destroy();
+                var results = generateMockResults();
+                var labels = results.map(function(r) { return trunc(r.name, 12); });
+                var currentData = results.map(function(r) { return r.current; });
+                var previousData = results.map(function(r) { return r.previous; });
+                var isLine = type === 'line';
+                state.charts.compChart = new Chart(document.getElementById('compChart'), {
+                    type: isLine ? 'line' : 'bar',
+                    data: { labels: labels, datasets: [
+                        { label: 'Current Period', data: currentData, backgroundColor: isLine ? 'rgba(59,130,246,0.1)' : 'rgba(59,130,246,0.7)', borderColor: '#3B82F6', borderWidth: isLine ? 2 : 0, tension: 0.4, fill: isLine, borderRadius: isLine ? 0 : 4, pointRadius: isLine ? 4 : 0 },
+                        { label: 'Previous Period', data: previousData, backgroundColor: isLine ? 'rgba(100,116,139,0.1)' : 'rgba(100,116,139,0.5)', borderColor: '#64748B', borderWidth: isLine ? 2 : 0, tension: 0.4, fill: isLine, borderRadius: isLine ? 0 : 4, pointRadius: isLine ? 4 : 0 }
+                    ]},
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94A3B8', font: { size: 10 } } } }, scales: { x: { ticks: { color: '#64748B', font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.1)' } }, y: { ticks: { color: '#64748B', font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.1)' } } } }
+                });
+            }
+        }
+
+        function switchVarChart(type) {
+            state.varType = type;
+            document.getElementById('varBarBtn').classList.toggle('active', type === 'bar');
+            document.getElementById('varLineBtn').classList.toggle('active', type === 'line');
+            if (state.charts.varChart && state.mode !== 'vertical') {
+                state.charts.varChart.destroy();
+                var results = generateMockResults();
+                var labels = results.map(function(r) { return trunc(r.name, 12); });
+                var deltas = results.map(function(r) { return r.delta; });
+                var deltaColors = deltas.map(function(d) { return d > 0 ? 'rgba(239, 68, 68, 0.7)' : 'rgba(34, 197, 94, 0.7)'; });
+                var isLine = type === 'line';
+                state.charts.varChart = new Chart(document.getElementById('varChart'), {
+                    type: isLine ? 'line' : 'bar',
+                    data: { labels: labels, datasets: [{ label: 'Variance', data: deltas, backgroundColor: isLine ? 'rgba(96,165,250,0.1)' : deltaColors, borderColor: '#60A5FA', borderWidth: isLine ? 2 : 0, tension: 0.4, fill: isLine, borderRadius: isLine ? 0 : 4, pointRadius: isLine ? 4 : 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#64748B', font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.1)' } }, y: { ticks: { color: '#64748B', font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.1)' } } } }
+                });
+            }
+        }
+
+        function switchTrendChart(type) {
+            state.trendType = type;
+            document.getElementById('trendLineBtn').classList.toggle('active', type === 'line');
+            document.getElementById('trendAreaBtn').classList.toggle('active', type === 'area');
+            if (state.charts.trendChart) {
+                state.charts.trendChart.destroy();
+                var results = generateMockResults();
+                renderTrendChart(results);
+            }
+        }
+
+        /* ===== CHART RENDERING ===== */
+        function renderCharts(results, totalCurrent, totalPrev, totalCost, totalPrevCost) {
+            console.log('[DEBUG] renderCharts STARTED');
+            console.log('[DEBUG] Mode:', state.mode, 'Results count:', results.length);
+            
+            Object.keys(state.charts).forEach(function(key) { if (state.charts[key]) state.charts[key].destroy(); });
+            state.charts = {};
+
+            var isVertical = state.mode === 'vertical';
+            console.log('[DEBUG] isVertical:', isVertical);
+            
+            var labels = results.map(function(r) { return trunc(r.name, 12); });
+            var currentData = results.map(function(r) { return r.current; });
+            var previousData = results.map(function(r) { return r.previous; });
+            var deltas = results.map(function(r) { return r.delta; });
+            var deltaColors = deltas.map(function(d) { return d > 0 ? 'rgba(239, 68, 68, 0.7)' : 'rgba(34, 197, 94, 0.7)'; });
+            var colors = ['#3B82F6', '#22C55E', '#F59E0B', '#8B5CF6', '#06B6D4', '#EF4444', '#EC4899', '#14B8A6', '#F97316', '#6366F1', '#84CC16', '#0EA5E9'];
+
+            var chartOpts = {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#94A3B8', font: { size: 10 } } } },
+                scales: {
+                    x: { ticks: { color: '#64748B', font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.1)' } },
+                    y: { ticks: { color: '#64748B', font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.1)' } }
+                }
+            };
+
+            // Comparison Chart - different for horizontal vs vertical
+            if (isVertical) {
+                // Vertical: show actual monthly data as grouped bar (each month = current vs previous)
+                state.charts.compChart = new Chart(document.getElementById('compChart'), {
+                    type: 'bar',
+                    data: { labels: labels, datasets: [
+                        { label: 'Current (2026)', data: currentData, backgroundColor: 'rgba(59, 130, 246, 0.7)', borderRadius: 4 },
+                        { label: 'Previous (2025)', data: previousData, backgroundColor: 'rgba(100, 116, 139, 0.5)', borderRadius: 4 }
+                    ]},
+                    options: chartOpts
+                });
+                document.getElementById('compBarBtn').style.display = 'none';
+                document.getElementById('compLineBtn').style.display = 'none';
+            } else {
+                // Horizontal: multiple objects, show grouped bar
+                state.charts.compChart = new Chart(document.getElementById('compChart'), {
+                    type: 'bar',
+                    data: { labels: labels, datasets: [
+                        { label: 'Current Period', data: currentData, backgroundColor: 'rgba(59, 130, 246, 0.7)', borderRadius: 4 },
+                        { label: 'Previous Period', data: previousData, backgroundColor: 'rgba(100, 116, 139, 0.5)', borderRadius: 4 }
+                    ]},
+                    options: chartOpts
+                });
+                document.getElementById('compBarBtn').style.display = '';
+                document.getElementById('compLineBtn').style.display = '';
+            }
+
+            // Variance Chart - different for horizontal vs vertical
+            if (isVertical) {
+                // Vertical: show monthly delta as line chart
+                state.charts.varChart = new Chart(document.getElementById('varChart'), {
+                    type: 'line',
+                    data: { labels: labels, datasets: [{
+                        label: 'Monthly Delta', data: deltas,
+                        borderColor: '#F59E0B', backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4, fill: true, pointRadius: 4, pointHoverRadius: 6
+                    }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                        scales: { x: { ticks: { color: '#64748B', font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.1)' } }, y: { ticks: { color: '#64748B', font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.1)' } } }
+                    }
+                });
+                document.getElementById('varBarBtn').style.display = 'none';
+                document.getElementById('varLineBtn').style.display = 'none';
+            } else {
+                // Horizontal: variance across objects
+                state.charts.varChart = new Chart(document.getElementById('varChart'), {
+                    type: 'bar',
+                    data: { labels: labels, datasets: [{ label: 'Variance', data: deltas, backgroundColor: deltaColors, borderRadius: 4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                        scales: { x: { ticks: { color: '#64748B', font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.1)' } }, y: { ticks: { color: '#64748B', font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.1)' } } }
+                    }
+                });
+                document.getElementById('varBarBtn').style.display = '';
+                document.getElementById('varLineBtn').style.display = '';
+            }
+
+            // Structure Chart (Doughnut) - different for vertical
+            if (isVertical) {
+                // Vertical: monthly composition doughnut
+                state.charts.structureChart = new Chart(document.getElementById('structureChart'), {
+                    type: 'doughnut',
+                    data: { labels: labels, datasets: [{ data: currentData, backgroundColor: colors.slice(0, results.length), borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '55%',
+                        plugins: { legend: { position: 'right', labels: { color: '#94A3B8', font: { size: 9 }, padding: 6 } },
+                            title: { display: true, text: 'Monthly Consumption Share', color: '#94A3B8', font: { size: 10 } } } }
+                });
+            } else {
+                // Horizontal: object share doughnut
+                state.charts.structureChart = new Chart(document.getElementById('structureChart'), {
+                    type: 'doughnut',
+                    data: { labels: labels, datasets: [{ data: currentData, backgroundColor: colors.slice(0, results.length), borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '55%',
+                        plugins: { legend: { position: 'right', labels: { color: '#94A3B8', font: { size: 9 }, padding: 6 } } } }
+                });
+            }
+
+            // Trend Chart
+            renderTrendChart(results);
+
+            // Growth Rate Chart - show for both modes but with different data
+            if (isVertical) {
+                // Ensure charts are visible in vertical mode
+                document.getElementById('growthChart').parentElement.parentElement.style.display = '';
+                document.getElementById('cumChart').parentElement.parentElement.style.display = '';
+                
+                console.log('[DEBUG] Vertical mode - rendering growth and cum charts');
+                console.log('[DEBUG] Results length:', results.length);
+                console.log('[DEBUG] First result:', results[0]);
+                console.log('[DEBUG] Last result:', results[results.length - 1]);
+                
+                // Vertical: show growth rate and cumulative for each time period
+                var growthData = [];
+                var cumData = [];
+                var cumSum = 0;
+                
+                for (var gi = 0; gi < results.length; gi++) {
+                    var prevPeriodVal = results[gi].previous;
+                    var currPeriodVal = results[gi].current;
+                    var growthRate = prevPeriodVal > 0 ? ((currPeriodVal - prevPeriodVal) / prevPeriodVal * 100).toFixed(1) : 0;
+                    growthData.push(parseFloat(growthRate));
+                    
+                    cumSum += currPeriodVal;
+                    cumData.push(cumSum);
+                }
+                
+                console.log('[DEBUG] Growth data sample:', growthData.slice(0, 3));
+                console.log('[DEBUG] Cum data sample:', cumData.slice(0, 3));
+                
+                try {
+                    state.charts.growthChart = new Chart(document.getElementById('growthChart'), {
+                        type: 'line',
+                        data: { 
+                            labels: results.map(function(r) { return r.name; }),
+                            datasets: [{
+                                label: 'Growth Rate (%)',
+                                data: growthData,
+                                borderColor: '#F59E0B',
+                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }]
+                        },
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false,
+                            plugins: { 
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.parsed.y.toFixed(1) + '%';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: { 
+                                x: { ticks: { color: '#64748B', font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.1)' } }, 
+                                y: { 
+                                    ticks: { color: '#64748B', callback: function(v) { return v + '%'; } }, 
+                                    grid: { color: 'rgba(100,116,139,0.1)' } 
+                                } 
+                            } 
+                        }
+                    });
+                    console.log('[DEBUG] Growth chart created successfully');
+                } catch(e) {
+                    console.error('[ERROR] Failed to create growth chart:', e);
+                }
+
+                try {
+                    state.charts.cumChart = new Chart(document.getElementById('cumChart'), {
+                        type: 'line',
+                        data: { 
+                            labels: results.map(function(r) { return r.name; }),
+                            datasets: [{
+                                label: 'Cumulative Consumption',
+                                data: cumData,
+                                borderColor: '#3B82F6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }]
+                        },
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false,
+                            plugins: { 
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.parsed.y.toLocaleString() + ' kWh';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: { 
+                                x: { ticks: { color: '#64748B', font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.1)' } }, 
+                                y: { 
+                                    ticks: { color: '#64748B' }, 
+                                    grid: { color: 'rgba(100,116,139,0.1)' } 
+                                }
+                            } 
+                        }
+                    });
+                    console.log('[DEBUG] Cum chart created successfully');
+                } catch(e) {
+                    console.error('[ERROR] Failed to create cum chart:', e);
+                }
+                
+                console.log('[DEBUG] Vertical mode charts rendering completed');
+            } else {
+                document.getElementById('growthChart').parentElement.parentElement.style.display = '';
+                document.getElementById('cumChart').parentElement.parentElement.style.display = '';
+
+                var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                var growthDS = [];
+                for (var gi = 0; gi < Math.min(results.length, 3); gi++) {
+                    growthDS.push({
+                        label: trunc(results[gi].name, 10),
+                        data: [3.2, -1.5, 5.8, -2.1, 4.3, -0.8].map(function(v) { return +(v + (Math.random() - 0.5) * 2).toFixed(1); }),
+                        borderColor: colors[gi], backgroundColor: colors[gi].replace(')', ', 0.1)').replace('rgb', 'rgba'),
+                        tension: 0.4, fill: true
+                    });
+                }
+                state.charts.growthChart = new Chart(document.getElementById('growthChart'), {
+                    type: 'line',
+                    data: { labels: months, datasets: growthDS },
+                    options: { responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#94A3B8', font: { size: 9 } } } },
+                        scales: { x: { ticks: { color: '#64748B' }, grid: { color: 'rgba(100,116,139,0.1)' } }, y: { ticks: { color: '#64748B', callback: function(v) { return v + '%'; } }, grid: { color: 'rgba(100,116,139,0.1)' } } } }
+                });
+
+                var cumDS = [];
+                for (var ci = 0; ci < Math.min(results.length, 3); ci++) {
+                    var cumBase = results[ci].current / 6;
+                    var cumData = []; var cumSum = 0;
+                    for (var cm = 0; cm < 6; cm++) { cumSum += Math.round(cumBase * (0.8 + Math.random() * 0.4)); cumData.push(cumSum); }
+                    cumDS.push({ label: trunc(results[ci].name, 10), data: cumData, borderColor: colors[ci], tension: 0.3, fill: false });
+                }
+                state.charts.cumChart = new Chart(document.getElementById('cumChart'), {
+                    type: 'line',
+                    data: { labels: months, datasets: cumDS },
+                    options: chartOpts
+                });
+            }
+        }
+
+        function renderTrendChart(results) {
+            var isVertical = state.mode === 'vertical';
+            var isArea = state.trendType === 'area';
+            var colors = ['#3B82F6', '#22C55E', '#F59E0B', '#8B5CF6', '#06B6D4', '#EF4444', '#EC4899', '#14B8A6'];
+
+            console.log('[DEBUG] renderTrendChart called, isVertical:', isVertical, 'results.length:', results.length);
+
+            if (isVertical) {
+                // Vertical: show actual monthly current vs previous as filled areas
+                console.log('[DEBUG] Rendering vertical trend chart with', results.length, 'data points');
+                state.charts.trendChart = new Chart(document.getElementById('trendChart'), {
+                    type: 'line',
+                    data: { labels: results.map(function(r) { return r.name; }), datasets: [
+                        { label: 'Current (2026)', data: results.map(function(r) { return r.current; }),
+                          borderColor: '#3B82F6', backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                          tension: 0.4, fill: true, pointRadius: 4, pointHoverRadius: 6 },
+                        { label: 'Previous (2025)', data: results.map(function(r) { return r.previous; }),
+                          borderColor: '#64748B', backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                          tension: 0.4, fill: true, pointRadius: 4, pointHoverRadius: 6 }
+                    ]},
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#94A3B8', font: { size: 10 } } } },
+                        scales: {
+                            x: { ticks: { color: '#64748B' }, grid: { color: 'rgba(100,116,139,0.1)' } },
+                            y: { ticks: { color: '#64748B' }, grid: { color: 'rgba(100,116,139,0.1)' } }
+                        }
+                    }
+                });
+                console.log('[DEBUG] Trend chart created successfully');
+            } else {
+                // Horizontal: multi-object trend with random monthly data
+                var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                var trendDS = [];
+                for (var i = 0; i < Math.min(results.length, 4); i++) {
+                    var base = results[i].current / 6;
+                    trendDS.push({
+                        label: trunc(results[i].name, 10),
+                        data: months.map(function() { return Math.round(base * (0.8 + Math.random() * 0.4)); }),
+                        borderColor: colors[i],
+                        backgroundColor: isArea ? colors[i].replace(')', ', 0.15)').replace('rgb', 'rgba') : 'transparent',
+                        tension: 0.4,
+                        fill: isArea,
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    });
+                }
+                var trendChartOpts = {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94A3B8', font: { size: 10 } } } },
+                    scales: {
+                        x: { ticks: { color: '#64748B' }, grid: { color: 'rgba(100,116,139,0.1)' } },
+                        y: { ticks: { color: '#64748B' }, grid: { color: 'rgba(100,116,139,0.1)' } }
+                    }
+                };
+                state.charts.trendChart = new Chart(document.getElementById('trendChart'), {
+                    type: 'line',
+                    data: { labels: months, datasets: trendDS },
+                    options: trendChartOpts
+                });
+            }
+        }
+
+        /* ===== TIME SELECTOR STATE ===== */
+        var timeState = {
+            current: 'month',
+            label: 'This Month',
+            customStart: '',
+            customEnd: ''
+        };
+
+        function getTimeConfig(timeKey, isVertical) {
+            var configs = {
+                today: { label: 'Today', numPeriods: 24, axisLabels: function() { return Array.from({length: 24}, (_, i) => i + ':00'); } },
+                week: { label: 'This Week', numPeriods: 7, axisLabels: function() { return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']; } },
+                month: { label: 'This Month', numPeriods: 30, axisLabels: function() { return Array.from({length: 30}, (_, i) => 'Day ' + (i+1)); } },
+                year: { label: 'This Year', numPeriods: 12, axisLabels: function() { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; } },
+                custom: { label: 'Custom Range', numPeriods: 6, axisLabels: function() { return ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']; } }
+            };
+            return configs[timeKey] || configs.month;
+        }
+
+        /* ===== TIME SELECTOR EVENT HANDLERS ===== */
+        function updateTimeSelector() {
+            document.getElementById('timeSelectorLabel').textContent = timeState.label;
+        }
+
+        function applyTimeSelection(timeKey) {
+            var config = getTimeConfig(timeKey, state.mode === 'vertical');
+            timeState.current = timeKey;
+            timeState.label = config.label;
+            updateTimeSelector();
+
+            // Update dropdown active state
+            document.querySelectorAll('#timeDropdown .time-opt').forEach(function(opt) {
+                opt.classList.toggle('active', opt.dataset.time === timeKey);
+            });
+
+            // Show/hide custom panel
+            document.getElementById('customTimePanel').classList.toggle('show', timeKey === 'custom');
+
+            // Close dropdown
+            document.getElementById('timeDropdown').classList.remove('show');
+
+            // Re-render results if already displayed
+            if (state.hasRun) {
+                renderResults();
+            }
+        }
+
+        // Time selector event listeners
+        (function() {
+            var selectorBtn = document.getElementById('timeSelectorBtn');
+            var dropdown = document.getElementById('timeDropdown');
+            var prevBtn = document.getElementById('prevTimeBtn');
+            var nextBtn = document.getElementById('nextTimeBtn');
+
+            if (selectorBtn) {
+                selectorBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('show');
+                });
+            }
+
+            if (dropdown) {
+                dropdown.querySelectorAll('.time-opt').forEach(function(opt) {
+                    opt.addEventListener('click', function() {
+                        applyTimeSelection(this.dataset.time);
+                    });
+                });
+            }
+
+            if (document.getElementById('applyCustomTime')) {
+                document.getElementById('applyCustomTime').addEventListener('click', function() {
+                    var start = document.getElementById('startDateInput').value;
+                    var end = document.getElementById('endDateInput').value;
+                    if (start && end) {
+                        timeState.customStart = start;
+                        timeState.customEnd = end;
+                        timeState.label = start + ' ~ ' + end;
+                        updateTimeSelector();
+                        dropdown.classList.remove('show');
+                        if (state.hasRun) renderResults();
+                    }
+                });
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function() {
+                    var order = ['today', 'week', 'month', 'year'];
+                    var idx = order.indexOf(timeState.current);
+                    if (idx > 0) { applyTimeSelection(order[idx - 1]); }
+                });
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    var order = ['today', 'week', 'month', 'year'];
+                    var idx = order.indexOf(timeState.current);
+                    if (idx < order.length - 1) { applyTimeSelection(order[idx + 1]); }
+                });
+            }
+
+            // Close dropdown on outside click
+            document.addEventListener('click', function(e) {
+                if (!document.getElementById('timeSelector').contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        })();
+
+        /* ===== INIT FUNCTION ===== */
+        function init() {
+            renderTemplateList();
+            // Auto-apply first template for demo purposes
+            if (templates.length > 0) {
+                applyTemplate(templates[0].id);
+            }
+            var quickRunBtn = document.getElementById('quickRunBtn');
+            if (quickRunBtn) quickRunBtn.style.display = 'none';
+        }
+
+        // ===== START =====
+        init();
+    </script>
+</body>
+</html>

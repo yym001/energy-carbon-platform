@@ -1,0 +1,2770 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RunDo Energy Carbon Platform | Smart Report Generation</title>
+    <meta name="description" content="RunDo Energy Carbon Platform - Smart Report Generation">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-base: #0b1220;
+            --bg-surface: #172131;
+            --bg-elevated: #253247;
+            --bg-content: #111a28;
+            --bg-card: #162233;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --accent-green: #22C55E;
+            --accent-blue: #3B82F6;
+            --accent-cyan: #06B6D4;
+            --accent-amber: #F59E0B;
+            --accent-red: #EF4444;
+            --accent-purple: #8B5CF6;
+            --border: #334155;
+            --border-light: #475569;
+            --font-ui: 'Fira Sans', sans-serif;
+            --font-data: 'Fira Code', monospace;
+            --radius: 8px;
+            --nav-right-w: 64px;
+            --topbar-h: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-ui);
+            background: #0b1220;
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
+
+        /* ===== TOP BAR ===== */
+        .topbar {
+            height: var(--topbar-h);
+            background: #152031;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.72);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+        }
+        .topbar-brand { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
+        .topbar-brand .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+        .topbar-brand .brand-name { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+        .topbar-brand .sys-name { font-size: 11px; color: var(--text-muted); }
+        .topbar-menu { display: flex; align-items: center; gap: 4px; }
+        .topbar-menu .module-name { font-weight: 600; font-size: 14px; color: var(--accent-green); margin-right: 8px; }
+        .topbar-menu .sub-menu { padding: 6px 12px; font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all .2s; border-bottom: 2px solid transparent; }
+        .topbar-menu .sub-menu:hover { color: var(--text-secondary); }
+        .topbar-menu .sub-menu.active { color: var(--text-primary); border-bottom-color: var(--accent-green); font-weight: 500; }
+        .topbar-tools { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-secondary); }
+        .topbar-tools .tool-item { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: color .2s; }
+        .topbar-tools .tool-item:hover { color: var(--text-primary); }
+        .topbar-tools .user-block { display: flex; flex-direction: row-reverse; align-items: center; gap: 8px; cursor: pointer; }
+        .topbar-tools .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
+        .topbar-tools .user-info { display: flex; flex-direction: column; line-height: 1.2; text-align: right; }
+        .topbar-tools .user-name { font-size: 12px; color: var(--text-primary); font-weight: 500; }
+        .topbar-tools .user-role { font-size: 10px; color: var(--text-muted); }
+
+        /* ===== RIGHT NAV ===== */
+        .right-nav {
+            position: fixed;
+            top: var(--topbar-h);
+            left: 0;
+            width: var(--nav-right-w);
+            height: calc(100vh - var(--topbar-h));
+            background: #0b1220;
+            border-right: 1px solid rgba(51, 65, 85, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0;
+            gap: 4px;
+            z-index: 90;
+        }
+        .right-nav .nav-item {
+            width: 48px;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all .2s;
+            font-size: 10px;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.3;
+        }
+        .right-nav .nav-item:hover { color: var(--text-secondary); background: var(--bg-elevated); }
+        .right-nav .nav-item.active { color: var(--accent-green); background: rgba(34, 197, 94, .1); }
+        .right-nav .nav-item svg { width: 20px; height: 20px; }
+
+        .nav-item-group { position: relative; display: flex; justify-content: center; width: 100%; }
+        .nav-flyout {
+            position: absolute;
+            top: 50%;
+            left: calc(100% + 14px);
+            transform: translateY(-50%) translateX(-8px);
+            min-width: 188px;
+            padding: 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            background: linear-gradient(180deg, rgba(17, 25, 37, 0.82), rgba(12, 19, 30, 0.76));
+            box-shadow: 0 18px 42px rgba(2, 6, 23, 0.34);
+            backdrop-filter: blur(16px) saturate(120%);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all .22s ease;
+            z-index: 120;
+        }
+        .nav-item-group:hover .nav-flyout {
+            opacity: 1; visibility: visible; pointer-events: auto;
+            transform: translateY(-50%) translateX(0);
+        }
+        .nav-flyout::after {
+            content: "";
+            position: absolute;
+            left: -7px; top: 50%;
+            width: 14px; height: 14px;
+            transform: translateY(-50%) rotate(45deg);
+            border-left: 1px solid rgba(148, 163, 184, 0.14);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+            background: rgba(15, 23, 34, 0.84);
+        }
+        .nav-flyout-title {
+            font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
+            color: rgba(148, 163, 184, 0.72);
+            margin-bottom: 8px; padding: 4px 8px 8px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .nav-flyout-item {
+            display: flex; align-items: center;
+            position: relative;
+            padding: 10px 12px 10px 16px;
+            margin: 4px 0;
+            border-radius: 10px;
+            color: #c4d0df;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-size: 12px;
+            line-height: 1.35;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .nav-flyout-item:hover { background: rgba(30, 41, 59, 0.54); color: var(--text-primary); }
+        .nav-flyout-item.active { background: rgba(34, 197, 94, 0.08); color: var(--text-primary); }
+        .nav-flyout-item.active::before {
+            content: "";
+            position: absolute; left: 6px; top: 8px; bottom: 8px;
+            width: 3px; border-radius: 999px;
+            background: linear-gradient(180deg, rgba(74, 222, 128, 0.95), rgba(34, 197, 94, 0.72));
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ===== LEFT SIDEBAR: Template List ===== */
+        .sidebar-panel {
+            width: 280px;
+            background: var(--bg-surface);
+            border-right: 1px solid rgba(51, 65, 85, 0.9);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .sidebar-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+        }
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        .type-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+        .type-tab {
+            flex: 1;
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all .18s;
+            font-family: var(--font-ui);
+        }
+        .type-tab:hover { color: var(--text-secondary); border-color: rgba(120, 142, 180, 0.3); }
+        .type-tab.active { background: rgba(34, 197, 94, 0.12); border-color: rgba(34, 197, 94, 0.24); color: var(--accent-green); }
+        .sidebar-search {
+            position: relative;
+        }
+        .sidebar-search input {
+            width: 100%;
+            padding: 8px 12px 8px 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96);
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            font-family: var(--font-ui);
+        }
+        .sidebar-search input:focus { border-color: rgba(96, 165, 250, 0.3); }
+        .sidebar-search input::placeholder { color: var(--text-muted); }
+        .sidebar-search svg {
+            position: absolute;
+            left: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            width: 14px;
+            height: 14px;
+        }
+        .template-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        .template-item {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all .18s;
+            margin-bottom: 4px;
+        }
+        .template-item:hover { background: rgba(30, 41, 59, 0.54); border-color: rgba(120, 142, 180, 0.1); }
+        .template-item.active { background: rgba(34, 197, 94, 0.06); border-color: rgba(34, 197, 94, 0.18); }
+        .template-item-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .template-type-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .template-type-badge.report { background: rgba(59, 130, 246, 0.12); color: #93c5fd; }
+        .template-type-badge.table { background: rgba(6, 182, 212, 0.12); color: #67e8f9; }
+        .template-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .template-meta {
+            font-size: 10px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .template-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .template-status .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .template-status .dot.green { background: var(--accent-green); box-shadow: 0 0 4px rgba(34, 197, 94, 0.4); }
+        .template-status .dot.amber { background: var(--accent-amber); }
+        .template-status .dot.gray { background: var(--text-muted); }
+        .template-actions {
+            display: none;
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .template-item:hover .template-actions,
+        .template-item.active .template-actions { display: flex; }
+        .template-action-btn {
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96);
+            color: var(--text-secondary);
+            font-size: 10px;
+            cursor: pointer;
+            transition: all .15s;
+            font-family: var(--font-ui);
+        }
+        .template-action-btn:hover { color: var(--text-primary); border-color: rgba(96, 165, 250, 0.3); }
+        .template-action-btn.primary { background: rgba(34, 197, 94, 0.12); border-color: rgba(34, 197, 94, 0.2); color: #bbf7d0; }
+        .sidebar-footer {
+            padding: 10px 12px;
+            border-top: 1px solid rgba(120, 142, 180, 0.1);
+        }
+        .new-template-btn {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px dashed rgba(120, 142, 180, 0.2);
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all .18s;
+            font-family: var(--font-ui);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .new-template-btn:hover { border-color: rgba(34, 197, 94, 0.3); color: var(--accent-green); background: rgba(34, 197, 94, 0.04); }
+
+        /* ===== MAIN CONTENT: Task Queue ===== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(19, 29, 44, 0.98);
+        }
+        .content-breadcrumb {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .content-breadcrumb span { color: var(--text-secondary); }
+        .content-breadcrumb .sep { margin: 0 6px; }
+        .content-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(21, 29, 42, 0.92);
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .18s;
+            font-family: var(--font-ui);
+        }
+        .action-btn:hover { border-color: rgba(96, 165, 250, 0.24); color: var(--text-primary); }
+        .action-btn.primary { background: rgba(34, 197, 94, 0.14); border-color: rgba(34, 197, 94, 0.2); color: #bbf7d0; }
+        .action-btn.primary:hover { background: rgba(34, 197, 94, 0.22); }
+        .action-btn svg { width: 13px; height: 13px; }
+
+        /* Filter bar */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.06);
+            background: rgba(19, 29, 44, 0.6);
+            flex-wrap: wrap;
+        }
+        .filter-bar label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            font-weight: 600;
+        }
+        .filter-select {
+            padding: 6px 24px 6px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96);
+            color: var(--text-primary);
+            font-size: 11px;
+            outline: none;
+            font-family: var(--font-ui);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 6px center;
+        }
+        .filter-select:focus { border-color: rgba(96, 165, 250, 0.24); }
+
+        /* Task table */
+        .task-table-wrap {
+            flex: 1;
+            overflow: auto;
+            padding: 0 20px;
+        }
+        .task-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .task-table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-size: 10px;
+            color: #8fa1b7;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            background: rgba(19, 29, 44, 0.98);
+            z-index: 1;
+            white-space: nowrap;
+        }
+        .task-table td {
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #d5dde8;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.06);
+            white-space: nowrap;
+        }
+        .task-table tbody tr { transition: background .15s; cursor: pointer; }
+        .task-table tbody tr:hover { background: rgba(34, 43, 58, 0.5); }
+        .task-table tbody tr.active { background: rgba(59, 130, 246, 0.06); }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+        .status-badge.completed { background: rgba(34, 197, 94, 0.1); color: #bbf7d0; }
+        .status-badge.running { background: rgba(59, 130, 246, 0.1); color: #93c5fd; }
+        .status-badge.queued { background: rgba(245, 158, 11, 0.1); color: #fde68a; }
+        .status-badge.failed { background: rgba(239, 68, 68, 0.1); color: #fecaca; }
+        .status-badge.cancelled { background: rgba(100, 116, 139, 0.1); color: #94a3b8; }
+        .status-badge .pulse {
+            width: 7px; height: 7px; border-radius: 50%;
+        }
+        .status-badge.completed .pulse { background: var(--accent-green); }
+        .status-badge.running .pulse { background: var(--accent-blue); animation: pulse 1.5s infinite; }
+        .status-badge.queued .pulse { background: var(--accent-amber); animation: pulse 2s infinite; }
+        .status-badge.failed .pulse { background: var(--accent-red); }
+        .status-badge.cancelled .pulse { background: var(--text-muted); }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* Progress bar */
+        .progress-bar {
+            width: 100px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(120, 142, 180, 0.1);
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width .5s ease;
+        }
+        .progress-bar-fill.green { background: var(--accent-green); }
+        .progress-bar-fill.blue { background: var(--accent-blue); }
+        .progress-bar-fill.amber { background: var(--accent-amber); }
+        .progress-bar-fill.red { background: var(--accent-red); }
+
+        /* Row actions */
+        .row-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .row-action-btn {
+            padding: 3px 6px;
+            border-radius: 4px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all .15s;
+            display: flex;
+            align-items: center;
+        }
+        .row-action-btn:hover { background: rgba(30, 41, 59, 0.54); color: var(--text-primary); }
+        .row-action-btn svg { width: 13px; height: 13px; }
+
+        /* Task type badge */
+        .task-type-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .task-type-badge.daily { background: rgba(59, 130, 246, 0.1); color: #93c5fd; }
+        .task-type-badge.weekly { background: rgba(139, 92, 246, 0.1); color: #c4b5fd; }
+        .task-type-badge.monthly { background: rgba(245, 158, 11, 0.1); color: #fde68a; }
+        .task-type-badge.thematic { background: rgba(6, 182, 212, 0.1); color: #67e8f9; }
+        .task-type-badge.summary { background: rgba(34, 197, 94, 0.1); color: #bbf7d0; }
+        .task-type-badge.allocation { background: rgba(236, 72, 153, 0.1); color: #f9a8d4; }
+        .task-type-badge.statistics { background: rgba(100, 116, 139, 0.1); color: #94a3b8; }
+        .task-type-badge.carbon { background: rgba(34, 197, 94, 0.1); color: #86efac; }
+        .task-type-badge.pivot { background: rgba(59, 130, 246, 0.1); color: #93c5fd; }
+
+        /* ===== SLIDE-OUT PREVIEW PANEL ===== */
+        .preview-overlay {
+            position: fixed;
+            inset: 0;
+            top: var(--topbar-h);
+            left: var(--nav-right-w);
+            background: rgba(2, 6, 23, 0.42);
+            z-index: 200;
+            display: none;
+        }
+        .preview-overlay.open { display: block; }
+        .preview-panel {
+            position: fixed;
+            top: var(--topbar-h);
+            right: 0;
+            width: clamp(480px, 42vw, 640px);
+            height: calc(100vh - var(--topbar-h));
+            background: var(--bg-surface);
+            border-left: 1px solid rgba(51, 65, 85, 0.9);
+            transform: translateX(100%);
+            transition: transform .25s ease;
+            z-index: 201;
+            display: flex;
+            flex-direction: column;
+        }
+        .preview-panel.open { transform: translateX(0); }
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(19, 29, 44, 0.98);
+        }
+        .preview-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+        .preview-close {
+            width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 6px; border: none; background: transparent;
+            color: var(--text-muted); cursor: pointer; transition: all .15s;
+        }
+        .preview-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .preview-body { flex: 1; overflow-y: auto; padding: 16px; }
+        .preview-section { margin-bottom: 16px; }
+        .preview-section-title {
+            font-size: 11px; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: .06em;
+            font-weight: 700; margin-bottom: 8px;
+        }
+        .preview-detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .preview-detail-item {
+            background: rgba(16, 22, 34, 0.6);
+            border-radius: 8px; padding: 10px 12px;
+        }
+        .preview-detail-label { font-size: 10px; color: var(--text-muted); margin-bottom: 3px; }
+        .preview-detail-value { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+
+        /* Report preview area */
+        .report-preview-area {
+            background: rgba(16, 22, 34, 0.6);
+            border: 1px solid rgba(120, 142, 180, 0.1);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .report-preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.08);
+        }
+        .report-preview-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .report-preview-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .report-preview-btn {
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96);
+            color: var(--text-secondary);
+            font-size: 10px;
+            cursor: pointer;
+            transition: all .15s;
+            font-family: var(--font-ui);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .report-preview-btn:hover { color: var(--text-primary); border-color: rgba(96, 165, 250, 0.3); }
+        .report-preview-btn svg { width: 11px; height: 11px; }
+        .report-content-mock {
+            background: rgba(11, 18, 32, 0.8);
+            border-radius: 8px;
+            padding: 14px;
+            min-height: 200px;
+        }
+        .report-mock-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .report-mock-date {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        .report-mock-kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .report-mock-kpi {
+            background: rgba(19, 29, 44, 0.8);
+            border-radius: 6px;
+            padding: 8px 10px;
+            text-align: center;
+        }
+        .report-mock-kpi-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: var(--font-data);
+        }
+        .report-mock-kpi-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        .report-mock-kpi-change {
+            font-size: 9px;
+            margin-top: 2px;
+        }
+        .report-mock-kpi-change.up { color: var(--accent-red); }
+        .report-mock-kpi-change.down { color: var(--accent-green); }
+        .report-mock-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .report-mock-table th {
+            padding: 6px 8px;
+            font-size: 9px;
+            color: #8fa1b7;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.08);
+            text-align: left;
+            font-weight: 700;
+        }
+        .report-mock-table td {
+            padding: 6px 8px;
+            font-size: 10px;
+            color: #d5dde8;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.04);
+        }
+
+        /* Version history */
+        .version-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .version-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(16, 22, 34, 0.6);
+            border: 1px solid transparent;
+            transition: all .15s;
+        }
+        .version-item:hover { border-color: rgba(120, 142, 180, 0.1); }
+        .version-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .version-tag {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .version-meta {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        .version-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .version-action-btn {
+            padding: 3px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 10px;
+            cursor: pointer;
+            transition: all .15s;
+            font-family: var(--font-ui);
+        }
+        .version-action-btn:hover { color: var(--text-primary); border-color: rgba(96, 165, 250, 0.3); }
+
+        /* ===== DRAWER: New Template ===== */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            top: var(--topbar-h);
+            left: var(--nav-right-w);
+            background: rgba(2, 6, 23, 0.42);
+            z-index: 260;
+            display: none;
+        }
+        .drawer-overlay.open { display: block; }
+        .drawer-panel {
+            position: fixed;
+            top: var(--topbar-h);
+            right: 0;
+            width: clamp(520px, 48vw, 680px);
+            height: calc(100vh - var(--topbar-h));
+            border-left: 1px solid rgba(120, 142, 180, 0.12);
+            transform: translateX(100%);
+            transition: transform .22s ease;
+            z-index: 261;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+            box-shadow: -20px 0 48px rgba(2, 6, 23, 0.36);
+        }
+        .drawer-panel.open { transform: translateX(0); }
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+            background: linear-gradient(180deg, rgba(19, 29, 44, 0.98), rgba(22, 34, 51, 0.96));
+        }
+        .drawer-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .drawer-close {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all .15s;
+        }
+        .drawer-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .drawer-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 14px 20px;
+            border-top: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(22, 34, 51, 0.96);
+        }
+
+        /* Form elements */
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .form-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .form-group label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .form-group label .req { color: var(--accent-red); margin-left: 2px; }
+        .form-input,
+        .form-select {
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96);
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            font-family: var(--font-ui);
+            transition: border-color .18s;
+        }
+        .form-input:focus,
+        .form-select:focus { border-color: rgba(96, 165, 250, 0.3); }
+        .form-input::placeholder { color: var(--text-muted); }
+        .form-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 26px;
+        }
+
+        /* Radio group */
+        .radio-group { display: flex; gap: 16px; }
+        .radio-item {
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .radio-item.selected { color: var(--text-primary); }
+        .radio-dot {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(120, 142, 180, 0.3);
+            display: flex; align-items: center; justify-content: center;
+            transition: all .15s;
+        }
+        .radio-item.selected .radio-dot { border-color: var(--accent-blue); }
+        .radio-item.selected .radio-dot::after {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+        }
+
+        /* Checkbox group */
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .checkbox-item {
+            display: flex; align-items: center; gap: 6px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.6);
+            cursor: pointer;
+            transition: all .15s;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        .checkbox-item:hover { border-color: rgba(96, 165, 250, 0.2); }
+        .checkbox-item.checked { background: rgba(59, 130, 246, 0.1); border-color: rgba(96, 165, 250, 0.2); color: var(--text-primary); }
+        .checkbox-item input { display: none; }
+        .checkbox-item .cb-icon {
+            width: 14px; height: 14px;
+            border-radius: 3px;
+            border: 1.5px solid rgba(120, 142, 180, 0.3);
+            display: flex; align-items: center; justify-content: center;
+            transition: all .15s;
+        }
+        .checkbox-item.checked .cb-icon { background: var(--accent-blue); border-color: var(--accent-blue); }
+        .checkbox-item .cb-icon svg { width: 9px; height: 9px; opacity: 0; color: #fff; }
+        .checkbox-item.checked .cb-icon svg { opacity: 1; }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(21, 29, 42, 0.92);
+            color: #b5c0d3;
+            cursor: pointer;
+            transition: .18s ease;
+            font-family: var(--font-ui);
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .btn:hover { border-color: rgba(96, 165, 250, 0.24); color: var(--text-primary); }
+        .btn-primary { background: rgba(59, 130, 246, 0.14); border-color: rgba(96, 165, 250, 0.2); color: #dbeafe; }
+        .btn-primary:hover { background: rgba(59, 130, 246, 0.22); }
+        .btn-success { background: rgba(34, 197, 94, 0.14); border-color: rgba(34, 197, 94, 0.2); color: #bbf7d0; }
+        .btn-success:hover { background: rgba(34, 197, 94, 0.22); }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 80px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+        .modal-overlay { position: fixed; inset: 0; top: var(--topbar-h); left: var(--nav-right-w); background: rgba(2, 6, 23, 0.5); z-index: 300; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal-card { background: var(--bg-card); border: 1px solid rgba(120, 142, 180, 0.12); border-radius: var(--radius-lg); box-shadow: 0 24px 64px rgba(2, 6, 23, 0.4); }
+        .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1); }
+        .modal-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .modal-close { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: all .15s; }
+        .modal-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .modal-body { padding: 24px 20px; }
+        .confirm-body { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+        .confirm-body svg { color: var(--accent-amber); opacity: 0.8; }
+        .confirm-body h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+        .confirm-body p { font-size: 13px; color: var(--text-muted); }
+        .modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 1px solid rgba(120, 142, 180, 0.1); }
+        .toast {
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+            display: flex; align-items: center; gap: 8px;
+            animation: toastIn .3s ease;
+            min-width: 240px;
+        }
+        .toast.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(74, 222, 128, 0.2); color: #bbf7d0; }
+        .toast.error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.2); color: #fecaca; }
+        .toast.info { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(96, 165, 250, 0.2); color: #bfdbfe; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Pagination */
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            border-top: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(19, 29, 44, 0.98);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .pagination-pages { display: flex; gap: 4px; }
+        .page-btn {
+            width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 6px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 11px;
+            font-family: var(--font-ui);
+            transition: all .15s;
+        }
+        .page-btn:hover { border-color: rgba(96, 165, 250, 0.3); color: var(--text-primary); }
+        .page-btn.active { background: rgba(59, 130, 246, 0.14); border-color: rgba(96, 165, 250, 0.2); color: #dbeafe; }
+
+        /* Stats strip */
+        .stats-strip {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .stats-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .stats-item strong {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .stats-item span {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+        .stats-divider {
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+
+        /* Report preview area */
+        .report-preview-area {
+            background: rgba(16, 22, 34, 0.6);
+            border: 1px solid rgba(120, 142, 180, 0.1);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .report-preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.08);
+        }
+        .report-preview-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .report-preview-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .report-preview-btn {
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.96);
+            color: var(--text-secondary);
+            font-size: 10px;
+            cursor: pointer;
+            transition: all .15s;
+            font-family: var(--font-ui);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .report-preview-btn:hover { color: var(--text-primary); border-color: rgba(96, 165, 250, 0.3); }
+        .report-preview-btn svg { width: 11px; height: 11px; }
+        .report-content-mock {
+            background: rgba(11, 18, 32, 0.8);
+            border-radius: 8px;
+            padding: 14px;
+            min-height: 200px;
+        }
+        .report-mock-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .report-mock-date {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        .report-mock-kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .report-mock-kpi {
+            background: rgba(19, 29, 44, 0.8);
+            border-radius: 6px;
+            padding: 8px 10px;
+            text-align: center;
+        }
+        .report-mock-kpi-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: var(--font-data);
+        }
+        .report-mock-kpi-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        .report-mock-kpi-change {
+            font-size: 9px;
+            margin-top: 2px;
+        }
+        .report-mock-kpi-change.up { color: var(--accent-red); }
+        .report-mock-kpi-change.down { color: var(--accent-green); }
+        .report-mock-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .report-mock-table th {
+            padding: 6px 8px;
+            font-size: 9px;
+            color: #8fa1b7;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.08);
+            text-align: left;
+            font-weight: 700;
+        }
+        .report-mock-table td {
+            padding: 6px 8px;
+            font-size: 10px;
+            color: #d5dde8;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.04);
+        }
+
+        /* Export scope selector */
+        .export-scope-section { margin-bottom: 14px; }
+        .export-scope-title {
+            font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-bottom: 8px;
+        }
+        .export-scope-options { display: flex; gap: 8px; margin-bottom: 10px; }
+        .export-scope-option {
+            flex: 1; padding: 8px 10px; border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.6);
+            cursor: pointer; transition: all .15s;
+            text-align: center; font-size: 11px; font-weight: 600;
+            color: var(--text-muted);
+        }
+        .export-scope-option:hover { border-color: rgba(96, 165, 250, 0.2); color: var(--text-secondary); }
+        .export-scope-option.active {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.24);
+            color: var(--accent-green);
+        }
+        .export-scope-detail {
+            display: none;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(120, 142, 180, 0.1);
+            background: rgba(16, 22, 34, 0.4);
+        }
+        .export-scope-detail.visible { display: block; }
+
+        /* Empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.3; }
+        .empty-state p { font-size: 13px; margin-bottom: 12px; }
+
+        /* Personnel dropdown styles */
+        .personnel-dropdown {
+            max-height: 240px;
+            overflow-y: auto;
+            border: 1px solid rgba(120, 142, 180, 0.14);
+            border-radius: 8px;
+            background: rgba(16, 22, 34, 0.96);
+            margin-bottom: 8px;
+        }
+        .personnel-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all .15s;
+            border-bottom: 1px solid rgba(120, 142, 180, 0.06);
+        }
+        .personnel-item:last-child { border-bottom: none; }
+        .personnel-item:hover { background: rgba(30, 41, 59, 0.54); }
+        .personnel-item.selected { background: rgba(59, 130, 246, 0.08); }
+        .personnel-check {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1.5px solid rgba(120, 142, 180, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: transparent;
+            transition: all .15s;
+            flex-shrink: 0;
+        }
+        .personnel-item.selected .personnel-check {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+        .personnel-name {
+            font-size: 12px;
+            color: var(--text-primary);
+            font-weight: 500;
+            flex: 1;
+        }
+        .personnel-role {
+            font-size: 10px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        .selected-personnel-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .personnel-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(59, 130, 246, 0.12);
+            color: #93c5fd;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        .personnel-tag .remove-tag {
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity .15s;
+        }
+        .personnel-tag .remove-tag:hover { opacity: 1; }
+
+        /* Periodic report indicator */
+        .periodic-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .periodic-indicator.yes {
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--accent-green);
+        }
+        .periodic-indicator.no {
+            background: rgba(100, 116, 139, 0.12);
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===== MAIN LAYOUT ===== -->
+    <div class="main-wrap">
+        <!-- LEFT SIDEBAR: Template List -->
+        <aside class="sidebar-panel">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Templates</div>
+                <div class="type-tabs">
+                    <button class="type-tab active" data-type="all" onclick="filterTemplates('all')">All</button>
+                    <button class="type-tab" data-type="report" onclick="filterTemplates('report')">📊 Reports</button>
+                    <button class="type-tab" data-type="table" onclick="filterTemplates('table')">📋 Tables</button>
+                </div>
+                <div class="sidebar-search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    <input type="text" id="templateSearch" placeholder="Search templates..." oninput="searchTemplates(this.value)">
+                </div>
+            </div>
+            <div class="template-list" id="templateList"></div>
+            <div class="sidebar-footer">
+                <button class="new-template-btn" onclick="openNewTemplate()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                    New Template
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT: Task Queue -->
+        <main class="main-content">
+            <div class="content-header">
+                <div class="stats-strip">
+                    <div class="stats-item">
+                        <strong id="statTotalTasks">0</strong>
+                        <span>Total Tasks</span>
+                    </div>
+                    <div class="stats-divider">/</div>
+                    <div class="stats-item">
+                        <strong id="statCompletedTasks">0</strong>
+                        <span>Completed</span>
+                    </div>
+                    <div class="stats-divider">/</div>
+                    <div class="stats-item">
+                        <strong id="statRunningTasks">0</strong>
+                        <span>Running</span>
+                    </div>
+                </div>
+                <div class="content-actions">
+                    <button class="action-btn" onclick="showToast('Batch generate triggered', 'info')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                        Batch Generate
+                    </button>
+                    <button class="action-btn" onclick="showToast('Export all triggered', 'info')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Export All
+                    </button>
+                    <button class="action-btn primary" onclick="openGenerateReport()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Generate Report
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <label>Type</label>
+                <select class="filter-select" id="filterType" onchange="applyTaskFilters()">
+                    <option value="">All Types</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="thematic">Thematic</option>
+                    <option value="summary">Summary Table</option>
+                    <option value="allocation">Allocation Table</option>
+                    <option value="statistics">Statistics Table</option>
+                    <option value="carbon">Carbon Table</option>
+                    <option value="pivot">Pivot Table</option>
+                </select>
+                <label>Status</label>
+                <select class="filter-select" id="filterStatus" onchange="applyTaskFilters()">
+                    <option value="">All Status</option>
+                    <option value="completed">Completed</option>
+                    <option value="running">Running</option>
+                    <option value="queued">Queued</option>
+                    <option value="failed">Failed</option>
+                </select>
+                <label>Trigger</label>
+                <select class="filter-select" id="filterTrigger" onchange="applyTaskFilters()">
+                    <option value="">All Triggers</option>
+                    <option value="auto">Auto</option>
+                    <option value="manual">Manual</option>
+                </select>
+                <button class="action-btn" onclick="resetTaskFilters()" style="font-size:10px;padding:5px 8px;">Reset</button>
+            </div>
+
+            <div class="task-table-wrap">
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Report Name</th>
+                            <th>Type</th>
+                            <th>Period</th>
+                            <th>Trigger</th>
+                            <th>Status</th>
+                            <th>Progress</th>
+                            <th>Duration</th>
+                            <th style="text-align:right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taskTableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="pagination-bar">
+                <span id="paginationInfo">Showing 0 of 0</span>
+                <div class="pagination-pages" id="paginationPages"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== SLIDE-OUT PREVIEW PANEL ===== -->
+    <div class="preview-overlay" id="previewOverlay" onclick="closePreview()"></div>
+    <aside class="preview-panel" id="previewPanel">
+        <div class="preview-header">
+            <div class="preview-title" id="previewTitle">Task Details</div>
+            <button class="preview-close" onclick="closePreview()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <div class="preview-body" id="previewBody"></div>
+    </aside>
+
+    <!-- ===== DRAWER: Generate Report ===== -->
+    <div class="drawer-overlay" id="generateDrawerOverlay" onclick="closeGenerateDrawer()"></div>
+    <aside class="drawer-panel" id="generateDrawer">
+        <div class="drawer-header">
+            <div class="drawer-title">Generate Report</div>
+            <button class="drawer-close" onclick="closeGenerateDrawer()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <div class="drawer-body">
+            <div class="form-section">
+                <div class="form-section-title">Step 1: Select Template</div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Report Template<span class="req">*</span></label>
+                        <select class="form-select" id="gen_template" onchange="onGenTemplateChange()">
+                            <option value="">Select a template...</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="genTemplateInfo" style="margin-top:8px;font-size:11px;color:var(--text-muted);display:none">
+                    <span id="genTemplateCategory"></span>
+                    <span id="genTemplatePeriodic" class="periodic-indicator"></span>
+                </div>
+            </div>
+
+            <div class="form-section" id="genParamsSection" style="display:none">
+                <div class="form-section-title">Step 2: Configure Parameters</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Report Period</label>
+                        <div class="radio-group" id="periodRadios">
+                            <div class="radio-item selected" onclick="setPeriod('default')"><span class="radio-dot"></span><span>Default</span></div>
+                            <div class="radio-item" onclick="setPeriod('custom')"><span class="radio-dot"></span><span>Custom</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row" id="customPeriodRow" style="display:none">
+                    <div class="form-group">
+                        <label>From</label>
+                        <input class="form-input" type="date" id="gen_from">
+                    </div>
+                    <div class="form-group">
+                        <label>To</label>
+                        <input class="form-input" type="date" id="gen_to">
+                    </div>
+                </div>
+
+                <div class="export-scope-section">
+                    <div class="export-scope-title">Export Scope (select one dimension)</div>
+                    <div class="export-scope-options">
+                        <div class="export-scope-option active" data-scope="space" onclick="setExportScope('space')">By Space</div>
+                        <div class="export-scope-option" data-scope="org" onclick="setExportScope('org')">By Organization</div>
+                        <div class="export-scope-option" data-scope="device" onclick="setExportScope('device')">By Device</div>
+                    </div>
+                    <div class="export-scope-detail visible" id="scopeSpace">
+                        <div class="checkbox-group">
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Block FA</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Block FB</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Library</span><input type="checkbox"></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Dormitory</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Cooling Plant</span><input type="checkbox"></div>
+                        </div>
+                    </div>
+                    <div class="export-scope-detail" id="scopeOrg">
+                        <div class="checkbox-group">
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Faculty of Computing</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Faculty of Engineering</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Library</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Student Affairs</span><input type="checkbox"></div>
+                        </div>
+                    </div>
+                    <div class="export-scope-detail" id="scopeDevice">
+                        <div class="checkbox-group">
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CH-1 Chiller</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CH-2 Chiller</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>AHU-3</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CWP-1 Pump</span><input type="checkbox"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Additional Metrics</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Equipment Efficiency</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Weather Correlation</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Carbon Detail</span><input type="checkbox"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+
+            <div class="form-section" id="genOutputSection" style="display:none">
+                <div class="form-section-title">Step 3: Output & Notify</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Output Format</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>PDF</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Excel</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CSV</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>PNG Charts</span><input type="checkbox"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Language</label>
+                        <select class="form-select" id="gen_language">
+                            <option value="en">English (Default)</option>
+                            <option value="zh">Chinese</option>
+                            <option value="bilingual">Bilingual</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Notify on Completion</label>
+                        <div class="radio-group" id="genNotifyRadios">
+                            <div class="radio-item selected" onclick="setGenNotify('yes')"><span class="radio-dot"></span><span>Yes</span></div>
+                            <div class="radio-item" onclick="setGenNotify('no')"><span class="radio-dot"></span><span>No</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Recipients</label>
+                        <input class="form-input" id="gen_recipients" placeholder="admin@utar.edu.my, weiming@utar.edu.my">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section" id="genPushSection" style="display:none">
+                <div class="form-section-title">Step 4: Personnel Push</div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Push Targets (Multi-select)</label>
+                        <div style="position:relative">
+                            <input class="form-input" id="gen_pushTargets_search" placeholder="Search personnel..." oninput="filterPushTargets('gen')" style="margin-bottom:8px">
+                            <div class="personnel-dropdown" id="gen_pushTargets_dropdown">
+                                <div class="personnel-item selected" data-id="p1" onclick="togglePersonnel('gen', 'p1')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Ahmad Razak</span>
+                                    <span class="personnel-role">Admin</span>
+                                </div>
+                                <div class="personnel-item selected" data-id="p2" onclick="togglePersonnel('gen', 'p2')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Lee Wei Ming</span>
+                                    <span class="personnel-role">Energy Manager</span>
+                                </div>
+                                <div class="personnel-item" data-id="p3" onclick="togglePersonnel('gen', 'p3')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Raj Kumar</span>
+                                    <span class="personnel-role">O&M Staff</span>
+                                </div>
+                                <div class="personnel-item" data-id="p4" onclick="togglePersonnel('gen', 'p4')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Dr. Lim Siew Hua</span>
+                                    <span class="personnel-role">Department Head</span>
+                                </div>
+                                <div class="personnel-item" data-id="p5" onclick="togglePersonnel('gen', 'p5')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Ng Ai Ling</span>
+                                    <span class="personnel-role">Finance Officer</span>
+                                </div>
+                                <div class="personnel-item" data-id="p6" onclick="togglePersonnel('gen', 'p6')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Tan Mei Lin</span>
+                                    <span class="personnel-role">Facility Manager</span>
+                                </div>
+                                <div class="personnel-item" data-id="p7" onclick="togglePersonnel('gen', 'p7')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Wong Kar Wai</span>
+                                    <span class="personnel-role">Sustainability Lead</span>
+                                </div>
+                                <div class="personnel-item" data-id="p8" onclick="togglePersonnel('gen', 'p8')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Sarah Abdullah</span>
+                                    <span class="personnel-role">Campus Director</span>
+                                </div>
+                            </div>
+                            <div class="selected-personnel-tags" id="gen_selectedTags"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Push Channel</label>
+                        <div class="checkbox-group" id="genPushChannels">
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Email</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>In-App</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>SMS</span><input type="checkbox"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Push Timing</label>
+                        <select class="form-select" id="gen_pushTiming">
+                            <option value="immediate">Immediate</option>
+                            <option value="scheduled">Scheduled</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <button class="btn" onclick="closeGenerateDrawer()">Cancel</button>
+            <button class="btn btn-success" onclick="confirmGenerate()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Generate Report
+            </button>
+        </div>
+    </aside>
+
+    <!-- ===== DRAWER: New/Edit Template ===== -->
+    <div class="drawer-overlay" id="templateDrawerOverlay" onclick="closeTemplateDrawer()"></div>
+    <aside class="drawer-panel" id="templateDrawer">
+        <div class="drawer-header">
+            <div class="drawer-title" id="templateDrawerTitle">New Template</div>
+            <button class="drawer-close" onclick="closeTemplateDrawer()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <div class="drawer-body">
+            <div class="form-section">
+                <div class="form-section-title">Basic Information</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Template Name<span class="req">*</span></label>
+                        <input class="form-input" id="tpl_name" placeholder="e.g. Daily Energy Summary">
+                    </div>
+                    <div class="form-group">
+                        <label>Category<span class="req">*</span></label>
+                        <select class="form-select" id="tpl_category" onchange="onCategoryChange()">
+                            <option value="report">📊 Report</option>
+                            <option value="table">📋 Table/Statement</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Report Type<span class="req">*</span></label>
+                        <select class="form-select" id="tpl_type" onchange="onTypeChange()">
+                            <option value="daily">Daily Report</option>
+                            <option value="weekly">Weekly Report</option>
+                            <option value="monthly">Monthly Report</option>
+                            <option value="custom">Custom Report</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row" id="periodicRow">
+                    <div class="form-group">
+                        <label>Is Periodic Report</label>
+                        <div style="display:flex;gap:8px;margin-top:4px">
+                            <button type="button" class="btn" id="periodicYesBtn" onclick="setPeriodic('yes')" style="flex:1">Yes, Recurring</button>
+                            <button type="button" class="btn" id="periodicNoBtn" onclick="setPeriodic('no')" style="flex:1">No, One-time</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row" id="timeRangeRow" style="display:none">
+                    <div class="form-group">
+                        <label>Start Date & Time</label>
+                        <input class="form-input" type="text" id="tpl_startDateTime" placeholder="YYYY-MM-DD HH:mm" onfocus="this.type='datetime-local'" onblur="if(!this.value)this.type='text'">
+                    </div>
+                    <div class="form-group">
+                        <label>End Date & Time</label>
+                        <input class="form-input" type="text" id="tpl_endDateTime" placeholder="YYYY-MM-DD HH:mm" onfocus="this.type='datetime-local'" onblur="if(!this.value)this.type='text'">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Data Scope</div>
+                <div class="export-scope-section">
+                    <div class="export-scope-title">Export Scope (select one dimension)</div>
+                    <div class="export-scope-options" id="tplExportScope">
+                        <div class="export-scope-option active" data-scope="space" onclick="setTplExportScope('space')">By Space</div>
+                        <div class="export-scope-option" data-scope="org" onclick="setTplExportScope('org')">By Organization</div>
+                        <div class="export-scope-option" data-scope="device" onclick="setTplExportScope('device')">By Device</div>
+                    </div>
+                    <div class="export-scope-detail visible" id="tplScopeSpace">
+                        <div class="checkbox-group">
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Block FA</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Block FB</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Library</span><input type="checkbox"></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Dormitory</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Cooling Plant</span><input type="checkbox"></div>
+                        </div>
+                    </div>
+                    <div class="export-scope-detail" id="tplScopeOrg">
+                        <div class="checkbox-group">
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Faculty of Computing</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Faculty of Engineering</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Library</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Student Affairs</span><input type="checkbox"></div>
+                        </div>
+                    </div>
+                    <div class="export-scope-detail" id="tplScopeDevice">
+                        <div class="checkbox-group">
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CH-1 Chiller</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CH-2 Chiller</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>AHU-3</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CWP-1 Pump</span><input type="checkbox"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Report Content</div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Include Metrics<span class="req">*</span></label>
+                        <div class="checkbox-group" id="metricCheckboxes">
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Energy Consumption</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Water Consumption</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Carbon Emissions</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Cost Analysis</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Equipment Efficiency</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Weather Correlation</span><input type="checkbox"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Comparison Dimensions</label>
+                        <div class="checkbox-group" id="compareCheckboxes">
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>MoM (vs Previous)</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>YoY (vs Last Year)</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Budget Comparison</span><input type="checkbox"></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Department Ranking</span><input type="checkbox" checked></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Output Format<span class="req">*</span></label>
+                        <div class="checkbox-group" id="formatCheckboxes">
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>PDF</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Excel</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CSV</span><input type="checkbox"></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>PNG Charts</span><input type="checkbox"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Report Language</label>
+                        <select class="form-select" id="tpl_language">
+                            <option value="en">English (Default)</option>
+                            <option value="zh">Chinese</option>
+                            <option value="bilingual">Bilingual (EN + ZH)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Personnel Push</div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Push Targets (Multi-select)</label>
+                        <div style="position:relative">
+                            <input class="form-input" id="tpl_pushTargets_search" placeholder="Search personnel..." oninput="filterPushTargets('tpl')" style="margin-bottom:8px">
+                            <div class="personnel-dropdown" id="tpl_pushTargets_dropdown">
+                                <div class="personnel-item selected" data-id="p1" onclick="togglePersonnel('tpl', 'p1')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Ahmad Razak</span>
+                                    <span class="personnel-role">Admin</span>
+                                </div>
+                                <div class="personnel-item selected" data-id="p2" onclick="togglePersonnel('tpl', 'p2')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Lee Wei Ming</span>
+                                    <span class="personnel-role">Energy Manager</span>
+                                </div>
+                                <div class="personnel-item" data-id="p3" onclick="togglePersonnel('tpl', 'p3')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Raj Kumar</span>
+                                    <span class="personnel-role">O&M Staff</span>
+                                </div>
+                                <div class="personnel-item" data-id="p4" onclick="togglePersonnel('tpl', 'p4')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Dr. Lim Siew Hua</span>
+                                    <span class="personnel-role">Department Head</span>
+                                </div>
+                                <div class="personnel-item" data-id="p5" onclick="togglePersonnel('tpl', 'p5')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Ng Ai Ling</span>
+                                    <span class="personnel-role">Finance Officer</span>
+                                </div>
+                                <div class="personnel-item" data-id="p6" onclick="togglePersonnel('tpl', 'p6')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Tan Mei Lin</span>
+                                    <span class="personnel-role">Facility Manager</span>
+                                </div>
+                                <div class="personnel-item" data-id="p7" onclick="togglePersonnel('tpl', 'p7')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Wong Kar Wai</span>
+                                    <span class="personnel-role">Sustainability Lead</span>
+                                </div>
+                                <div class="personnel-item" data-id="p8" onclick="togglePersonnel('tpl', 'p8')">
+                                    <span class="personnel-check">✓</span>
+                                    <span class="personnel-name">Sarah Abdullah</span>
+                                    <span class="personnel-role">Campus Director</span>
+                                </div>
+                            </div>
+                            <div class="selected-personnel-tags" id="tpl_selectedTags"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Push Channel</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Email</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>In-App</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>SMS</span><input type="checkbox"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Push Timing</label>
+                        <select class="form-select" id="tpl_pushTiming">
+                            <option value="immediate">Immediate (on generation)</option>
+                            <option value="scheduled">Scheduled Delivery</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Push Message Template</label>
+                        <input class="form-input" id="tpl_pushMsg" placeholder="Your {reportName} for {period} is ready. Please review.">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Notification</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Notify on Completion</label>
+                        <div class="radio-group" id="notifyRadios">
+                            <div class="radio-item selected" onclick="setNotify('yes')"><span class="radio-dot"></span><span>Yes</span></div>
+                            <div class="radio-item" onclick="setNotify('no')"><span class="radio-dot"></span><span>No</span></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notification Channels</label>
+                        <div class="checkbox-group" id="channelCheckboxes">
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Email</span><input type="checkbox" checked></div>
+                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>In-App</span><input type="checkbox" checked></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Recipients</label>
+                        <input class="form-input" id="tpl_recipients" placeholder="admin@utar.edu.my, weiming@utar.edu.my">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <button class="btn" onclick="closeTemplateDrawer()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveTemplate()">Save Template</button>
+        </div>
+    </aside>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== MODAL: Confirm Dialog ===== -->
+    <div class="modal-overlay" id="confirmModal" onclick="if(event.target===this)closeModal('confirmModal')">
+        <div class="modal-card" style="width:min(440px,calc(100vw - 48px))">
+            <div class="modal-head">
+                <span class="modal-title" id="confirmModalTitle">Confirm</span>
+                <button class="modal-close" onclick="closeModal('confirmModal')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-body">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                    <h3 id="confirmTitle">Are you sure?</h3>
+                    <p id="confirmMsg">This action cannot be undone.</p>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn" onclick="closeModal('confirmModal')">Cancel</button>
+                <button class="btn btn-danger" id="confirmActionBtn" onclick="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ===== MOCK DATA ===== */
+        var templates = [
+            { id: 'tpl-001', name: 'Daily Energy Summary', category: 'report', type: 'daily', schedule: 'auto', time: '08:00', lastGen: '2026-04-06 08:00', status: 'green', active: true },
+            { id: 'tpl-002', name: 'Weekly Energy & Carbon', category: 'report', type: 'weekly', schedule: 'manual', time: '', lastGen: '2026-03-31 17:30', status: 'green', active: true },
+            { id: 'tpl-003', name: 'Monthly Billing Statement', category: 'report', type: 'monthly', schedule: 'scheduled', time: '00:00', lastGen: '2026-04-01 00:00', status: 'amber', active: true },
+            { id: 'tpl-004', name: 'HVAC Efficiency Analysis', category: 'report', type: 'thematic', schedule: 'manual', time: '', lastGen: '2026-03-15 14:20', status: 'green', active: true },
+            { id: 'tpl-005', name: 'Custom Report', category: 'report', type: 'custom', schedule: 'manual', time: '', lastGen: 'Never', status: 'gray', active: false },
+            { id: 'tpl-006', name: 'Energy Summary Table', category: 'table', type: 'summary', schedule: 'manual', time: '', lastGen: '2026-04-01 10:00', status: 'green', active: true },
+            { id: 'tpl-007', name: 'Cost Allocation Table', category: 'table', type: 'allocation', schedule: 'scheduled', time: '00:00', lastGen: '2026-04-03 00:00', status: 'amber', active: true },
+            { id: 'tpl-008', name: 'Equipment Operation Table', category: 'table', type: 'statistics', schedule: 'manual', time: '', lastGen: '2026-03-28 16:00', status: 'green', active: true },
+            { id: 'tpl-009', name: 'Carbon Accounting Table', category: 'table', type: 'carbon', schedule: 'scheduled', time: '00:00', lastGen: '2026-04-01 00:00', status: 'amber', active: true },
+            { id: 'tpl-010', name: 'Custom Pivot Table', category: 'table', type: 'pivot', schedule: 'manual', time: '', lastGen: '2026-03-20 11:30', status: 'green', active: true }
+        ];
+
+        var tasks = [
+            { id: 'task-0406-001', name: 'Daily Energy Summary 04-06', template: 'Daily Energy Summary', type: 'daily', period: '2026-04-05 ~ 04-06', trigger: 'auto', status: 'completed', progress: 100, duration: '2m 15s', outputs: ['pdf', 'excel'] },
+            { id: 'task-0407-001', name: 'Daily Energy Summary 04-07', template: 'Daily Energy Summary', type: 'daily', period: '2026-04-06 ~ 04-07', trigger: 'auto', status: 'running', progress: 72, duration: '-', outputs: [] },
+            { id: 'task-0401-001', name: 'Monthly Billing Mar 2026', template: 'Monthly Billing Statement', type: 'monthly', period: '2026-03-01 ~ 03-31', trigger: 'auto', status: 'completed', progress: 100, duration: '5m 42s', outputs: ['pdf', 'excel'] },
+            { id: 'task-0315-001', name: 'HVAC Efficiency Q1', template: 'HVAC Efficiency Analysis', type: 'thematic', period: '2026-Q1', trigger: 'manual', status: 'failed', progress: 45, duration: '-', outputs: [] },
+            { id: 'task-0401-002', name: 'Energy Summary Table Mar', template: 'Energy Summary Table', type: 'summary', period: '2026-03-01 ~ 03-31', trigger: 'manual', status: 'completed', progress: 100, duration: '1m 32s', outputs: ['excel', 'csv'] },
+            { id: 'task-0403-001', name: 'Cost Allocation Table Mar', template: 'Cost Allocation Table', type: 'allocation', period: '2026-03-01 ~ 03-31', trigger: 'auto', status: 'completed', progress: 100, duration: '2m 08s', outputs: ['excel'] },
+            { id: 'task-0401-003', name: 'Carbon Accounting Q1', template: 'Carbon Accounting Table', type: 'carbon', period: '2026-Q1', trigger: 'auto', status: 'completed', progress: 100, duration: '3m 15s', outputs: ['pdf', 'excel', 'csv'] },
+            { id: 'task-0320-001', name: 'Custom Pivot Table Q1', template: 'Custom Pivot Table', type: 'pivot', period: '2026-Q1', trigger: 'manual', status: 'completed', progress: 100, duration: '0m 45s', outputs: ['excel'] },
+            { id: 'task-0331-001', name: 'Weekly Energy & Carbon W13', template: 'Weekly Energy & Carbon', type: 'weekly', period: '2026-03-24 ~ 03-30', trigger: 'manual', status: 'completed', progress: 100, duration: '3m 28s', outputs: ['pdf'] },
+            { id: 'task-0407-002', name: 'Equipment Operation Apr', template: 'Equipment Operation Table', type: 'statistics', period: '2026-04-01 ~ 04-07', trigger: 'manual', status: 'queued', progress: 0, duration: '-', outputs: [] },
+            { id: 'task-0402-001', name: 'Daily Energy Summary 04-02', template: 'Daily Energy Summary', type: 'daily', period: '2026-04-01 ~ 04-02', trigger: 'auto', status: 'completed', progress: 100, duration: '2m 02s', outputs: ['pdf', 'excel'] },
+            { id: 'task-0403-002', name: 'Daily Energy Summary 04-03', template: 'Daily Energy Summary', type: 'daily', period: '2026-04-02 ~ 04-03', trigger: 'auto', status: 'completed', progress: 100, duration: '1m 58s', outputs: ['pdf', 'excel'] }
+        ];
+
+        var versions = {
+            'task-0406-001': [
+                { v: 'v12', date: '2026-04-06 08:00', by: 'Scheduler', duration: '2m 15s' },
+                { v: 'v11', date: '2026-04-05 08:00', by: 'Scheduler', duration: '2m 08s' },
+                { v: 'v10', date: '2026-04-04 08:00', by: 'Scheduler', duration: '1m 55s' },
+                { v: 'v9', date: '2026-04-03 14:30', by: 'Admin', duration: '3m 12s' }
+            ],
+            'task-0401-001': [
+                { v: 'v3', date: '2026-04-01 00:00', by: 'Scheduler', duration: '5m 42s' },
+                { v: 'v2', date: '2026-03-01 00:00', by: 'Scheduler', duration: '5m 18s' }
+            ]
+        };
+
+        var currentFilter = 'all';
+        var searchQuery = '';
+        var filteredTasks = [];
+        var currentPage = 1;
+        var pageSize = 10;
+        var editingTemplateId = null;
+
+        /* ===== TEMPLATE LIST ===== */
+        function renderTemplates() {
+            var list = document.getElementById('templateList');
+            var filtered = templates.filter(function(t) {
+                if (currentFilter !== 'all' && t.category !== currentFilter) return false;
+                if (searchQuery && t.name.toLowerCase().indexOf(searchQuery.toLowerCase()) === -1) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="empty-state"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg><p>No templates found</p></div>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < filtered.length; i++) {
+                var t = filtered[i];
+                var badgeCls = t.category === 'report' ? 'report' : 'table';
+                var statusDot = t.status === 'green' ? 'green' : t.status === 'amber' ? 'amber' : 'gray';
+                var typeLabel = capitalize(t.type);
+
+                html += '<div class="template-item" onclick="selectTemplate(\'' + t.id + '\')">' +
+                    '<div class="template-item-header">' +
+                        '<span class="template-type-badge ' + badgeCls + '">' + (t.category === 'report' ? '📊' : '📋') + '</span>' +
+                        '<span class="template-name">' + esc(t.name) + '</span>' +
+                    '</div>' +
+                    '<div class="template-meta">' +
+                        '<span class="template-status"><span class="dot ' + statusDot + '"></span></span>' +
+                        '<span>' + typeLabel + '</span>' +
+                    '</div>' +
+                    '<div class="template-meta" style="margin-top:2px">' +
+                        '<span>Last: ' + t.lastGen + '</span>' +
+                    '</div>' +
+                    '<div class="template-actions">' +
+                        '<button class="template-action-btn primary" onclick="event.stopPropagation();generateFromTemplate(\'' + t.id + '\')">▶ Generate</button>' +
+                        '<button class="template-action-btn" onclick="event.stopPropagation();editTemplate(\'' + t.id + '\')">Edit</button>' +
+                        '<button class="template-action-btn" onclick="event.stopPropagation();deleteTemplate(\'' + t.id + '\')">Delete</button>' +
+                    '</div>' +
+                '</div>';
+            }
+            list.innerHTML = html;
+        }
+
+        function filterTemplates(type) {
+            currentFilter = type;
+            document.querySelectorAll('.type-tab').forEach(function(t) {
+                t.classList.toggle('active', t.dataset.type === type);
+            });
+            renderTemplates();
+        }
+
+        function searchTemplates(query) {
+            searchQuery = query;
+            renderTemplates();
+        }
+
+        function selectTemplate(id) {
+            document.querySelectorAll('.template-item').forEach(function(item) { item.classList.remove('active'); });
+            event.currentTarget.classList.add('active');
+        }
+
+        /* ===== TASK TABLE ===== */
+        function renderTasks() {
+            var typeFilter = document.getElementById('filterType').value;
+            var statusFilter = document.getElementById('filterStatus').value;
+            var triggerFilter = document.getElementById('filterTrigger').value;
+
+            filteredTasks = tasks.filter(function(t) {
+                if (typeFilter && t.type !== typeFilter) return false;
+                if (statusFilter && t.status !== statusFilter) return false;
+                if (triggerFilter && t.trigger !== triggerFilter) return false;
+                return true;
+            });
+
+            var total = filteredTasks.length;
+            var totalPages = Math.max(1, Math.ceil(total / pageSize));
+            if (currentPage > totalPages) currentPage = totalPages;
+            var start = (currentPage - 1) * pageSize;
+            var pageTasks = filteredTasks.slice(start, start + pageSize);
+
+            document.getElementById('statTotalTasks').textContent = tasks.length;
+            document.getElementById('statCompletedTasks').textContent = tasks.filter(function(t){ return t.status === 'completed'; }).length;
+            document.getElementById('statRunningTasks').textContent = tasks.filter(function(t){ return t.status === 'running'; }).length;
+            document.getElementById('paginationInfo').textContent = 'Showing ' + (total ? start + 1 : 0) + '-' + Math.min(start + pageSize, total) + ' of ' + total;
+
+            var tbody = document.getElementById('taskTableBody');
+            if (pageTasks.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted)">No tasks found</td></tr>';
+            } else {
+                var html = '';
+                for (var i = 0; i < pageTasks.length; i++) {
+                    var t = pageTasks[i];
+                    var statusLabel = t.status.charAt(0).toUpperCase() + t.status.slice(1);
+                    var progressColor = t.status === 'completed' ? 'green' : t.status === 'running' ? 'blue' : t.status === 'queued' ? 'amber' : 'red';
+                    var triggerLabel = t.trigger === 'auto' ? 'Auto' : 'Manual';
+
+                    html += '<tr onclick="openPreview(\'' + t.id + '\')">' +
+                        '<td style="font-family:var(--font-data);font-size:11px;color:var(--text-muted)">' + esc(t.id) + '</td>' +
+                        '<td style="font-weight:600;color:var(--text-primary)">' + esc(t.name) + '</td>' +
+                        '<td><span class="task-type-badge ' + t.type + '">' + capitalize(t.type) + '</span></td>' +
+                        '<td style="font-size:11px;color:var(--text-secondary)">' + esc(t.period) + '</td>' +
+                        '<td><span style="font-size:11px;color:var(--text-muted)">' + triggerLabel + '</span></td>' +
+                        '<td><span class="status-badge ' + t.status + '"><span class="pulse"></span>' + statusLabel + '</span></td>' +
+                        '<td>' +
+                            '<div class="progress-bar"><div class="progress-bar-fill ' + progressColor + '" style="width:' + t.progress + '%"></div></div>' +
+                            '<span style="font-size:10px;color:var(--text-muted)">' + t.progress + '%</span>' +
+                        '</td>' +
+                        '<td style="font-size:11px;color:var(--text-muted)">' + (t.duration || '—') + '</td>' +
+                        '<td style="text-align:right" onclick="event.stopPropagation()">' +
+                            '<div class="row-actions">' +
+                                (t.status === 'completed' ? '<button class="row-action-btn" title="View" onclick="openPreview(\'' + t.id + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>' : '') +
+                                (t.status === 'completed' ? '<button class="row-action-btn" title="Download" onclick="showToast(\'Downloading ' + esc(t.name) + '\', \'info\')"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>' : '') +
+                                (t.status === 'failed' ? '<button class="row-action-btn" title="Retry" onclick="retryTask(\'' + t.id + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></button>' : '') +
+                                (t.status === 'running' || t.status === 'queued' ? '<button class="row-action-btn" title="Cancel" onclick="cancelTask(\'' + t.id + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg></button>' : '') +
+                            '</div>' +
+                        '</td>' +
+                    '</tr>';
+                }
+                tbody.innerHTML = html;
+            }
+
+            // Pagination
+            var pagesHtml = '';
+            pagesHtml += '<button class="page-btn" onclick="goPage(' + (currentPage - 1) + ')" ' + (currentPage <= 1 ? 'disabled' : '') + '>&lt;</button>';
+            for (var p = 1; p <= totalPages; p++) {
+                pagesHtml += '<button class="page-btn ' + (p === currentPage ? 'active' : '') + '" onclick="goPage(' + p + ')">' + p + '</button>';
+            }
+            pagesHtml += '<button class="page-btn" onclick="goPage(' + (currentPage + 1) + ')" ' + (currentPage >= totalPages ? 'disabled' : '') + '>&gt;</button>';
+            document.getElementById('paginationPages').innerHTML = pagesHtml;
+        }
+
+        function applyTaskFilters() { currentPage = 1; renderTasks(); }
+        function resetTaskFilters() {
+            document.getElementById('filterType').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterTrigger').value = '';
+            currentPage = 1;
+            renderTasks();
+        }
+        function goPage(p) {
+            var totalPages = Math.ceil(filteredTasks.length / pageSize);
+            if (p < 1 || p > totalPages) return;
+            currentPage = p;
+            renderTasks();
+        }
+
+        /* ===== PREVIEW PANEL ===== */
+        function openPreview(taskId) {
+            var task = tasks.find(function(t) { return t.id === taskId; });
+            if (!task) return;
+
+            document.getElementById('previewTitle').textContent = task.name;
+            var verList = versions[taskId] || [];
+
+            var body = document.getElementById('previewBody');
+            var html = '';
+
+            // Report preview area (for completed tasks)
+            if (task.status === 'completed') {
+                html += '<div class="preview-section">' +
+                    '<div class="report-preview-area">' +
+                        '<div class="report-preview-header">' +
+                            '<span class="report-preview-title">📄 Report Preview</span>' +
+                            '<div class="report-preview-actions">' +
+                                '<button class="report-preview-btn" onclick="showToast(\'Exporting PDF...\', \'info\')"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> PDF</button>' +
+                                '<button class="report-preview-btn" onclick="showToast(\'Exporting Excel...\', \'info\')"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>' +
+                                '<button class="report-preview-btn" onclick="showToast(\'Exporting CSV...\', \'info\')"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> CSV</button>' +
+                                '<button class="report-preview-btn" onclick="showToast(\'Printing...\', \'info\')"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="report-content-mock">' +
+                            '<div class="report-mock-title">UTAR Campus Energy Daily Report</div>' +
+                            '<div class="report-mock-date">Period: ' + esc(task.period) + ' | Generated: ' + new Date().toLocaleString() + ' | Language: English</div>' +
+                            '<div class="report-mock-kpi-row">' +
+                                '<div class="report-mock-kpi"><div class="report-mock-kpi-value">12,450</div><div class="report-mock-kpi-label">kWh</div><div class="report-mock-kpi-change up">↑ 3.2%</div></div>' +
+                                '<div class="report-mock-kpi"><div class="report-mock-kpi-value">856</div><div class="report-mock-kpi-label">m³ Water</div><div class="report-mock-kpi-change down">↓ 1.5%</div></div>' +
+                                '<div class="report-mock-kpi"><div class="report-mock-kpi-value">6.82</div><div class="report-mock-kpi-label">tCO₂</div><div class="report-mock-kpi-change up">↑ 2.8%</div></div>' +
+                                '<div class="report-mock-kpi"><div class="report-mock-kpi-value">4,230</div><div class="report-mock-kpi-label">RM Cost</div><div class="report-mock-kpi-change up">↑ 4.1%</div></div>' +
+                            '</div>' +
+                            '<div style="margin-top:14px;margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;">Energy Breakdown by Space</div>' +
+                            '<table class="report-mock-table">' +
+                                '<thead><tr><th>Space</th><th>Energy (kWh)</th><th>Change</th><th>Cost (RM)</th><th>Carbon (tCO₂)</th></tr></thead>' +
+                                '<tbody>' +
+                                '<tr><td>Block FA</td><td>4,200</td><td style="color:#f87171">↑ 5%</td><td>1,450</td><td>2.30</td></tr>' +
+                                '<tr><td>Block FB</td><td>3,800</td><td style="color:#4ade80">↓ 2%</td><td>1,310</td><td>2.08</td></tr>' +
+                                '<tr><td>Library</td><td>2,100</td><td style="color:#f87171">↑ 1%</td><td>725</td><td>1.15</td></tr>' +
+                                '<tr><td>Dormitory</td><td>2,350</td><td style="color:#f87171">↑ 8%</td><td>810</td><td>1.29</td></tr>' +
+                                '</tbody>' +
+                            '</table>' +
+                            '<div style="margin-top:14px;margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;">Anomaly Events</div>' +
+                            '<div style="font-size:10px;color:var(--text-muted);line-height:1.6;">' +
+                                '<div style="padding:4px 0;border-bottom:1px solid rgba(120,142,180,0.06);">⚠️ 02:15 Block FB 3F — Energy spike +45% (duration 2h)</div>' +
+                                '<div style="padding:4px 0;border-bottom:1px solid rgba(120,142,180,0.06);">⚠️ 14:30 CH-1 Chiller — COP dropped to 3.2 (normal ≥4.0)</div>' +
+                                '<div style="padding:4px 0;">✅ Night shutdown compliance: 98% (target met)</div>' +
+                            '</div>' +
+                            '<div style="margin-top:14px;margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;">Weather Correlation</div>' +
+                            '<div style="font-size:10px;color:var(--text-muted);line-height:1.6;">' +
+                                '<div>Max Temp: 34°C | Avg Humidity: 78% | Condition: Partly Cloudy</div>' +
+                                '<div>Est. impact: +3.5% cooling load per 1°C above baseline (30°C)</div>' +
+                            '</div>' +
+                            '<div style="margin-top:14px;margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;">Recommendations</div>' +
+                            '<div style="font-size:10px;color:var(--text-muted);line-height:1.6;">' +
+                                '<div>💡 Dormitory night lighting off-rate 15% — increase patrol frequency</div>' +
+                                '<div>💡 Block FA weekend overtime areas suggest sub-metering</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }
+
+            // Task info
+            html += '<div class="preview-section">' +
+                '<div class="preview-section-title">Task Information</div>' +
+                '<div class="preview-detail-grid">' +
+                    '<div class="preview-detail-item"><div class="preview-detail-label">Task ID</div><div class="preview-detail-value" style="font-family:var(--font-data);font-size:11px">' + esc(task.id) + '</div></div>' +
+                    '<div class="preview-detail-item"><div class="preview-detail-label">Template</div><div class="preview-detail-value">' + esc(task.template) + '</div></div>' +
+                    '<div class="preview-detail-item"><div class="preview-detail-label">Type</div><div class="preview-detail-value"><span class="task-type-badge ' + task.type + '">' + capitalize(task.type) + '</span></div></div>' +
+                    '<div class="preview-detail-item"><div class="preview-detail-label">Period</div><div class="preview-detail-value">' + esc(task.period) + '</div></div>' +
+                    '<div class="preview-detail-item"><div class="preview-detail-label">Trigger</div><div class="preview-detail-value">' + (task.trigger === 'auto' ? 'Auto' : 'Manual') + '</div></div>' +
+                    '<div class="preview-detail-item"><div class="preview-detail-label">Status</div><div class="preview-detail-value"><span class="status-badge ' + task.status + '"><span class="pulse"></span>' + capitalize(task.status) + '</span></div></div>' +
+                    '<div class="preview-detail-item"><div class="preview-detail-label">Progress</div><div class="preview-detail-value">' + task.progress + '%</div></div>' +
+                    '<div class="preview-detail-item"><div class="preview-detail-label">Duration</div><div class="preview-detail-value">' + (task.duration || '—') + '</div></div>' +
+                '</div>' +
+            '</div>';
+
+            if (task.outputs && task.outputs.length > 0) {
+                html += '<div class="preview-section">' +
+                    '<div class="preview-section-title">Output Files</div>' +
+                    '<div style="display:flex;gap:6px;flex-wrap:wrap">';
+                for (var i = 0; i < task.outputs.length; i++) {
+                    var fmt = task.outputs[i].toUpperCase();
+                    html += '<button class="action-btn" onclick="showToast(\'Downloading ' + fmt + '...\', \'info\')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' + fmt + '</button>';
+                }
+                html += '</div></div>';
+            }
+
+            if (verList.length > 0) {
+                html += '<div class="preview-section">' +
+                    '<div class="preview-section-title">Version History</div>' +
+                    '<div class="version-list">';
+                for (var j = 0; j < verList.length; j++) {
+                    var v = verList[j];
+                    html += '<div class="version-item">' +
+                        '<div class="version-info">' +
+                            '<span class="version-tag">' + v.v + '</span>' +
+                            '<span class="version-meta">' + v.date + ' · ' + v.by + ' · ' + v.duration + '</span>' +
+                        '</div>' +
+                        '<div class="version-actions">' +
+                            '<button class="version-action-btn" onclick="showToast(\'Opening ' + v.v + ' preview\', \'info\')">View</button>' +
+                            '<button class="version-action-btn" onclick="showToast(\'Downloading ' + v.v + '\', \'info\')">Download</button>' +
+                            (j > 0 ? '<button class="version-action-btn" onclick="showToast(\'Comparing with previous version\', \'info\')">Compare</button>' : '') +
+                        '</div>' +
+                    '</div>';
+                }
+                html += '</div></div>';
+            }
+
+            body.innerHTML = html;
+            document.getElementById('previewPanel').classList.add('open');
+            document.getElementById('previewOverlay').classList.add('open');
+        }
+
+        function closePreview() {
+            document.getElementById('previewPanel').classList.remove('open');
+            document.getElementById('previewOverlay').classList.remove('open');
+        }
+
+        /* ===== GENERATE REPORT DRAWER ===== */
+        function openGenerateReport() {
+            var sel = document.getElementById('gen_template');
+            sel.innerHTML = '<option value="">Select a template...</option>';
+            for (var i = 0; i < templates.length; i++) {
+                if (!templates[i].active) continue;
+                sel.innerHTML += '<option value="' + templates[i].id + '">' + templates[i].name + ' (' + capitalize(templates[i].type) + ')</option>';
+            }
+            
+            // Initialize personnel selection for generate drawer
+            initPersonnelData('gen');
+            
+            // Hide all sections initially
+            document.getElementById('genParamsSection').style.display = 'none';
+            document.getElementById('genOutputSection').style.display = 'none';
+            document.getElementById('genPushSection').style.display = 'none';
+            document.getElementById('genTemplateInfo').style.display = 'none';
+            
+            document.getElementById('generateDrawer').classList.add('open');
+            document.getElementById('generateDrawerOverlay').classList.add('open');
+        }
+
+        function onGenTemplateChange() {
+            var tplId = document.getElementById('gen_template').value;
+            if (!tplId) {
+                document.getElementById('genParamsSection').style.display = 'none';
+                document.getElementById('genOutputSection').style.display = 'none';
+                document.getElementById('genPushSection').style.display = 'none';
+                document.getElementById('genTemplateInfo').style.display = 'none';
+                return;
+            }
+            
+            var tpl = templates.find(function(t) { return t.id === tplId; });
+            if (!tpl) return;
+            
+            // Show template info
+            var infoDiv = document.getElementById('genTemplateInfo');
+            infoDiv.style.display = 'block';
+            document.getElementById('genTemplateCategory').textContent = tpl.category === 'report' ? '📊 Report' : '📋 Table';
+            
+            var periodicSpan = document.getElementById('genTemplatePeriodic');
+            if (['daily', 'weekly', 'monthly', 'yearly'].includes(tpl.type)) {
+                periodicSpan.textContent = 'Periodic';
+                periodicSpan.className = 'periodic-indicator yes';
+            } else {
+                periodicSpan.textContent = 'One-time';
+                periodicSpan.className = 'periodic-indicator no';
+            }
+            
+            // For Reports: minimal configuration needed (use defaults)
+            // For Tables: show full parameter configuration
+            if (tpl.category === 'table') {
+                // Show all configuration sections for tables
+                document.getElementById('genParamsSection').style.display = 'block';
+                document.getElementById('genOutputSection').style.display = 'block';
+                document.getElementById('genPushSection').style.display = 'block';
+            } else {
+                // For reports, only show output and push sections (skip detailed params)
+                document.getElementById('genParamsSection').style.display = 'none';
+                document.getElementById('genOutputSection').style.display = 'block';
+                document.getElementById('genPushSection').style.display = 'block';
+            }
+        }
+
+        function closeGenerateDrawer() {
+            document.getElementById('generateDrawer').classList.remove('open');
+            document.getElementById('generateDrawerOverlay').classList.remove('open');
+        }
+
+        function setExportScope(scope) {
+            document.querySelectorAll('.export-scope-option').forEach(function(opt) {
+                opt.classList.toggle('active', opt.dataset.scope === scope);
+            });
+            document.querySelectorAll('.export-scope-detail').forEach(function(det) {
+                det.classList.remove('visible');
+            });
+            var targetMap = { space: 'scopeSpace', org: 'scopeOrg', device: 'scopeDevice' };
+            var target = document.getElementById(targetMap[scope]);
+            if (target) target.classList.add('visible');
+        }
+
+        function setTplExportScope(scope) {
+            document.querySelectorAll('#tplExportScope .export-scope-option').forEach(function(opt) {
+                opt.classList.toggle('active', opt.dataset.scope === scope);
+            });
+            document.querySelectorAll('[id^="tplScope"]').forEach(function(det) {
+                det.classList.remove('visible');
+            });
+            var targetMap = { space: 'tplScopeSpace', org: 'tplScopeOrg', device: 'tplScopeDevice' };
+            var target = document.getElementById(targetMap[scope]);
+            if (target) target.classList.add('visible');
+        }
+
+        function setPeriod(val) {
+            var items = document.querySelectorAll('#periodRadios .radio-item');
+            items.forEach(function(item, i) {
+                item.classList.toggle('selected', (i === 0 && val === 'default') || (i === 1 && val === 'custom'));
+            });
+            document.getElementById('customPeriodRow').style.display = val === 'custom' ? 'grid' : 'none';
+        }
+
+        function setGenNotify(val) {
+            var items = document.querySelectorAll('#genNotifyRadios .radio-item');
+            items.forEach(function(item, i) {
+                item.classList.toggle('selected', (i === 0 && val === 'yes') || (i === 1 && val === 'no'));
+            });
+        }
+
+        function confirmGenerate() {
+            var tplId = document.getElementById('gen_template').value;
+            if (!tplId) { showToast('Please select a template', 'error'); return; }
+            var tpl = templates.find(function(t) { return t.id === tplId; });
+            if (!tpl) return;
+
+            var today = new Date().toISOString().split('T')[0];
+            var newTask = {
+                id: 'task-' + today.replace(/-/g, '').slice(2) + '-' + String(tasks.length + 1).padStart(3, '0'),
+                name: tpl.name + ' ' + today,
+                template: tpl.name,
+                type: tpl.type,
+                period: today + ' ~ ' + today,
+                trigger: 'manual',
+                status: 'queued',
+                progress: 0,
+                duration: '-',
+                outputs: []
+            };
+            pendingAction = function() {
+                tasks.unshift(newTask);
+                closeGenerateDrawer();
+                renderTasks();
+                showToast('Task queued: ' + newTask.name, 'success');
+                simulateProgress(newTask.id);
+            };
+            openActionConfirm('Generate Report', 'Are you sure you want to generate "' + tpl.name + '"?', 'Generate');
+        }
+
+        /* ===== TEMPLATE DRAWER ===== */
+        function openNewTemplate() {
+            editingTemplateId = null;
+            document.getElementById('templateDrawerTitle').textContent = 'New Template';
+            document.getElementById('tpl_name').value = '';
+            document.getElementById('tpl_category').value = 'report';
+            
+            // Initialize type options based on category
+            onCategoryChange();
+            document.getElementById('tpl_type').value = 'daily';
+            
+            document.getElementById('tpl_recipients').value = '';
+            
+            // Show periodic buttons for daily/weekly/monthly, default to non-periodic (show time picker)
+            document.getElementById('periodicRow').style.display = 'grid';
+            setPeriodic('no'); // Default to showing time picker
+            
+            // Initialize personnel selection
+            initPersonnelData('tpl');
+            
+            document.getElementById('templateDrawer').classList.add('open');
+            document.getElementById('templateDrawerOverlay').classList.add('open');
+        }
+
+        function editTemplate(id) {
+            var tpl = templates.find(function(t) { return t.id === id; });
+            if (!tpl) return;
+            editingTemplateId = id;
+            document.getElementById('templateDrawerTitle').textContent = 'Edit Template';
+            document.getElementById('tpl_name').value = tpl.name;
+            document.getElementById('tpl_category').value = tpl.category;
+            
+            // Set the type - need to ensure the option exists first
+            onCategoryChange(); // Refresh type options based on category
+            document.getElementById('tpl_type').value = tpl.type;
+            
+            document.getElementById('tpl_recipients').value = '';
+            
+            // Set periodic based on type
+            if (['daily', 'weekly', 'monthly'].includes(tpl.type)) {
+                // For daily/weekly/monthly, show periodic button
+                document.getElementById('periodicRow').style.display = 'grid';
+                setPeriodic('no'); // Default to showing time picker
+            } else if (tpl.type === 'custom') {
+                // For custom, hide periodic and show time range
+                document.getElementById('periodicRow').style.display = 'none';
+                document.getElementById('timeRangeRow').style.display = 'grid';
+            }
+            
+            // Initialize personnel selection
+            initPersonnelData('tpl');
+            
+            document.getElementById('templateDrawer').classList.add('open');
+            document.getElementById('templateDrawerOverlay').classList.add('open');
+        }
+
+        function closeTemplateDrawer() {
+            document.getElementById('templateDrawer').classList.remove('open');
+            document.getElementById('templateDrawerOverlay').classList.remove('open');
+        }
+
+        function saveTemplate() {
+            var name = document.getElementById('tpl_name').value.trim();
+            if (!name) { showToast('Please enter a template name', 'error'); return; }
+
+            if (editingTemplateId) {
+                var tpl = templates.find(function(t) { return t.id === editingTemplateId; });
+                if (tpl) {
+                    pendingAction = function() {
+                        tpl.name = name;
+                        tpl.category = document.getElementById('tpl_category').value;
+                        tpl.type = document.getElementById('tpl_type').value;
+                        closeTemplateDrawer();
+                        renderTemplates();
+                        showToast('Template "' + name + '" updated', 'success');
+                    };
+                    openActionConfirm('Update Template', 'Are you sure you want to update "' + name + '"?', 'Update');
+                }
+            } else {
+                pendingAction = function() {
+                    templates.push({
+                        id: 'tpl-' + (templates.length + 1).toString().padStart(3, '0'),
+                        name: name,
+                        category: document.getElementById('tpl_category').value,
+                        type: document.getElementById('tpl_type').value,
+                        schedule: 'manual', // Default to manual
+                        time: '',
+                        lastGen: 'Never',
+                        status: 'green',
+                        active: true
+                    });
+                    closeTemplateDrawer();
+                    renderTemplates();
+                    showToast('Template "' + name + '" created', 'success');
+                };
+                openActionConfirm('Create Template', 'Are you sure you want to create template "' + name + '"?', 'Create');
+            }
+        }
+
+        function deleteTemplate(id) {
+            var tpl = templates.find(function(t) { return t.id === id; });
+            if (!tpl) return;
+            pendingAction = function() {
+                templates = templates.filter(function(t) { return t.id !== id; });
+                renderTemplates();
+                showToast('Template "' + tpl.name + '" deleted', 'success');
+            };
+            openActionConfirm('Delete Template', 'Are you sure you want to delete "' + tpl.name + '"? This cannot be undone.', 'Delete');
+        }
+
+        /* ===== GENERATE ===== */
+        function generateFromTemplate(id) {
+            var tpl = templates.find(function(t) { return t.id === id; });
+            if (!tpl) return;
+            var today = new Date().toISOString().split('T')[0];
+            var newTask = {
+                id: 'task-' + today.replace(/-/g, '').slice(2) + '-' + String(tasks.length + 1).padStart(3, '0'),
+                name: tpl.name + ' ' + today,
+                template: tpl.name,
+                type: tpl.type,
+                period: today + ' ~ ' + today,
+                trigger: 'manual',
+                status: 'queued',
+                progress: 0,
+                duration: '-',
+                outputs: []
+            };
+            pendingAction = function() {
+                tasks.unshift(newTask);
+                renderTasks();
+                showToast('Task queued: ' + newTask.name, 'success');
+                simulateProgress(newTask.id);
+            };
+            openActionConfirm('Generate Report', 'Are you sure you want to generate "' + tpl.name + '"?', 'Generate');
+        }
+
+        function simulateProgress(taskId) {
+            var task = tasks.find(function(t) { return t.id === taskId; });
+            if (!task) return;
+            var interval = setInterval(function() {
+                if (task.progress >= 100) {
+                    task.status = 'completed';
+                    task.progress = 100;
+                    task.duration = '1m ' + Math.floor(Math.random() * 50 + 10) + 's';
+                    task.outputs = ['pdf', 'excel'];
+                    clearInterval(interval);
+                    renderTasks();
+                    showToast('Task completed: ' + task.name, 'success');
+                    return;
+                }
+                task.status = 'running';
+                task.progress = Math.min(task.progress + Math.floor(Math.random() * 15 + 5), 100);
+                renderTasks();
+            }, 1500);
+        }
+
+        function retryTask(id) {
+            var task = tasks.find(function(t) { return t.id === id; });
+            if (!task) return;
+            task.status = 'queued';
+            task.progress = 0;
+            renderTasks();
+            showToast('Retrying: ' + task.name, 'info');
+            simulateProgress(id);
+        }
+
+        function cancelTask(id) {
+            var task = tasks.find(function(t) { return t.id === id; });
+            if (!task) return;
+            task.status = 'cancelled';
+            task.progress = 0;
+            renderTasks();
+            showToast('Cancelled: ' + task.name, 'info');
+        }
+
+        /* ===== HELPERS ===== */
+        var pendingAction = null;
+
+        function openModal(id) { var el = document.getElementById(id); if (el) el.classList.add('open'); }
+        function closeModal(id) { var el = document.getElementById(id); if (el) el.classList.remove('open'); }
+
+        function openActionConfirm(title, message, btnText) {
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMsg').textContent = message;
+            document.getElementById('confirmActionBtn').textContent = btnText;
+            openModal('confirmModal');
+        }
+
+        function confirmAction() {
+            if (pendingAction) {
+                var action = pendingAction;
+                pendingAction = null;
+                action();
+                closeModal('confirmModal');
+            }
+        }
+
+        function toggleCb(el) {
+            el.classList.toggle('checked');
+            var cb = el.querySelector('input');
+            cb.checked = !cb.checked;
+        }
+
+        function setNotify(val) {
+            var items = document.querySelectorAll('#notifyRadios .radio-item');
+            items.forEach(function(item, i) {
+                item.classList.toggle('selected', (i === 0 && val === 'yes') || (i === 1 && val === 'no'));
+            });
+        }
+
+        /* ===== PERIODIC REPORT HANDLING ===== */
+        function setPeriodic(val) {
+            var yesBtn = document.getElementById('periodicYesBtn');
+            var noBtn = document.getElementById('periodicNoBtn');
+            
+            if (val === 'yes') {
+                // Periodic task: show time range for recurring schedule
+                yesBtn.classList.add('btn-primary');
+                noBtn.classList.remove('btn-primary');
+                document.getElementById('timeRangeRow').style.display = 'grid';
+            } else {
+                // One-time task: hide time range
+                noBtn.classList.add('btn-primary');
+                yesBtn.classList.remove('btn-primary');
+                document.getElementById('timeRangeRow').style.display = 'none';
+            }
+        }
+
+        function onCategoryChange() {
+            var category = document.getElementById('tpl_category').value;
+            var typeSelect = document.getElementById('tpl_type');
+            
+            // Clear existing options
+            typeSelect.innerHTML = '';
+            
+            if (category === 'report') {
+                // Report types - only daily, weekly, monthly, custom
+                typeSelect.innerHTML = '<option value="daily">Daily Report</option>' +
+                    '<option value="weekly">Weekly Report</option>' +
+                    '<option value="monthly">Monthly Report</option>' +
+                    '<option value="custom">Custom Report</option>';
+            } else {
+                // Table types
+                typeSelect.innerHTML = '<option value="summary">Summary Table</option>' +
+                    '<option value="allocation">Allocation Table</option>' +
+                    '<option value="statistics">Statistics Table</option>' +
+                    '<option value="carbon">Carbon Table</option>' +
+                    '<option value="pivot">Pivot Table</option>';
+            }
+        }
+
+        function onTypeChange() {
+            var type = document.getElementById('tpl_type').value;
+            
+            // For Daily/Weekly/Monthly: show periodic button option
+            if (['daily', 'weekly', 'monthly'].includes(type)) {
+                document.getElementById('periodicRow').style.display = 'grid';
+                // Default to non-periodic (one-time), hide time picker
+                setPeriodic('no');
+            } else if (type === 'custom') {
+                // Custom report: always show time range, hide periodic option
+                document.getElementById('periodicRow').style.display = 'none';
+                document.getElementById('timeRangeRow').style.display = 'grid';
+            }
+        }
+
+
+
+        /* ===== PERSONNEL SELECTION ===== */
+        var personnelData = {
+            tpl: { selected: ['p1', 'p2'], all: {} },
+            gen: { selected: ['p1', 'p2'], all: {} }
+        };
+
+        function initPersonnelData(prefix) {
+            var dropdown = document.getElementById(prefix + '_pushTargets_dropdown');
+            if (!dropdown) return;
+            
+            var items = dropdown.querySelectorAll('.personnel-item');
+            items.forEach(function(item) {
+                var id = item.dataset.id;
+                var name = item.querySelector('.personnel-name').textContent;
+                var role = item.querySelector('.personnel-role').textContent;
+                personnelData[prefix].all[id] = { name: name, role: role };
+                
+                if (item.classList.contains('selected')) {
+                    if (!personnelData[prefix].selected.includes(id)) {
+                        personnelData[prefix].selected.push(id);
+                    }
+                }
+            });
+            updateSelectedTags(prefix);
+        }
+
+        function togglePersonnel(prefix, id) {
+            var selected = personnelData[prefix].selected;
+            var index = selected.indexOf(id);
+            
+            if (index > -1) {
+                selected.splice(index, 1);
+            } else {
+                selected.push(id);
+            }
+            
+            // Update UI
+            var dropdown = document.getElementById(prefix + '_pushTargets_dropdown');
+            var items = dropdown.querySelectorAll('.personnel-item');
+            items.forEach(function(item) {
+                if (item.dataset.id === id) {
+                    item.classList.toggle('selected', selected.includes(id));
+                }
+            });
+            
+            updateSelectedTags(prefix);
+        }
+
+        function updateSelectedTags(prefix) {
+            var container = document.getElementById(prefix + '_selectedTags');
+            if (!container) return;
+            
+            var selected = personnelData[prefix].selected;
+            var html = '';
+            
+            selected.forEach(function(id) {
+                var person = personnelData[prefix].all[id];
+                if (person) {
+                    html += '<div class="personnel-tag">' +
+                        '<span>' + esc(person.name) + '</span>' +
+                        '<span class="remove-tag" onclick="togglePersonnel(\'' + prefix + '\', \'' + id + '\')">×</span>' +
+                    '</div>';
+                }
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function filterPushTargets(prefix) {
+            var searchInput = document.getElementById(prefix + '_pushTargets_search');
+            if (!searchInput) return;
+            
+            var query = searchInput.value.toLowerCase();
+            var dropdown = document.getElementById(prefix + '_pushTargets_dropdown');
+            var items = dropdown.querySelectorAll('.personnel-item');
+            
+            items.forEach(function(item) {
+                var name = item.querySelector('.personnel-name').textContent.toLowerCase();
+                var role = item.querySelector('.personnel-role').textContent.toLowerCase();
+                var match = name.includes(query) || role.includes(query);
+                item.style.display = match ? 'flex' : 'none';
+            });
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function esc(s) {
+            var d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        function showToast(msg, type) {
+            type = type || 'info';
+            var container = document.getElementById('toastContainer');
+            var toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            var iconSvg = type === 'success' ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>' :
+                          type === 'error' ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>' :
+                          '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+            toast.innerHTML = iconSvg + ' ' + msg;
+            container.appendChild(toast);
+            setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = '.3s'; setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300); }, 3000);
+        }
+
+        function updateClock() {
+            var el = document.getElementById('clock');
+            if (!el) return;
+            var now = new Date();
+            var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+            el.textContent = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        /* ===== INIT FUNCTION ===== */
+        function init() {
+            renderTemplates();
+            renderTasks();
+        }
+
+        // ===== START =====
+        init();
+    </script>
+</body>
+</html>

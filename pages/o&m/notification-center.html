@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RunDo Energy Carbon Platform | Alarm Notification Rules</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-base: #0b1220;
+        --bg-surface: #172131;
+        --bg-elevated: #253247;
+        --bg-content: #111a28;
+        --bg-card: #162233;
+        --text-primary: #F8FAFC;
+        --text-secondary: #94A3B8;
+        --text-muted: #64748B;
+        --accent-green: #22C55E;
+        --accent-blue: #3B82F6;
+        --accent-cyan: #06B6D4;
+        --accent-amber: #F59E0B;
+        --accent-red: #EF4444;
+        --accent-orange: #F97316;
+        --accent-purple: #8B5CF6;
+        --border: #334155;
+        --border-light: #475569;
+        --font-ui: 'Fira Sans', sans-serif;
+        --font-data: 'Fira Code', monospace;
+        --radius: 8px;
+        --radius-lg: 12px;
+        --nav-right-w: 64px;
+        --topbar-h: 60px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: var(--font-ui);
+        background: var(--bg-base);
+        color: var(--text-primary);
+        overflow: hidden;
+        height: 100vh;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
+
+    /* ===== TOP BAR ===== */
+    .topbar {
+        height: var(--topbar-h);
+        background: #152031;
+        border-bottom: 1px solid rgba(71, 85, 105, 0.72);
+        display: flex; align-items: center; padding: 0 16px;
+        position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    }
+    .topbar-brand { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
+    .topbar-brand .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+    .topbar-brand .brand-name { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+    .topbar-brand .sys-name { font-size: 11px; color: var(--text-muted); }
+    .topbar-menu { display: flex; align-items: center; gap: 4px; }
+    .topbar-menu .module-name { font-weight: 600; font-size: 14px; color: var(--accent-green); margin-right: 8px; }
+    .topbar-menu .sub-menu { padding: 6px 12px; font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all .2s; border-bottom: 2px solid transparent; }
+    .topbar-menu .sub-menu:hover { color: var(--text-secondary); }
+    .topbar-menu .sub-menu.active { color: var(--text-primary); border-bottom-color: var(--accent-green); font-weight: 500; }
+    .topbar-tools { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-secondary); }
+    .topbar-tools .tool-item { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: color .2s; }
+    .topbar-tools .tool-item:hover { color: var(--text-primary); }
+    .topbar-tools .user-block { display: flex; flex-direction: row-reverse; align-items: center; gap: 8px; cursor: pointer; }
+    .topbar-tools .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
+    .topbar-tools .user-info { display: flex; flex-direction: column; line-height: 1.2; text-align: right; }
+    .topbar-tools .user-name { font-size: 12px; color: var(--text-primary); font-weight: 500; }
+    .topbar-tools .user-role { font-size: 10px; color: var(--text-muted); }
+
+    /* ===== RIGHT NAV ===== */
+    .right-nav {
+        position: fixed; top: var(--topbar-h); left: 0;
+        width: var(--nav-right-w); height: calc(100vh - var(--topbar-h));
+        background: #0b1220; border-right: 1px solid rgba(51, 65, 85, 0.9);
+        display: flex; flex-direction: column; align-items: center;
+        padding: 16px 0; gap: 4px; z-index: 90;
+    }
+    .right-nav .nav-item {
+        width: 48px; padding: 10px 0;
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+        border-radius: var(--radius); cursor: pointer; transition: all .2s;
+        font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.3;
+    }
+    .right-nav .nav-item:hover { color: var(--text-secondary); background: var(--bg-elevated); }
+    .right-nav .nav-item.active { color: var(--accent-green); background: rgba(34, 197, 94, .1); }
+    .right-nav .nav-item svg { width: 20px; height: 20px; }
+    .nav-item-group { position: relative; display: flex; justify-content: center; width: 100%; }
+    .nav-flyout {
+        position: absolute; top: 50%; left: calc(100% + 14px);
+        transform: translateY(-50%) translateX(-8px);
+        min-width: 188px; padding: 10px; border-radius: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        background: linear-gradient(180deg, rgba(17, 25, 37, 0.82), rgba(12, 19, 30, 0.76));
+        box-shadow: 0 18px 42px rgba(2, 6, 23, 0.34);
+        backdrop-filter: blur(16px) saturate(120%);
+        opacity: 0; visibility: hidden; pointer-events: none;
+        transition: all .22s ease; z-index: 120;
+    }
+    .nav-item-group:hover .nav-flyout {
+        opacity: 1; visibility: visible; pointer-events: auto;
+        transform: translateY(-50%) translateX(0);
+    }
+    .nav-flyout::after {
+        content: ""; position: absolute; left: -7px; top: 50%;
+        width: 14px; height: 14px; transform: translateY(-50%) rotate(45deg);
+        border-left: 1px solid rgba(148, 163, 184, 0.14);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+        background: rgba(15, 23, 34, 0.84);
+    }
+    .nav-flyout-title {
+        font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
+        color: rgba(148, 163, 184, 0.72);
+        margin-bottom: 8px; padding: 4px 8px 8px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .nav-flyout-item {
+        display: flex; align-items: center; position: relative;
+        padding: 10px 12px 10px 16px; margin: 4px 0;
+        border-radius: 10px; color: #c4d0df;
+        cursor: pointer; transition: all .2s ease;
+        font-size: 12px; line-height: 1.35; font-weight: 500; white-space: nowrap;
+    }
+    .nav-flyout-item:hover { background: rgba(30, 41, 59, 0.54); color: var(--text-primary); }
+    .nav-flyout-item.active { background: rgba(34, 197, 94, 0.08); color: var(--text-primary); }
+    .nav-flyout-item.active::before {
+        content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px;
+        width: 3px; border-radius: 999px;
+        background: linear-gradient(180deg, rgba(74, 222, 128, 0.95), rgba(34, 197, 94, 0.72));
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main-wrap {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex; 
+        flex-direction: column; 
+        overflow: hidden;
+    }
+
+    /* ===== CONTENT HEADER ===== */
+    .content-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+        background: rgba(19, 29, 44, 0.98); flex-shrink: 0;
+    }
+    .content-breadcrumb { font-size: 12px; color: var(--text-muted); }
+    .content-breadcrumb span { color: var(--text-secondary); }
+    .content-breadcrumb .sep { margin: 0 6px; }
+    .content-actions { display: flex; gap: 8px; align-items: center; }
+    .action-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 12px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(21, 29, 42, 0.92); color: var(--text-secondary);
+        font-size: 11px; font-weight: 600; cursor: pointer;
+        transition: all .18s; font-family: var(--font-ui);
+    }
+    .action-btn:hover { border-color: rgba(96, 165, 250, 0.24); color: var(--text-primary); }
+    .action-btn.create { background: rgba(34, 197, 94, 0.14); border-color: rgba(34, 197, 94, 0.2); color: #bbf7d0; }
+    .action-btn.create:hover { background: rgba(34, 197, 94, 0.22); }
+    .action-btn svg { width: 13px; height: 13px; }
+
+    /* ===== TABS ===== */
+    .tabs-bar {
+        display: flex; align-items: center; gap: 4px;
+        padding: 0 20px;
+        background: rgba(19, 29, 44, 0.98);
+        border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+        flex-shrink: 0;
+    }
+    .tab-btn {
+        padding: 10px 16px;
+        font-size: 12px; font-weight: 600;
+        color: var(--text-muted);
+        border: none; background: transparent;
+        cursor: pointer; transition: all .15s;
+        border-bottom: 2px solid transparent;
+        font-family: var(--font-ui);
+    }
+    .tab-btn:hover { color: var(--text-secondary); }
+    .tab-btn.active { color: var(--accent-green); border-bottom-color: var(--accent-green); }
+
+    /* ===== STATS ===== */
+    .stats-strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        padding: 16px 20px;
+        background: var(--bg-base);
+        flex-shrink: 0;
+    }
+    .stat-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 14px 16px;
+        display: flex; flex-direction: column; gap: 4px;
+    }
+    .stat-card .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .stat-card .stat-value { font-size: 24px; font-weight: 700; font-family: var(--font-data); }
+    .stat-card.total .stat-value { color: var(--accent-blue); }
+    .stat-card.active .stat-value { color: var(--accent-green); }
+    .stat-card.disabled .stat-value { color: var(--text-muted); }
+    .stat-card.sent .stat-value { color: var(--accent-amber); }
+    .stat-card.delivered .stat-value { color: var(--accent-green); }
+    .stat-card.failed .stat-value { color: var(--accent-red); }
+    .stat-card.pending .stat-value { color: var(--accent-amber); }
+
+    /* ===== TOOLBAR ===== */
+    .toolbar {
+        display: flex; align-items: center; gap: 10px;
+        padding: 12px 20px; background: var(--bg-base); flex-shrink: 0; flex-wrap: wrap;
+    }
+    .search-box {
+        display: flex; align-items: center; gap: 8px;
+        padding: 7px 12px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.96); min-width: 220px;
+    }
+    .search-box svg { width: 14px; height: 14px; color: var(--text-muted); flex-shrink: 0; }
+    .search-box input {
+        border: none; background: transparent; color: var(--text-primary);
+        font-size: 12px; outline: none; width: 100%; font-family: var(--font-ui);
+    }
+    .search-box input::placeholder { color: var(--text-muted); }
+    .obj-search {
+        display: flex; align-items: center; gap: 8px;
+        padding: 7px 12px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.96);
+    }
+    .obj-search svg { width: 14px; height: 14px; color: var(--text-muted); flex-shrink: 0; }
+    .obj-search input {
+        border: none; background: transparent; color: var(--text-primary);
+        font-size: 12px; outline: none; width: 100%; font-family: var(--font-ui);
+    }
+    .obj-search input::placeholder { color: var(--text-muted); }
+    .filter-select {
+        padding: 7px 28px 7px 10px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.96); color: var(--text-primary);
+        font-size: 12px; outline: none; font-family: var(--font-ui);
+        cursor: pointer; appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: right 8px center;
+    }
+    .filter-select:focus { border-color: rgba(96, 165, 250, 0.3); }
+    .filter-chip {
+        padding: 5px 10px; border-radius: 6px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: transparent; color: var(--text-muted);
+        font-size: 11px; font-weight: 600; cursor: pointer;
+        transition: all .15s; font-family: var(--font-ui);
+    }
+    .filter-chip:hover { border-color: rgba(96, 165, 250, 0.2); color: var(--text-primary); }
+    .filter-chip.active { background: rgba(34, 197, 94, 0.12); border-color: rgba(34, 197, 94, 0.2); color: #86efac; }
+    .toolbar-spacer { flex: 1; }
+
+    /* ===== TABLE ===== */
+    .table-wrap {
+        flex: 1; min-height: 0; margin: 0 20px 20px;
+        border-radius: var(--radius-lg); border: 1px solid var(--border);
+        background: var(--bg-surface); overflow: hidden;
+        display: flex; flex-direction: column;
+    }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table thead { position: sticky; top: 0; z-index: 2; background: rgba(19, 29, 44, 0.98); }
+    .data-table th {
+        padding: 12px 16px; font-size: 11px; color: #8fa1b7;
+        text-transform: uppercase; letter-spacing: .06em;
+        border-bottom: 1px solid var(--border); text-align: left;
+        font-weight: 700; white-space: nowrap;
+    }
+    .data-table td {
+        padding: 12px 16px; font-size: 13px; color: var(--text-secondary);
+        border-bottom: 1px solid rgba(120, 142, 180, 0.06); vertical-align: middle;
+    }
+    .data-table tbody tr { transition: background .12s; cursor: pointer; }
+    .data-table tbody tr:hover { background: rgba(30, 41, 59, 0.4); }
+    .data-table .name-cell { color: var(--text-primary); font-weight: 600; }
+    .data-table .mono { font-family: var(--font-data); font-size: 12px; }
+    .data-table .desc-cell { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .data-table .actions { display: flex; gap: 6px; align-items: center; }
+
+    /* ===== BADGES ===== */
+    .badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 3px 10px; border-radius: 6px;
+        font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .badge-info { background: rgba(59, 130, 246, 0.12); color: #bfdbfe; }
+    .badge-success { background: rgba(34, 197, 94, 0.12); color: #bbf7d0; }
+    .badge-warning { background: rgba(245, 158, 11, 0.12); color: #fde68a; }
+    .badge-danger { background: rgba(239, 68, 68, 0.12); color: #fecaca; }
+    .badge-purple { background: rgba(139, 92, 246, 0.12); color: #ddd6fe; }
+    .badge-orange { background: rgba(249, 115, 22, 0.12); color: #fed7aa; }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    .channel-badge {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 2px 8px; border-radius: 4px;
+        font-size: 10px; font-weight: 600;
+        background: rgba(6, 182, 212, 0.1); color: #67e8f9;
+        margin: 1px 2px;
+    }
+
+    .sev-tag {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 2px 8px; border-radius: 4px;
+        font-size: 10px; font-weight: 600;
+        margin: 1px 2px;
+    }
+    .sev-tag.critical { background: rgba(239, 68, 68, 0.12); color: #fecaca; }
+    .sev-tag.high { background: rgba(249, 115, 22, 0.12); color: #fed7aa; }
+    .sev-tag.medium { background: rgba(245, 158, 11, 0.12); color: #fde68a; }
+    .sev-tag.low { background: rgba(59, 130, 246, 0.12); color: #bfdbfe; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 8px 14px; border-radius: 10px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(21, 29, 42, 0.92); color: #b5c0d3;
+        cursor: pointer; transition: .18s ease;
+        font-family: var(--font-ui); font-size: 12px; font-weight: 600; white-space: nowrap;
+    }
+    .btn:hover { border-color: rgba(96, 165, 250, 0.24); color: var(--text-primary); }
+    .btn-primary { background: rgba(59, 130, 246, 0.14); border-color: rgba(96, 165, 250, 0.2); color: #dbeafe; }
+    .btn-primary:hover { background: rgba(59, 130, 246, 0.22); }
+    .btn-danger { border-color: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.12); }
+    .btn-success { border-color: rgba(34, 197, 94, 0.2); color: #bbf7d0; }
+    .btn-success:hover { background: rgba(34, 197, 94, 0.12); }
+    .btn-warning { border-color: rgba(245, 158, 11, 0.2); color: #fde68a; }
+    .btn-warning:hover { background: rgba(245, 158, 11, 0.12); }
+    .btn-cyan { border-color: rgba(6, 182, 212, 0.2); color: #67e8f9; }
+    .btn-cyan:hover { background: rgba(6, 182, 212, 0.12); }
+    .btn-sm { padding: 5px 10px; font-size: 11px; }
+    .btn svg { width: 14px; height: 14px; }
+
+    /* ===== DRAWER ===== */
+    .drawer-overlay {
+        position: fixed; inset: 0; top: var(--topbar-h); left: var(--nav-right-w);
+        background: rgba(2, 6, 23, 0.42); z-index: 260; display: none;
+    }
+    .drawer-overlay.open { display: block; }
+    .drawer-panel {
+        position: fixed; top: var(--topbar-h); right: 0;
+        width: min(600px, 92vw); height: calc(100vh - var(--topbar-h));
+        border-left: 1px solid rgba(120, 142, 180, 0.12);
+        transform: translateX(100%); transition: transform .22s ease;
+        z-index: 261; display: flex; flex-direction: column;
+        background: var(--bg-card); box-shadow: -20px 0 48px rgba(2, 6, 23, 0.36);
+    }
+    .drawer-panel.open { transform: translateX(0); }
+    .drawer-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+        background: linear-gradient(180deg, rgba(19, 29, 44, 0.98), rgba(22, 34, 51, 0.96));
+        flex-shrink: 0;
+    }
+    .drawer-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    .drawer-close {
+        width: 28px; height: 28px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 6px; border: none; background: transparent;
+        color: var(--text-muted); cursor: pointer; transition: all .15s;
+    }
+    .drawer-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+    .drawer-foot {
+        display: flex; justify-content: flex-end; gap: 10px;
+        padding: 14px 20px; border-top: 1px solid rgba(120, 142, 180, 0.1);
+        background: rgba(22, 34, 51, 0.96); flex-shrink: 0;
+    }
+
+    /* ===== CARD BLOCK ===== */
+    .card-block {
+        border-radius: 12px; border: 1px solid rgba(120, 142, 180, 0.1);
+        background: rgba(16, 22, 34, 0.6); overflow: hidden; margin-bottom: 14px;
+    }
+    .card-block:last-child { margin-bottom: 0; }
+    .card-block-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 16px; border-bottom: 1px solid rgba(120, 142, 180, 0.08);
+        background: rgba(19, 29, 44, 0.5);
+    }
+    .card-block-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .card-block-sub { font-size: 11px; color: var(--text-muted); }
+    .card-block-body { padding: 14px 16px; }
+
+    /* ===== FORM ===== */
+    .form-group label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--text-secondary); }
+    .form-group label .req { color: var(--accent-red); margin-left: 2px; }
+    .form-input, .form-select, .form-textarea {
+        width: 100%; padding: 9px 12px; border-radius: 10px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.96); color: var(--text-primary);
+        font-size: 13px; outline: none; font-family: var(--font-ui);
+        transition: border-color .18s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(96, 165, 250, 0.3); }
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-select {
+        cursor: pointer; appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px;
+    }
+    .form-textarea { min-height: 50px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+    /* ===== MULTI-SELECT CHECKBOX ===== */
+    .checkbox-grid { display: flex; flex-direction: column; gap: 6px; }
+    .checkbox-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 12px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.08);
+        background: rgba(16, 22, 34, 0.6); cursor: pointer;
+        transition: all .15s;
+    }
+    .checkbox-item:hover { border-color: rgba(96, 165, 250, 0.15); background: rgba(30, 41, 59, 0.54); }
+    .checkbox-item.checked { border-color: rgba(34, 197, 94, 0.2); background: rgba(34, 197, 94, 0.06); }
+    .cb-box {
+        width: 16px; height: 16px; border-radius: 4px;
+        border: 1px solid rgba(120, 142, 180, 0.2);
+        background: transparent; display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; transition: all .15s;
+    }
+    .checkbox-item.checked .cb-box { background: var(--accent-green); border-color: var(--accent-green); }
+    .cb-box svg { width: 10px; height: 10px; color: #fff; display: none; }
+    .checkbox-item.checked .cb-box svg { display: block; }
+    .cb-info { flex: 1; min-width: 0; }
+    .cb-name { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+    .cb-meta { font-size: 10px; color: var(--text-muted); }
+
+    /* ===== SEVERITY MULTI-SELECT ===== */
+    .sev-multi { display: flex; gap: 8px; flex-wrap: wrap; }
+    .sev-option {
+        padding: 6px 14px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: transparent; color: var(--text-muted);
+        font-size: 12px; font-weight: 600; cursor: pointer;
+        transition: all .15s; font-family: var(--font-ui);
+    }
+    .sev-option:hover { border-color: rgba(96, 165, 250, 0.2); color: var(--text-primary); }
+    .sev-option.selected.critical { background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.3); color: #fecaca; }
+    .sev-option.selected.high { background: rgba(249, 115, 22, 0.12); border-color: rgba(249, 115, 22, 0.3); color: #fed7aa; }
+    .sev-option.selected.medium { background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.3); color: #fde68a; }
+    .sev-option.selected.low { background: rgba(59, 130, 246, 0.12); border-color: rgba(59, 130, 246, 0.3); color: #bfdbfe; }
+
+    /* ===== CHANNEL MULTI-SELECT ===== */
+    .chan-multi { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chan-option {
+        padding: 8px 14px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: transparent; color: var(--text-muted);
+        font-size: 12px; font-weight: 600; cursor: pointer;
+        transition: all .15s; font-family: var(--font-ui);
+        display: flex; align-items: center; gap: 6px;
+    }
+    .chan-option:hover { border-color: rgba(96, 165, 250, 0.2); color: var(--text-primary); }
+    .chan-option.selected { background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.3); color: #67e8f9; }
+
+    /* ===== TOGGLE ===== */
+    .toggle-switch {
+        width: 40px; height: 22px; border-radius: 11px;
+        background: var(--bg-elevated); cursor: pointer;
+        position: relative; transition: all .2s; flex-shrink: 0;
+    }
+    .toggle-switch.on { background: rgba(34, 197, 94, 0.3); }
+    .toggle-switch::after {
+        content: ''; position: absolute;
+        width: 16px; height: 16px; border-radius: 50%;
+        background: var(--text-muted); top: 3px; left: 3px; transition: all .2s;
+    }
+    .toggle-switch.on::after { left: 21px; background: var(--accent-green); }
+
+    .enabled-row { display: flex; align-items: center; gap: 12px; }
+    .enabled-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .enabled-desc { font-size: 11px; color: var(--text-muted); }
+
+    /* ===== PAGINATION ===== */
+    .pagination {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 10px 0;
+    }
+    .page-info { font-size: 12px; color: var(--text-muted); }
+    .page-btns { display: flex; align-items: center; gap: 4px; }
+    .page-btn {
+        padding: 5px 10px; border-radius: 6px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.6);
+        color: var(--text-secondary);
+        font-size: 12px; font-weight: 500; cursor: pointer;
+        transition: all .15s; font-family: var(--font-ui);
+    }
+    .page-btn:hover:not(.disabled):not(.active) { border-color: rgba(96, 165, 250, 0.2); color: var(--text-primary); }
+    .page-btn.active { background: rgba(34, 197, 94, 0.12); border-color: rgba(34, 197, 94, 0.2); color: #86efac; }
+    .page-btn.disabled { opacity: 0.3; cursor: not-allowed; }
+    .page-dots { padding: 0 4px; color: var(--text-muted); font-size: 12px; }
+
+    /* ===== CONFIRM MODAL ===== */
+    .confirm-overlay {
+        position: fixed; inset: 0; z-index: 510;
+        display: none; align-items: center; justify-content: center;
+        background: rgba(2, 6, 23, 0.6); backdrop-filter: blur(4px);
+    }
+    .confirm-overlay.open { display: flex; }
+    .confirm-card {
+        width: min(400px, calc(100vw - 48px));
+        border-radius: 16px; border: 1px solid var(--border);
+        background: var(--bg-surface);
+        box-shadow: 0 24px 64px rgba(2, 6, 23, 0.5); overflow: hidden;
+    }
+    .confirm-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+    }
+    .confirm-title { font-size: 15px; font-weight: 700; }
+    .confirm-close {
+        width: 28px; height: 28px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 8px; border: none; background: transparent;
+        color: var(--text-muted); cursor: pointer; transition: all .15s;
+    }
+    .confirm-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+    .confirm-body { padding: 24px 20px; text-align: center; }
+    .confirm-body svg { width: 48px; height: 48px; color: var(--accent-amber); margin-bottom: 12px; }
+    .confirm-body h3 { font-size: 15px; margin-bottom: 8px; }
+    .confirm-body p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+    .confirm-foot {
+        display: flex; justify-content: flex-end; gap: 10px;
+        padding: 14px 20px; border-top: 1px solid rgba(120, 142, 180, 0.1);
+    }
+
+    /* ===== TOAST ===== */
+    .toast-container { position: fixed; top: 72px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+        padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 500;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+        display: flex; align-items: center; gap: 8px; animation: toastIn .3s ease; min-width: 260px;
+    }
+    .toast.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(74, 222, 128, 0.2); color: #bbf7d0; }
+    .toast.error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.2); color: #fecaca; }
+    .toast.info { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(96, 165, 250, 0.2); color: #bfdbfe; }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        flex: 1; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        color: var(--text-muted);
+    }
+    .empty-state svg { width: 48px; height: 48px; opacity: 0.3; margin-bottom: 12px; }
+    .empty-state p { font-size: 13px; }
+
+    /* ===== COLLAPSIBLE ===== */
+    .collapsible-head {
+        display: flex; align-items: center; justify-content: space-between;
+        cursor: pointer; padding: 12px 16px;
+    }
+    .collapsible-head:hover { background: rgba(30, 41, 59, 0.3); }
+    .collapsible-arrow { transition: transform .2s; font-size: 12px; color: var(--text-muted); }
+    .collapsible-arrow.open { transform: rotate(180deg); }
+    .collapsible-body { display: none; padding: 14px 16px; border-top: 1px solid rgba(120, 142, 180, 0.08); }
+    .collapsible-body.open { display: block; }
+
+    /* ===== INFO GRID ===== */
+    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .info-item { display: flex; flex-direction: column; gap: 2px; }
+    .info-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+    .info-value { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<!-- MAIN -->
+<div class="main-wrap">
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="content-breadcrumb">O&amp;M <span class="sep">/</span> <span>Notification Center</span></div>
+        <div class="content-actions">
+            <button class="action-btn create" id="btnNewStrategy">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Strategy
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-bar">
+        <button class="tab-btn active" data-tab="strategies">Notification Strategies</button>
+        <button class="tab-btn" data-tab="records">Send Records</button>
+    </div>
+
+    <!-- Tab: Strategies -->
+    <div id="tab-strategies">
+        <div class="stats-strip" id="strategyStats"></div>
+        <div class="toolbar">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" placeholder="Search strategies..." id="searchStrategy">
+            </div>
+            <select class="filter-select" id="filterStratStatus">
+                <option value="">All Status</option>
+                <option value="enabled">Enabled</option>
+                <option value="disabled">Disabled</option>
+            </select>
+            <div class="toolbar-spacer"></div>
+            <span style="font-size:11px;color:var(--text-muted);" id="stratCountLabel">0 strategies</span>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Strategy Name</th>
+                        <th>Trigger Level</th>
+                        <th>Targets</th>
+                        <th>Channels</th>
+                        <th>Device Scope</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th style="text-align:right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="strategiesTbody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab: Records -->
+    <div id="tab-records" style="display:none;">
+        <div class="stats-strip" id="recordStats"></div>
+        <div class="toolbar">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" placeholder="Search records..." id="searchRecord">
+            </div>
+            <select class="filter-select" id="filterChannel">
+                <option value="">All Channels</option>
+                <option value="email">📧 Email</option>
+                <option value="phone">📞 Phone</option>
+                <option value="wecom">💬 WeCom</option>
+                <option value="sms">📱 SMS</option>
+            </select>
+            <button class="filter-chip active" data-status="">All Status</button>
+            <button class="filter-chip" data-status="delivered">Delivered</button>
+            <button class="filter-chip" data-status="failed">Failed</button>
+            <button class="filter-chip" data-status="pending">Pending</button>
+            <div class="toolbar-spacer"></div>
+            <span style="font-size:11px;color:var(--text-muted);" id="recordCountLabel">0 records</span>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Strategy</th>
+                        <th>Channel</th>
+                        <th>Recipient</th>
+                        <th>Alarm</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Retries</th>
+                        <th style="text-align:right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recordsTbody"></tbody>
+            </table>
+        </div>
+        <div id="recordPaginationWrap" style="padding:0 20px 16px;flex-shrink:0;"></div>
+    </div>
+</div>
+
+<!-- DRAWER: Strategy Editor -->
+<div class="drawer-overlay" id="stratOverlay" onclick="closeStratDrawer()"></div>
+<div class="drawer-panel" id="stratPanel">
+    <div class="drawer-head">
+        <span class="drawer-title" id="stratTitle">New Strategy</span>
+        <button class="drawer-close" id="stratClose">✕</button>
+    </div>
+    <div class="drawer-body" id="stratBody"></div>
+    <div class="drawer-foot">
+        <button class="btn" onclick="closeStratDrawer()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveStrategy()">Save Strategy</button>
+    </div>
+</div>
+
+<!-- DRAWER: Record Detail -->
+<div class="drawer-overlay" id="recOverlay" onclick="closeRecDrawer()"></div>
+<div class="drawer-panel" id="recPanel">
+    <div class="drawer-head">
+        <span class="drawer-title" id="recTitle">Send Record Detail</span>
+        <button class="drawer-close" id="recClose">✕</button>
+    </div>
+    <div class="drawer-body" id="recBody"></div>
+    <div class="drawer-foot">
+        <button class="btn" onclick="closeRecDrawer()">Close</button>
+    </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="confirm-overlay" id="confirmModal">
+    <div class="confirm-card">
+        <div class="confirm-head">
+            <span class="confirm-title" id="confirmTitle">Confirm</span>
+            <button class="confirm-close" onclick="closeConfirm()">✕</button>
+        </div>
+        <div class="confirm-body">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <h3 id="confirmHeading">Are you sure?</h3>
+            <p id="confirmMessage">This action cannot be undone.</p>
+        </div>
+        <div class="confirm-foot">
+            <button class="btn" onclick="closeConfirm()">Cancel</button>
+            <button class="btn btn-primary" id="confirmAction">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ===== State =====
+var strategies = [];
+var records = [];
+var editingStratId = null;
+var stratForm = {};
+var currentPage = 1;
+var pageSize = 15;
+
+var channelLabels = {email:'📧 Email',phone:'📞 Phone',wecom:'💬 WeCom',sms:'📱 SMS'};
+var sevLabels = {critical:'Critical',high:'High',medium:'Medium',low:'Low'};
+
+var orgList = [
+    {id:'admin_team',name:'Administration Team',members:5},
+    {id:'facility_mgmt',name:'Facility Management',members:8},
+    {id:'maintenance',name:'Maintenance Team',members:12},
+    {id:'operations',name:'Operations Dept',members:6},
+    {id:'hvac_team',name:'HVAC Team',members:4},
+];
+
+var accountList = [
+    {id:'admin01',name:'John Smith',role:'Super Admin',email:'john@rundocorp.com',phone:'+60123456789'},
+    {id:'manager01',name:'Sarah Lee',role:'Facility Manager',email:'sarah@rundocorp.com',phone:'+60987654321'},
+    {id:'tech01',name:'Mike Chen',role:'Technician',email:'mike@rundocorp.com',phone:'+60112233445'},
+    {id:'eng01',name:'Lisa Wang',role:'Engineer',email:'lisa@rundocorp.com',phone:'+60556677889'},
+];
+
+// ===== Init =====
+function init() {
+    initMockData();
+    bindEvents();
+    renderStrategyStats();
+    renderStrategies();
+    renderRecordStats();
+    renderRecords();
+    updateClock();
+}
+
+function initMockData() {
+    strategies = [
+        {id:'STRAT-001',name:'Critical Emergency',description:'Immediate notification for all critical alarms',enabled:true,
+         triggerSeverities:['critical'],deviceScope:'all',devices:[],
+         targetOrgs:['admin_team'],targetAccounts:['admin01'],
+         channels:['email','phone','wecom'],quietHours:null,maxRetries:3,retryInterval:{value:5,unit:'minutes'},
+         createdAt:'2026-04-01 10:00:00'},
+        {id:'STRAT-002',name:'High Priority Alert',description:'Notify facility manager for high severity alarms',enabled:true,
+         triggerSeverities:['high'],deviceScope:'all',devices:[],
+         targetOrgs:[],targetAccounts:['manager01'],
+         channels:['email','wecom'],quietHours:null,maxRetries:3,retryInterval:{value:5,unit:'minutes'},
+         createdAt:'2026-04-01 10:30:00'},
+        {id:'STRAT-003',name:'Device Team Notice',description:'Maintenance team alerts for device-specific issues',enabled:true,
+         triggerSeverities:['critical','high'],deviceScope:'specific',devices:['ch1','ch2','chwp1','chwp2'],
+         targetOrgs:['maintenance'],targetAccounts:[],
+         channels:['wecom','sms'],quietHours:{start:'22:00',end:'06:00'},maxRetries:5,retryInterval:{value:10,unit:'minutes'},
+         createdAt:'2026-04-02 09:00:00'},
+        {id:'STRAT-004',name:'Daily Summary',description:'Low priority operational summary',enabled:false,
+         triggerSeverities:['low'],deviceScope:'all',devices:[],
+         targetOrgs:['operations'],targetAccounts:[],
+         channels:['email'],quietHours:null,maxRetries:1,retryInterval:{value:15,unit:'minutes'},
+         createdAt:'2026-04-02 14:00:00'},
+        {id:'STRAT-005',name:'Chiller Team Alert',description:'HVAC team alerts for chiller equipment',enabled:true,
+         triggerSeverities:['critical','high'],deviceScope:'specific',devices:['ch1','ch2'],
+         targetOrgs:[],targetAccounts:['tech01','eng01'],
+         channels:['phone','wecom'],quietHours:null,maxRetries:3,retryInterval:{value:5,unit:'minutes'},
+         createdAt:'2026-04-03 11:00:00'},
+    ];
+
+    records = [
+        {id:'REC-001',strategyId:'STRAT-001',strategyName:'Critical Emergency',channel:'email',recipient:'john@rundocorp.com',recipientType:'account',alarmId:'ALM-001',alarmDescription:'BTSS main power exceeded 500 kW threshold',alarmSeverity:'critical',status:'delivered',sentAt:'2026-04-08 14:32:20',deliveredAt:'2026-04-08 14:32:25',retries:0,retryHistory:[],errorMessage:null,contentPreview:'Critical Alarm: BTSS main power exceeded 500 kW at 14:32. Immediate action required.'},
+        {id:'REC-002',strategyId:'STRAT-001',strategyName:'Critical Emergency',channel:'phone',recipient:'+60123456789',recipientType:'account',alarmId:'ALM-001',alarmDescription:'BTSS main power exceeded 500 kW threshold',alarmSeverity:'critical',status:'delivered',sentAt:'2026-04-08 14:32:22',deliveredAt:'2026-04-08 14:33:10',retries:0,retryHistory:[],errorMessage:null,contentPreview:'Voice alert: Critical alarm on BTSS Main Building. Power exceeded threshold.'},
+        {id:'REC-003',strategyId:'STRAT-001',strategyName:'Critical Emergency',channel:'wecom',recipient:'Admin Team (5 members)',recipientType:'org',alarmId:'ALM-001',alarmDescription:'BTSS main power exceeded 500 kW threshold',alarmSeverity:'critical',status:'delivered',sentAt:'2026-04-08 14:32:21',deliveredAt:'2026-04-08 14:32:23',retries:0,retryHistory:[],errorMessage:null,contentPreview:'[Critical] BTSS power 523kW > 500kW threshold. Location: BTSS Main Building.'},
+        {id:'REC-004',strategyId:'STRAT-002',strategyName:'High Priority Alert',channel:'email',recipient:'sarah@rundocorp.com',recipientType:'account',alarmId:'ALM-002',alarmDescription:'Chiller CH-1 communication timeout',alarmSeverity:'high',status:'delivered',sentAt:'2026-04-08 15:10:45',deliveredAt:'2026-04-08 15:10:50',retries:0,retryHistory:[],errorMessage:null,contentPreview:'High priority: CH-1 communication lost for 30s. Please investigate.'},
+        {id:'REC-005',strategyId:'STRAT-002',strategyName:'High Priority Alert',channel:'wecom',recipient:'sarah@rundocorp.com',recipientType:'account',alarmId:'ALM-002',alarmDescription:'Chiller CH-1 communication timeout',alarmSeverity:'high',status:'failed',sentAt:'2026-04-08 15:10:46',deliveredAt:null,retries:2,retryHistory:[{attempt:1,time:'2026-04-08 15:15:46',status:'failed',error:'API timeout'},{attempt:2,time:'2026-04-08 15:20:46',status:'failed',error:'API timeout'}],errorMessage:'WeCom API connection refused',contentPreview:'[High] CH-1 comm timeout. Device: Chiller CH-1.'},
+        {id:'REC-006',strategyId:'STRAT-003',strategyName:'Device Team Notice',channel:'wecom',recipient:'Maintenance Team (12 members)',recipientType:'org',alarmId:'ALM-006',alarmDescription:'AI predicted potential chiller failure',alarmSeverity:'critical',status:'delivered',sentAt:'2026-04-08 09:15:05',deliveredAt:'2026-04-08 09:15:08',retries:0,retryHistory:[],errorMessage:null,contentPreview:'[Critical AI Alert] Predicted chiller failure within 48h. Vibration: 4.8mm/s.'},
+        {id:'REC-007',strategyId:'STRAT-003',strategyName:'Device Team Notice',channel:'sms',recipient:'+60112233445',recipientType:'account',alarmId:'ALM-006',alarmDescription:'AI predicted potential chiller failure',alarmSeverity:'critical',status:'pending',sentAt:'2026-04-08 09:15:10',deliveredAt:null,retries:1,retryHistory:[{attempt:1,time:'2026-04-08 09:20:10',status:'pending',error:'Carrier delay'}],errorMessage:null,contentPreview:'CRITICAL: Chiller CH-1 failure predicted. Vibration 4.8mm/s. Check immediately.'},
+        {id:'REC-008',strategyId:'STRAT-005',strategyName:'Chiller Team Alert',channel:'phone',recipient:'+60112233445',recipientType:'account',alarmId:'ALM-019',alarmDescription:'CH-1 load rate exceeded 90%',alarmSeverity:'high',status:'delivered',sentAt:'2026-04-08 14:50:05',deliveredAt:'2026-04-08 14:50:45',retries:0,retryHistory:[],errorMessage:null,contentPreview:'High alert: CH-1 load 93%. Threshold: 90%. Equipment: Chiller CH-1.'},
+        {id:'REC-009',strategyId:'STRAT-005',strategyName:'Chiller Team Alert',channel:'wecom',recipient:'tech01, eng01',recipientType:'account',alarmId:'ALM-019',alarmDescription:'CH-1 load rate exceeded 90%',alarmSeverity:'high',status:'delivered',sentAt:'2026-04-08 14:50:06',deliveredAt:'2026-04-08 14:50:08',retries:0,retryHistory:[],errorMessage:null,contentPreview:'[High] CH-1 load 93% > 90%. Mike Chen, Lisa Wang notified.'},
+        {id:'REC-010',strategyId:'STRAT-001',strategyName:'Critical Emergency',channel:'email',recipient:'john@rundocorp.com',recipientType:'account',alarmId:'ALM-016',alarmDescription:'BTSS total power exceeded 600 kW emergency threshold',alarmSeverity:'critical',status:'delivered',sentAt:'2026-04-08 15:45:05',deliveredAt:'2026-04-08 15:45:10',retries:0,retryHistory:[],errorMessage:null,contentPreview:'EMERGENCY: BTSS power 612kW > 600kW emergency threshold. Current: 890A.'},
+        {id:'REC-011',strategyId:'STRAT-001',strategyName:'Critical Emergency',channel:'phone',recipient:'+60123456789',recipientType:'account',alarmId:'ALM-016',alarmDescription:'BTSS total power exceeded 600 kW emergency threshold',alarmSeverity:'critical',status:'failed',sentAt:'2026-04-08 15:45:07',deliveredAt:null,retries:3,retryHistory:[{attempt:1,time:'2026-04-08 15:50:07',status:'failed',error:'No answer'},{attempt:2,time:'2026-04-08 15:55:07',status:'failed',error:'No answer'},{attempt:3,time:'2026-04-08 16:00:07',status:'failed',error:'No answer'}],errorMessage:'Call unanswered after 3 attempts',contentPreview:'EMERGENCY call: BTSS power critical at 612kW.'},
+        {id:'REC-012',strategyId:'STRAT-004',strategyName:'Daily Summary',channel:'email',recipient:'ops@rundocorp.com',recipientType:'org',alarmId:'ALM-005',alarmDescription:'Water main meter collection quality dropped',alarmSeverity:'low',status:'delivered',sentAt:'2026-04-08 10:20:05',deliveredAt:'2026-04-08 10:20:12',retries:0,retryHistory:[],errorMessage:null,contentPreview:'Low priority: Water meter quality 91% < 95%. Auto-resolved at 11:05.'},
+        {id:'REC-013',strategyId:'STRAT-002',strategyName:'High Priority Alert',channel:'email',recipient:'sarah@rundocorp.com',recipientType:'account',alarmId:'ALM-014',alarmDescription:'Gas meter flow rate anomaly detected',alarmSeverity:'medium',status:'delivered',sentAt:'2026-04-08 12:30:05',deliveredAt:'2026-04-08 12:30:10',retries:0,retryHistory:[],errorMessage:null,contentPreview:'Medium alert: Gas flow 12.5m³/h > 8m³/h. Possible leak at Gas Meter.'},
+        {id:'REC-014',strategyId:'STRAT-003',strategyName:'Device Team Notice',channel:'wecom',recipient:'Maintenance Team (12 members)',recipientType:'org',alarmId:'ALM-011',alarmDescription:'Cooling Tower CT-1 fan motor bearing temperature high',alarmSeverity:'high',status:'delivered',sentAt:'2026-04-08 17:20:05',deliveredAt:'2026-04-08 17:20:08',retries:0,retryHistory:[],errorMessage:null,contentPreview:'[High] CT-1 bearing temp 78°C > 70°C. Fan speed: 1450rpm.'},
+        {id:'REC-015',strategyId:'STRAT-001',strategyName:'Critical Emergency',channel:'wecom',recipient:'Admin Team (5 members)',recipientType:'org',alarmId:'ALM-015',alarmDescription:'AI anomaly: irregular energy spike in Library',alarmSeverity:'high',status:'pending',sentAt:'2026-04-08 03:15:05',deliveredAt:null,retries:0,retryHistory:[],errorMessage:null,contentPreview:'[High AI Alert] Library energy spike 185kWh during off-hours. Confidence: 89%.'},
+        {id:'REC-016',strategyId:'STRAT-005',strategyName:'Chiller Team Alert',channel:'phone',recipient:'+60556677889',recipientType:'account',alarmId:'ALM-018',alarmDescription:'AI predictive: AHU-2 belt wear detected',alarmSeverity:'medium',status:'delivered',sentAt:'2026-04-08 16:30:05',deliveredAt:'2026-04-08 16:30:50',retries:0,retryHistory:[],errorMessage:null,contentPreview:'Medium alert: AHU-2 belt wear. Vibration 3.8mm/s. Replace within 2 weeks.'},
+        {id:'REC-017',strategyId:'STRAT-002',strategyName:'High Priority Alert',channel:'wecom',recipient:'sarah@rundocorp.com',recipientType:'account',alarmId:'ALM-004',alarmDescription:'CH-2 supply temperature exceeded 14°C',alarmSeverity:'medium',status:'delivered',sentAt:'2026-04-08 16:05:35',deliveredAt:'2026-04-08 16:05:38',retries:0,retryHistory:[],errorMessage:null,contentPreview:'[Medium] CH-2 supply temp 15.2°C > 14°C. Load rate: 78%.'},
+        {id:'REC-018',strategyId:'STRAT-003',strategyName:'Device Team Notice',channel:'sms',recipient:'+60112233445',recipientType:'account',alarmId:'ALM-008',alarmDescription:'AHU-1 filter differential pressure high',alarmSeverity:'medium',status:'failed',sentAt:'2026-04-08 11:40:05',deliveredAt:null,retries:3,retryHistory:[{attempt:1,time:'2026-04-08 11:45:05',status:'failed',error:'Invalid number'},{attempt:2,time:'2026-04-08 11:50:05',status:'failed',error:'Invalid number'},{attempt:3,time:'2026-04-08 11:55:05',status:'failed',error:'Invalid number'}],errorMessage:'SMS delivery failed: invalid recipient number',contentPreview:'Medium: AHU-1 filter DP 250Pa > 200Pa. Airflow: 85%. Replacement needed.'},
+        {id:'REC-019',strategyId:'STRAT-001',strategyName:'Critical Emergency',channel:'email',recipient:'john@rundocorp.com',recipientType:'account',alarmId:'ALM-006',alarmDescription:'AI predicted potential chiller failure',alarmSeverity:'critical',status:'delivered',sentAt:'2026-04-08 09:15:03',deliveredAt:'2026-04-08 09:15:08',retries:0,retryHistory:[],errorMessage:null,contentPreview:'Critical AI Alert: Chiller CH-1 failure predicted within 48h. Vibration: 4.8mm/s, Bearing: 68°C.'},
+        {id:'REC-020',strategyId:'STRAT-002',strategyName:'High Priority Alert',channel:'email',recipient:'sarah@rundocorp.com',recipientType:'account',alarmId:'ALM-020',alarmDescription:'Residence Meter voltage fluctuation',alarmSeverity:'medium',status:'delivered',sentAt:'2026-04-08 11:00:05',deliveredAt:'2026-04-08 11:00:10',retries:0,retryHistory:[],errorMessage:null,contentPreview:'Medium: Residence Meter voltage imbalance 4.2% > 3%. Frequency: 49.8Hz.'},
+    ];
+}
+
+// ===== Clock =====
+function updateClock() {
+    var el = document.getElementById('clock');
+    if (el) el.textContent = new Date().toLocaleTimeString('en-US', {hour12:false});
+}
+setInterval(updateClock, 1000);
+
+// ===== Events =====
+function bindEvents() {
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            document.getElementById('tab-strategies').style.display = btn.dataset.tab === 'strategies' ? '' : 'none';
+            document.getElementById('tab-records').style.display = btn.dataset.tab === 'records' ? '' : 'none';
+        });
+    });
+
+    document.querySelectorAll('.filter-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+            chip.classList.add('active');
+            currentPage = 1;
+            renderRecords();
+        });
+    });
+
+    document.getElementById('searchStrategy').addEventListener('input', renderStrategies);
+    document.getElementById('filterStratStatus').addEventListener('change', renderStrategies);
+    document.getElementById('searchRecord').addEventListener('input', function() { currentPage=1; renderRecords(); });
+    document.getElementById('filterChannel').addEventListener('change', function() { currentPage=1; renderRecords(); });
+    document.getElementById('btnNewStrategy').addEventListener('click', function() { openStratDrawer(null); });
+    document.getElementById('stratClose').addEventListener('click', closeStratDrawer);
+    document.getElementById('recClose').addEventListener('click', closeRecDrawer);
+    document.getElementById('confirmModal').addEventListener('click', function(e){ if(e.target===this) closeConfirm(); });
+}
+
+// ===== Strategy Stats =====
+function renderStrategyStats() {
+    var total = strategies.length;
+    var active = strategies.filter(function(s){return s.enabled;}).length;
+    var disabled = total - active;
+    var sentToday = records.filter(function(r){return r.sentAt && r.sentAt.indexOf('2026-04-08')===0;}).length;
+
+    document.getElementById('strategyStats').innerHTML =
+        '<div class="stat-card total"><span class="stat-label">Total Strategies</span><span class="stat-value">'+total+'</span></div>'+
+        '<div class="stat-card active"><span class="stat-label">Active</span><span class="stat-value">'+active+'</span></div>'+
+        '<div class="stat-card disabled"><span class="stat-label">Disabled</span><span class="stat-value">'+disabled+'</span></div>'+
+        '<div class="stat-card sent"><span class="stat-label">Sent Today</span><span class="stat-value">'+sentToday+'</span></div>';
+}
+
+// ===== Strategy Table =====
+function renderStrategies() {
+    var search = document.getElementById('searchStrategy').value.toLowerCase();
+    var statusFilter = document.getElementById('filterStratStatus').value;
+
+    var filtered = strategies.filter(function(s) {
+        if (search && s.name.toLowerCase().indexOf(search) === -1) return false;
+        if (statusFilter === 'enabled' && !s.enabled) return false;
+        if (statusFilter === 'disabled' && s.enabled) return false;
+        return true;
+    });
+
+    document.getElementById('stratCountLabel').textContent = filtered.length + ' strateg' + (filtered.length !== 1 ? 'ies' : 'y');
+
+    var tbody = document.getElementById('strategiesTbody');
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>No matching strategies found</p></div></td></tr>';
+        return;
+    }
+
+    var rows = filtered.map(function(s) {
+        var sevTags = s.triggerSeverities.map(function(sev) { return '<span class="sev-tag '+sev+'">'+sevLabels[sev]+'</span>'; }).join(' ');
+        var chanBadges = s.channels.map(function(ch) { return '<span class="channel-badge">'+channelLabels[ch]+'</span>'; }).join(' ');
+        var targets = [];
+        for (var i = 0; i < s.targetOrgs.length; i++) { targets.push(s.targetOrgs[i]); }
+        for (var j = 0; j < s.targetAccounts.length; j++) { targets.push(s.targetAccounts[j]); }
+        var targetText = targets.length > 2 ? targets.slice(0,2).join(', ') + ' +' + (targets.length-2) + ' more' : targets.join(', ');
+        var deviceText = s.deviceScope === 'all' ? 'All Devices' : s.devices.length + ' devices';
+        var statusBadge = s.enabled ? '<span class="badge badge-success"><span class="badge-dot"></span>Enabled</span>' : '<span class="badge badge-warning"><span class="badge-dot"></span>Disabled</span>';
+
+        return '<tr>' +
+            '<td class="name-cell">'+escHtml(s.name)+'</td>' +
+            '<td>'+sevTags+'</td>' +
+            '<td style="font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+escHtml(targetText)+'">'+escHtml(targetText)+'</td>' +
+            '<td>'+chanBadges+'</td>' +
+            '<td style="font-size:12px;">'+deviceText+'</td>' +
+            '<td>'+statusBadge+'</td>' +
+            '<td class="mono" style="font-size:11px;">'+s.createdAt+'</td>' +
+            '<td><div class="actions" style="justify-content:flex-end;">' +
+            '<button class="btn btn-sm btn-cyan" onclick="event.stopPropagation();testStrategy(\''+s.id+'\')">Test</button>' +
+            '<button class="btn btn-sm" onclick="event.stopPropagation();openStratDrawer(\''+s.id+'\')">Edit</button>' +
+            '<button class="btn btn-sm '+(s.enabled?'btn-warning':'btn-success')+'" onclick="event.stopPropagation();toggleStrategy(\''+s.id+'\')">'+(s.enabled?'Disable':'Enable')+'</button>' +
+            '<button class="btn btn-sm btn-danger" onclick="event.stopPropagation();confirmDeleteStrategy(\''+s.id+'\')">Delete</button>' +
+            '</div></td></tr>';
+    }).join('');
+
+    tbody.innerHTML = rows;
+}
+
+// ===== Record Stats =====
+function renderRecordStats() {
+    var total = records.length;
+    var delivered = records.filter(function(r){return r.status==='delivered';}).length;
+    var failed = records.filter(function(r){return r.status==='failed';}).length;
+    var pending = records.filter(function(r){return r.status==='pending';}).length;
+
+    document.getElementById('recordStats').innerHTML =
+        '<div class="stat-card total"><span class="stat-label">Total Sent</span><span class="stat-value">'+total+'</span></div>'+
+        '<div class="stat-card delivered"><span class="stat-label">Delivered</span><span class="stat-value">'+delivered+'</span></div>'+
+        '<div class="stat-card failed"><span class="stat-label">Failed</span><span class="stat-value">'+failed+'</span></div>'+
+        '<div class="stat-card pending"><span class="stat-label">Pending</span><span class="stat-value">'+pending+'</span></div>';
+}
+
+// ===== Record Table =====
+function getFilteredRecords() {
+    var search = document.getElementById('searchRecord').value.toLowerCase();
+    var chanFilter = document.getElementById('filterChannel').value;
+    var statusFilter = document.querySelector('#tab-records .filter-chip.active') ? document.querySelector('#tab-records .filter-chip.active').dataset.status : '';
+
+    return records.filter(function(r) {
+        if (search && r.recipient.toLowerCase().indexOf(search) === -1 && r.strategyName.toLowerCase().indexOf(search) === -1 && r.alarmDescription.toLowerCase().indexOf(search) === -1) return false;
+        if (chanFilter && r.channel !== chanFilter) return false;
+        if (statusFilter && r.status !== statusFilter) return false;
+        return true;
+    });
+}
+
+function renderPagination(filtered) {
+    var total = filtered.length;
+    var totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    var start = (currentPage - 1) * pageSize;
+    var end = Math.min(start + pageSize, total);
+    var pageData = filtered.slice(start, end);
+
+    var wrapper = document.getElementById('recordPaginationWrap');
+    if (!wrapper) return pageData;
+    if (totalPages <= 1) { wrapper.innerHTML = ''; return pageData; }
+
+    var html = '<div class="pagination"><span class="page-info">Showing ' + (start+1) + '-' + end + ' of ' + total + '</span><div class="page-btns">';
+    html += '<button class="page-btn' + (currentPage===1?' disabled':'') + '" onclick="goPage(' + (currentPage-1) + ')">‹ Prev</button>';
+    var startP = Math.max(1, currentPage - 2);
+    var endP = Math.min(totalPages, currentPage + 2);
+    if (startP > 1) { html += '<button class="page-btn" onclick="goPage(1)">1</button>'; if(startP>2) html+='<span class="page-dots">…</span>'; }
+    for (var p = startP; p <= endP; p++) {
+        html += '<button class="page-btn' + (p===currentPage?' active':'') + '" onclick="goPage(' + p + ')">' + p + '</button>';
+    }
+    if (endP < totalPages) { if(endP<totalPages-1) html+='<span class="page-dots">…</span>'; html += '<button class="page-btn" onclick="goPage(' + totalPages + ')">' + totalPages + '</button>'; }
+    html += '<button class="page-btn' + (currentPage===totalPages?' disabled':'') + '" onclick="goPage(' + (currentPage+1) + ')">Next ›</button>';
+    html += '</div></div>';
+    wrapper.innerHTML = html;
+    return pageData;
+}
+
+function goPage(p) {
+    var filtered = getFilteredRecords();
+    var totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+    if (p < 1 || p > totalPages) return;
+    currentPage = p;
+    renderRecords();
+}
+
+function renderRecords() {
+    var filtered = getFilteredRecords();
+    document.getElementById('recordCountLabel').textContent = filtered.length + ' record' + (filtered.length !== 1 ? 's' : '');
+    var pageData = renderPagination(filtered);
+
+    var tbody = document.getElementById('recordsTbody');
+    if (pageData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>No matching records found</p></div></td></tr>';
+        return;
+    }
+
+    var statusBadgeMap = {delivered:'badge-success',failed:'badge-danger',pending:'badge-warning'};
+    var statusLabelMap = {delivered:'Delivered',failed:'Failed',pending:'Pending'};
+
+    var rows = pageData.map(function(r) {
+        return '<tr onclick="viewRecord(\''+r.id+'\')">' +
+            '<td class="mono" style="font-size:11px;">'+r.sentAt+'</td>' +
+            '<td style="font-size:12px;">'+escHtml(r.strategyName)+'</td>' +
+            '<td><span class="channel-badge">'+channelLabels[r.channel]+'</span></td>' +
+            '<td style="font-size:12px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(r.recipient)+'</td>' +
+            '<td class="desc-cell" title="'+escHtml(r.alarmDescription)+'">'+escHtml(r.alarmDescription)+'</td>' +
+            '<td><span class="sev-tag '+r.alarmSeverity+'">'+sevLabels[r.alarmSeverity]+'</span></td>' +
+            '<td><span class="badge '+statusBadgeMap[r.status]+'"><span class="badge-dot"></span>'+statusLabelMap[r.status]+'</span></td>' +
+            '<td class="mono" style="font-size:12px;">'+r.retries+'</td>' +
+            '<td><div class="actions" style="justify-content:flex-end;">' +
+            (r.status==='failed'?'<button class="btn btn-sm btn-warning" onclick="event.stopPropagation();resendRecord(\''+r.id+'\')">Resend</button>':'') +
+            '<button class="btn btn-sm btn-cyan" onclick="event.stopPropagation();viewRecord(\''+r.id+'\')">View</button>' +
+            '</div></td></tr>';
+    }).join('');
+
+    tbody.innerHTML = rows;
+}
+
+// ===== Strategy Drawer =====
+function openStratDrawer(id) {
+    editingStratId = id || null;
+    document.getElementById('stratTitle').textContent = id ? 'Edit Strategy' : 'New Strategy';
+
+    var s = null;
+    if (id) { for (var i = 0; i < strategies.length; i++) { if (strategies[i].id === id) { s = strategies[i]; break; } } }
+
+    stratForm = {
+        name: s ? s.name : '',
+        description: s ? s.description : '',
+        enabled: s ? s.enabled : true,
+        triggerSeverities: s ? s.triggerSeverities.slice() : [],
+        deviceScope: s ? s.deviceScope : 'all',
+        devices: s ? s.devices.slice() : [],
+        targetOrgs: s ? s.targetOrgs.slice() : [],
+        targetAccounts: s ? s.targetAccounts.slice() : [],
+        channels: s ? s.channels.slice() : [],
+        quietHours: s && s.quietHours ? {start:s.quietHours.start,end:s.quietHours.end} : null,
+        maxRetries: s ? s.maxRetries : 3,
+        retryInterval: s ? {value:s.retryInterval.value,unit:s.retryInterval.unit} : {value:5,unit:'minutes'},
+    };
+
+    renderStratDrawer();
+    document.getElementById('stratOverlay').classList.add('open');
+    document.getElementById('stratPanel').classList.add('open');
+}
+
+function closeStratDrawer() {
+    document.getElementById('stratOverlay').classList.remove('open');
+    document.getElementById('stratPanel').classList.remove('open');
+    editingStratId = null;
+}
+
+function renderStratDrawer() {
+    var f = stratForm;
+    var body = document.getElementById('stratBody');
+
+    var sevOptions = ['critical','high','medium','low'].map(function(sev) {
+        return '<button class="sev-option ' + sev + (f.triggerSeverities.indexOf(sev)>=0?' selected':'') + '" onclick="toggleStratSev(\''+sev+'\')">'+sevLabels[sev]+'</button>';
+    }).join('');
+
+    var chanOptions = ['email','phone','wecom','sms'].map(function(ch) {
+        return '<button class="chan-option' + (f.channels.indexOf(ch)>=0?' selected':'') + '" onclick="toggleStratChannel(\''+ch+'\')">'+channelLabels[ch]+'</button>';
+    }).join('');
+
+    var devChecks = '';
+    if (f.deviceScope === 'specific') {
+        var devList = [
+            {id:'ch1',name:'Chiller CH-1',type:'Chiller',meta:'350 kW',icon:'❄️'},
+            {id:'ch2',name:'Chiller CH-2',type:'Chiller',meta:'350 kW',icon:'❄️'},
+            {id:'chwp1',name:'Chilled Water Pump CHWP-1',type:'Pump',meta:'30 kW',icon:'💧'},
+            {id:'chwp2',name:'Chilled Water Pump CHWP-2',type:'Pump',meta:'30 kW',icon:'💧'},
+            {id:'ahu1',name:'Air Handling Unit AHU-1',type:'AHU',meta:'15 kW',icon:'🌀'},
+            {id:'ahu2',name:'Air Handling Unit AHU-2',type:'AHU',meta:'15 kW',icon:'🌀'},
+            {id:'ct1',name:'Cooling Tower CT-1',type:'Cooling Tower',meta:'7.5 kW',icon:'🗼'},
+            {id:'ltg_main',name:'Main Lighting Circuit',type:'Lighting',meta:'8 kW',icon:'💡'},
+            {id:'btss',name:'BTSS Main Building',type:'Space',meta:'8,204 m²',icon:'🏢'},
+            {id:'ttss_main',name:'TTSS Main Meter',type:'Meter',meta:'Incoming',icon:'⚡'},
+        ];
+        devChecks = '<div class="form-group" style="margin-top:12px;"><label>Search Devices</label>' +
+            '<div class="obj-search" style="margin-bottom:8px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+            '<input type="text" placeholder="Search devices..." id="devSearchInput" oninput="filterDevChecks()"></div>' +
+            '<div class="checkbox-grid" id="devCheckGrid" style="max-height:180px;overflow-y:auto;">' +
+            devList.map(function(d) {
+                var checked = f.devices.indexOf(d.id) >= 0;
+                return '<div class="checkbox-item '+(checked?'checked':'')+'" data-dev-id="'+d.id+'" onclick="toggleStratDevice(\''+d.id+'\')">' +
+                    '<div class="cb-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+                    '<span style="font-size:12px;">'+d.icon+'</span>' +
+                    '<div class="cb-info"><div class="cb-name">'+escHtml(d.name)+'</div><div class="cb-meta">'+escHtml(d.type)+' · '+escHtml(d.meta)+'</div></div></div>';
+            }).join('') +
+            '</div></div>';
+    }
+
+    var orgChecks = orgList.map(function(o) {
+        var checked = f.targetOrgs.indexOf(o.id) >= 0;
+        return '<div class="checkbox-item '+(checked?'checked':'')+'" data-org-id="'+o.id+'" onclick="toggleStratOrg(\''+o.id+'\')">' +
+            '<div class="cb-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+            '<div class="cb-info"><div class="cb-name">'+escHtml(o.name)+'</div><div class="cb-meta">'+o.members+' members</div></div></div>';
+    }).join('');
+
+    var acctChecks = accountList.map(function(a) {
+        var checked = f.targetAccounts.indexOf(a.id) >= 0;
+        return '<div class="checkbox-item '+(checked?'checked':'')+'" data-acct-id="'+a.id+'" onclick="toggleStratAccount(\''+a.id+'\')">' +
+            '<div class="cb-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+            '<div class="cb-info"><div class="cb-name">'+escHtml(a.name)+'</div><div class="cb-meta">'+escHtml(a.role)+' · '+escHtml(a.email)+'</div></div></div>';
+    }).join('');
+
+    var qhHtml = f.quietHours
+        ? '<div style="display:flex;gap:8px;align-items:center;"><input type="time" class="form-input" style="width:110px;" value="'+f.quietHours.start+'" onchange="stratForm.quietHours.start=this.value">' +
+          '<span style="color:var(--text-muted);">to</span>' +
+          '<input type="time" class="form-input" style="width:110px;" value="'+f.quietHours.end+'" onchange="stratForm.quietHours.end=this.value">' +
+          '<button class="btn btn-sm btn-danger" onclick="stratForm.quietHours=null;renderStratDrawer()">Clear</button></div>'
+        : '<button class="btn btn-sm" onclick="stratForm.quietHours={start:\'22:00\',end:\'06:00\'};renderStratDrawer()">+ Set Quiet Hours</button>';
+
+    body.innerHTML =
+        '<div class="card-block"><div class="card-block-head"><span class="card-block-title">Basic Information</span></div><div class="card-block-body">' +
+        '<div class="form-group" style="margin-bottom:12px;"><label>Strategy Name <span class="req">*</span></label><input type="text" class="form-input" id="sfName" value="'+escHtml(f.name)+'" placeholder="e.g. Critical Emergency"></div>' +
+        '<div class="form-group" style="margin-bottom:12px;"><label>Description</label><textarea class="form-textarea" id="sfDesc" placeholder="Optional description...">'+escHtml(f.description)+'</textarea></div>' +
+        '<div class="enabled-row"><div class="toggle-switch '+(f.enabled?'on':'')+'" id="sfEnabled" onclick="stratForm.enabled=!stratForm.enabled;renderStratDrawer()"></div><div><div class="enabled-label">'+(f.enabled?'Enabled':'Disabled')+'</div><div class="enabled-desc">Strategy is active</div></div></div>' +
+        '</div></div>' +
+
+        '<div class="card-block"><div class="card-block-head"><span class="card-block-title">Trigger Conditions</span></div><div class="card-block-body">' +
+        '<div class="form-group" style="margin-bottom:12px;"><label>Trigger Severity <span class="req">*</span></label><div class="sev-multi">'+sevOptions+'</div></div>' +
+        '<div class="form-group"><label>Device Scope</label><select class="form-select" onchange="stratForm.deviceScope=this.value;stratForm.devices=[];renderStratDrawer()"><option value="all"'+(f.deviceScope==='all'?' selected':'')+'>All Devices</option><option value="specific"'+(f.deviceScope==='specific'?' selected':'')+'>Specific Devices</option></select></div>' +
+        devChecks +
+        '</div></div>' +
+
+        '<div class="card-block"><div class="card-block-head"><span class="card-block-title">Notification Targets</span><span class="card-block-sub">'+(f.targetOrgs.length+f.targetAccounts.length)+' selected</span></div><div class="card-block-body">' +
+        '<div class="form-group" style="margin-bottom:12px;"><label>Organizations</label>' +
+        '<div class="obj-search" style="margin-bottom:8px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+        '<input type="text" placeholder="Search organizations..." id="orgSearchInput" oninput="filterOrgChecks()"></div>' +
+        '<div class="checkbox-grid" id="orgCheckGrid" style="max-height:140px;overflow-y:auto;">'+orgChecks+'</div></div>' +
+        '<div class="form-group"><label>Accounts</label>' +
+        '<div class="obj-search" style="margin-bottom:8px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+        '<input type="text" placeholder="Search accounts..." id="acctSearchInput" oninput="filterAcctChecks()"></div>' +
+        '<div class="checkbox-grid" id="acctCheckGrid" style="max-height:140px;overflow-y:auto;">'+acctChecks+'</div></div>' +
+        '</div></div>' +
+
+        '<div class="card-block"><div class="card-block-head"><span class="card-block-title">Notification Channels</span></div><div class="card-block-body">' +
+        '<div class="chan-multi">'+chanOptions+'</div>' +
+        '<div style="font-size:10px;color:var(--text-muted);margin-top:8px;">Select one or more channels to deliver notifications</div>' +
+        '</div></div>' +
+
+        '<div class="card-block"><div class="card-block-head"><div class="collapsible-head" onclick="toggleCollapsible(this)"><span class="card-block-title">Advanced Options</span><span class="collapsible-arrow">▼</span></div></div><div class="collapsible-body">' +
+        '<div class="form-group" style="margin-bottom:12px;"><label>Quiet Hours</label>'+qhHtml+'</div>' +
+        '<div class="form-row">' +
+        '<div class="form-group"><label>Max Retries</label><input type="number" class="form-input" value="'+f.maxRetries+'" min="0" max="10" onchange="stratForm.maxRetries=parseInt(this.value)||0"></div>' +
+        '<div class="form-group"><label>Retry Interval</label><div style="display:flex;gap:8px;"><input type="number" class="form-input" style="flex:1;" value="'+f.retryInterval.value+'" min="1" onchange="stratForm.retryInterval.value=parseInt(this.value)||1"><select class="form-select" style="width:90px;" onchange="stratForm.retryInterval.unit=this.value"><option value="seconds"'+(f.retryInterval.unit==='seconds'?' selected':'')+'>Sec</option><option value="minutes"'+(f.retryInterval.unit==='minutes'?' selected':'')+'>Min</option><option value="hours"'+(f.retryInterval.unit==='hours'?' selected':'')+'>Hrs</option></select></div></div>' +
+        '</div>' +
+        '</div></div>';
+}
+
+function toggleCollapsible(head) {
+    var body = head.parentElement.nextElementSibling;
+    var arrow = head.querySelector('.collapsible-arrow');
+    body.classList.toggle('open');
+    arrow.classList.toggle('open');
+}
+
+function toggleStratDevice(devId) {
+    var idx = stratForm.devices.indexOf(devId);
+    if (idx >= 0) stratForm.devices.splice(idx, 1); else stratForm.devices.push(devId);
+    var el = document.querySelector('[data-dev-id="'+devId+'"]');
+    if (el) el.classList.toggle('checked', stratForm.devices.indexOf(devId) >= 0);
+}
+
+function filterDevChecks() {
+    var search = (document.getElementById('devSearchInput') ? document.getElementById('devSearchInput').value : '').toLowerCase();
+    var items = document.querySelectorAll('#devCheckGrid .checkbox-item');
+    for (var i = 0; i < items.length; i++) {
+        var text = items[i].textContent.toLowerCase();
+        items[i].style.display = text.indexOf(search) >= 0 ? '' : 'none';
+    }
+}
+
+function filterOrgChecks() {
+    var search = (document.getElementById('orgSearchInput') ? document.getElementById('orgSearchInput').value : '').toLowerCase();
+    var items = document.querySelectorAll('#orgCheckGrid .checkbox-item');
+    for (var i = 0; i < items.length; i++) {
+        var text = items[i].textContent.toLowerCase();
+        items[i].style.display = text.indexOf(search) >= 0 ? '' : 'none';
+    }
+}
+
+function filterAcctChecks() {
+    var search = (document.getElementById('acctSearchInput') ? document.getElementById('acctSearchInput').value : '').toLowerCase();
+    var items = document.querySelectorAll('#acctCheckGrid .checkbox-item');
+    for (var i = 0; i < items.length; i++) {
+        var text = items[i].textContent.toLowerCase();
+        items[i].style.display = text.indexOf(search) >= 0 ? '' : 'none';
+    }
+}
+
+function toggleStratSev(sev) {
+    var idx = stratForm.triggerSeverities.indexOf(sev);
+    if (idx >= 0) stratForm.triggerSeverities.splice(idx, 1); else stratForm.triggerSeverities.push(sev);
+    renderStratDrawer();
+}
+
+function toggleStratChannel(ch) {
+    var idx = stratForm.channels.indexOf(ch);
+    if (idx >= 0) stratForm.channels.splice(idx, 1); else stratForm.channels.push(ch);
+    renderStratDrawer();
+}
+
+function toggleStratOrg(orgId) {
+    var idx = stratForm.targetOrgs.indexOf(orgId);
+    if (idx >= 0) stratForm.targetOrgs.splice(idx, 1); else stratForm.targetOrgs.push(orgId);
+    renderStratDrawer();
+}
+
+function toggleStratAccount(acctId) {
+    var idx = stratForm.targetAccounts.indexOf(acctId);
+    if (idx >= 0) stratForm.targetAccounts.splice(idx, 1); else stratForm.targetAccounts.push(acctId);
+    renderStratDrawer();
+}
+
+function saveStrategy() {
+    var name = document.getElementById('sfName') ? document.getElementById('sfName').value.trim() : stratForm.name;
+    if (!name) { showToast('Please enter a strategy name', 'error'); return; }
+    if (stratForm.triggerSeverities.length === 0) { showToast('Please select at least one trigger severity', 'error'); return; }
+    if (stratForm.channels.length === 0) { showToast('Please select at least one notification channel', 'error'); return; }
+    if (stratForm.targetOrgs.length === 0 && stratForm.targetAccounts.length === 0) { showToast('Please select at least one target (Org or Account)', 'error'); return; }
+
+    stratForm.name = name;
+    stratForm.description = document.getElementById('sfDesc') ? document.getElementById('sfDesc').value : '';
+
+    if (editingStratId) {
+        var idx = -1;
+        for (var i = 0; i < strategies.length; i++) { if (strategies[i].id === editingStratId) { idx = i; break; } }
+        if (idx !== -1) {
+            strategies[idx] = Object.assign({}, strategies[idx], stratForm);
+        }
+        showToast('Strategy updated', 'success');
+    } else {
+        strategies.push({
+            id: 'STRAT-' + String(strategies.length + 1).padStart(3, '0'),
+            createdAt: new Date().toISOString().replace('T',' ').substring(0,19),
+        }, stratForm);
+        showToast('Strategy created', 'success');
+    }
+
+    closeStratDrawer();
+    renderStrategyStats();
+    renderStrategies();
+}
+
+// ===== Strategy Actions =====
+function toggleStrategy(id) {
+    var s = null;
+    for (var i = 0; i < strategies.length; i++) { if (strategies[i].id === id) { s = strategies[i]; break; } }
+    if (!s) return;
+    s.enabled = !s.enabled;
+    renderStrategyStats();
+    renderStrategies();
+    showToast('Strategy ' + (s.enabled ? 'enabled' : 'disabled'), 'success');
+}
+
+function confirmDeleteStrategy(id) {
+    var s = null;
+    for (var i = 0; i < strategies.length; i++) { if (strategies[i].id === id) { s = strategies[i]; break; } }
+    if (!s) return;
+    showConfirm('Delete Strategy', 'Delete "' + s.name + '"?', 'This will remove the notification strategy.', function() {
+        strategies = strategies.filter(function(st) { return st.id !== id; });
+        renderStrategyStats();
+        renderStrategies();
+        showToast('Strategy deleted', 'success');
+        closeConfirm();
+    });
+}
+
+function testStrategy(id) {
+    var s = null;
+    for (var i = 0; i < strategies.length; i++) { if (strategies[i].id === id) { s = strategies[i]; break; } }
+    if (!s) return;
+    showConfirm('Test Strategy', 'Send test notifications for "' + s.name + '"?', 'Test notifications will be sent to all configured channels and targets.', function() {
+        var count = s.channels.length * (s.targetOrgs.length + s.targetAccounts.length);
+        showToast('Test notifications sent (' + count + ' messages)', 'success');
+        closeConfirm();
+    });
+}
+
+// ===== Record Detail =====
+function viewRecord(id) {
+    var r = null;
+    for (var i = 0; i < records.length; i++) { if (records[i].id === id) { r = records[i]; break; } }
+    if (!r) return;
+
+    document.getElementById('recTitle').textContent = 'Record: ' + r.id;
+
+    var statusBadgeMap = {delivered:'badge-success',failed:'badge-danger',pending:'badge-warning'};
+    var statusLabelMap = {delivered:'Delivered',failed:'Failed',pending:'Pending'};
+
+    var retryHtml = '';
+    if (r.retryHistory && r.retryHistory.length > 0) {
+        retryHtml = '<div class="card-block"><div class="card-block-head"><span class="card-block-title">Retry History</span></div><div class="card-block-body"><div class="param-list">';
+        for (var i = 0; i < r.retryHistory.length; i++) {
+            var rh = r.retryHistory[i];
+            var cls = rh.status === 'failed' ? 'alert' : (rh.status === 'delivered' ? 'normal' : '');
+            retryHtml += '<div class="param-row ' + cls + '">' +
+                '<span class="param-name">Attempt #' + rh.attempt + '</span>' +
+                '<span class="param-value ' + (rh.status==='failed'?'high':'ok') + '">' + rh.status + '</span>' +
+                '<span class="param-threshold">' + rh.time + (rh.error ? ' — ' + rh.error : '') + '</span></div>';
+        }
+        retryHtml += '</div></div></div>';
+    }
+
+    document.getElementById('recBody').innerHTML =
+        '<div class="card-block"><div class="card-block-head"><span class="card-block-title">Basic Information</span></div><div class="card-block-body">' +
+        '<div class="info-grid">' +
+        '<div class="info-item"><span class="info-label">Record ID</span><span class="info-value">'+r.id+'</span></div>' +
+        '<div class="info-item"><span class="info-label">Strategy</span><span class="info-value">'+escHtml(r.strategyName)+'</span></div>' +
+        '<div class="info-item"><span class="info-label">Channel</span><span class="info-value">'+channelLabels[r.channel]+'</span></div>' +
+        '<div class="info-item"><span class="info-label">Recipient</span><span class="info-value">'+escHtml(r.recipient)+'</span></div>' +
+        '<div class="info-item"><span class="info-label">Sent At</span><span class="info-value">'+r.sentAt+'</span></div>' +
+        '<div class="info-item"><span class="info-label">Delivered At</span><span class="info-value">'+(r.deliveredAt||'--')+'</span></div>' +
+        '<div class="info-item"><span class="info-label">Status</span><span class="info-value"><span class="badge '+statusBadgeMap[r.status]+'"><span class="badge-dot"></span>'+statusLabelMap[r.status]+'</span></span></div>' +
+        '<div class="info-item"><span class="info-label">Retries</span><span class="info-value">'+r.retries+'</span></div>' +
+        '</div></div></div>' +
+
+        '<div class="card-block"><div class="card-block-head"><span class="card-block-title">Associated Alarm</span></div><div class="card-block-body">' +
+        '<div class="info-grid">' +
+        '<div class="info-item"><span class="info-label">Alarm ID</span><span class="info-value">'+r.alarmId+'</span></div>' +
+        '<div class="info-item"><span class="info-label">Severity</span><span class="info-value"><span class="sev-tag '+r.alarmSeverity+'">'+sevLabels[r.alarmSeverity]+'</span></span></div>' +
+        '</div>' +
+        '<div style="margin-top:10px;font-size:12px;color:var(--text-secondary);">'+escHtml(r.alarmDescription)+'</div>' +
+        '</div></div>' +
+
+        '<div class="card-block"><div class="card-block-head"><span class="card-block-title">Content Preview</span></div><div class="card-block-body">' +
+        '<div style="padding:12px;border-radius:8px;background:rgba(16,22,34,0.96);border:1px solid rgba(120,142,180,0.1);font-size:12px;color:var(--text-secondary);line-height:1.6;">'+escHtml(r.contentPreview)+'</div>' +
+        '</div></div>' +
+
+        (r.errorMessage ? '<div class="card-block"><div class="card-block-head"><span class="card-block-title" style="color:var(--accent-red);">Error</span></div><div class="card-block-body"><div style="font-size:12px;color:var(--accent-red);">'+escHtml(r.errorMessage)+'</div></div></div>' : '') +
+
+        retryHtml;
+
+    document.getElementById('recOverlay').classList.add('open');
+    document.getElementById('recPanel').classList.add('open');
+}
+
+function closeRecDrawer() {
+    document.getElementById('recOverlay').classList.remove('open');
+    document.getElementById('recPanel').classList.remove('open');
+}
+
+function resendRecord(id) {
+    var r = null;
+    for (var i = 0; i < records.length; i++) { if (records[i].id === id) { r = records[i]; break; } }
+    if (!r) return;
+    showConfirm('Resend Notification', 'Resend notification for record ' + r.id + '?', 'The notification will be sent again to ' + r.recipient + '.', function() {
+        r.status = 'pending';
+        r.retries++;
+        r.retryHistory.push({attempt:r.retries, time:new Date().toISOString().replace('T',' ').substring(0,19), status:'pending', error:null});
+        renderRecordStats();
+        renderRecords();
+        showToast('Notification queued for resend', 'info');
+        closeConfirm();
+    });
+}
+
+// ===== Confirm =====
+var pendingAction = null;
+function showConfirm(title, heading, message, action) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmHeading').textContent = heading;
+    document.getElementById('confirmMessage').textContent = message;
+    pendingAction = action;
+    document.getElementById('confirmAction').onclick = function() { if (pendingAction) pendingAction(); };
+    document.getElementById('confirmModal').classList.add('open');
+}
+function closeConfirm() { document.getElementById('confirmModal').classList.remove('open'); pendingAction = null; }
+
+// ===== Toast =====
+function showToast(message, type) {
+    if (!type) type = 'info';
+    var container = document.getElementById('toastContainer');
+    var icons = {success: '✓', error: '✕', info: 'ℹ'};
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = '<span>' + (icons[type] || 'ℹ') + '</span> ' + message;
+    container.appendChild(toast);
+    setTimeout(function() {
+        toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = 'all .3s';
+        setTimeout(function() { toast.remove(); }, 300);
+    }, 3000);
+}
+
+function escHtml(str) { var div = document.createElement('div'); div.appendChild(document.createTextNode(str)); return div.innerHTML; }
+
+// ===== Start =====
+init();
+</script>
+</body>
+</html>

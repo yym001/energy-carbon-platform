@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RunDo Energy Carbon Platform | Alarm List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+    :root {
+        --bg-base: #0b1220;
+        --bg-surface: #172131;
+        --bg-elevated: #253247;
+        --bg-content: #111a28;
+        --bg-card: #162233;
+        --text-primary: #F8FAFC;
+        --text-secondary: #94A3B8;
+        --text-muted: #64748B;
+        --accent-green: #22C55E;
+        --accent-blue: #3B82F6;
+        --accent-cyan: #06B6D4;
+        --accent-amber: #F59E0B;
+        --accent-red: #EF4444;
+        --accent-orange: #F97316;
+        --accent-purple: #8B5CF6;
+        --border: #334155;
+        --border-light: #475569;
+        --font-ui: 'Fira Sans', sans-serif;
+        --font-data: 'Fira Code', monospace;
+        --radius: 8px;
+        --radius-lg: 12px;
+        --nav-right-w: 64px;
+        --topbar-h: 60px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: var(--font-ui);
+        background: var(--bg-base);
+        color: var(--text-primary);
+        overflow: hidden;
+        height: 100vh;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
+
+    /* ===== TOP BAR ===== */
+    .topbar {
+        height: var(--topbar-h);
+        background: #152031;
+        border-bottom: 1px solid rgba(71, 85, 105, 0.72);
+        display: flex; align-items: center; padding: 0 16px;
+        position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    }
+    .topbar-brand { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
+    .topbar-brand .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+    .topbar-brand .brand-name { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+    .topbar-brand .sys-name { font-size: 11px; color: var(--text-muted); }
+    .topbar-menu { display: flex; align-items: center; gap: 4px; }
+    .topbar-menu .module-name { font-weight: 600; font-size: 14px; color: var(--accent-green); margin-right: 8px; }
+    .topbar-menu .sub-menu { padding: 6px 12px; font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all .2s; border-bottom: 2px solid transparent; }
+    .topbar-menu .sub-menu:hover { color: var(--text-secondary); }
+    .topbar-menu .sub-menu.active { color: var(--text-primary); border-bottom-color: var(--accent-green); font-weight: 500; }
+    .topbar-tools { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-secondary); }
+    .topbar-tools .tool-item { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: color .2s; }
+    .topbar-tools .tool-item:hover { color: var(--text-primary); }
+    .topbar-tools .user-block { display: flex; flex-direction: row-reverse; align-items: center; gap: 8px; cursor: pointer; }
+    .topbar-tools .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
+    .topbar-tools .user-info { display: flex; flex-direction: column; line-height: 1.2; text-align: right; }
+    .topbar-tools .user-name { font-size: 12px; color: var(--text-primary); font-weight: 500; }
+    .topbar-tools .user-role { font-size: 10px; color: var(--text-muted); }
+
+    /* ===== RIGHT NAV ===== */
+    .right-nav {
+        position: fixed; top: var(--topbar-h); left: 0;
+        width: var(--nav-right-w); height: calc(100vh - var(--topbar-h));
+        background: #0b1220; border-right: 1px solid rgba(51, 65, 85, 0.9);
+        display: flex; flex-direction: column; align-items: center;
+        padding: 16px 0; gap: 4px; z-index: 90;
+    }
+    .right-nav .nav-item {
+        width: 48px; padding: 10px 0;
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+        border-radius: var(--radius); cursor: pointer; transition: all .2s;
+        font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.3;
+    }
+    .right-nav .nav-item:hover { color: var(--text-secondary); background: var(--bg-elevated); }
+    .right-nav .nav-item.active { color: var(--accent-green); background: rgba(34, 197, 94, .1); }
+    .right-nav .nav-item svg { width: 20px; height: 20px; }
+    .nav-item-group { position: relative; display: flex; justify-content: center; width: 100%; }
+    .nav-flyout {
+        position: absolute; top: 50%; left: calc(100% + 14px);
+        transform: translateY(-50%) translateX(-8px);
+        min-width: 188px; padding: 10px; border-radius: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        background: linear-gradient(180deg, rgba(17, 25, 37, 0.82), rgba(12, 19, 30, 0.76));
+        box-shadow: 0 18px 42px rgba(2, 6, 23, 0.34);
+        backdrop-filter: blur(16px) saturate(120%);
+        opacity: 0; visibility: hidden; pointer-events: none;
+        transition: all .22s ease; z-index: 120;
+    }
+    .nav-item-group:hover .nav-flyout {
+        opacity: 1; visibility: visible; pointer-events: auto;
+        transform: translateY(-50%) translateX(0);
+    }
+    .nav-flyout::after {
+        content: ""; position: absolute; left: -7px; top: 50%;
+        width: 14px; height: 14px; transform: translateY(-50%) rotate(45deg);
+        border-left: 1px solid rgba(148, 163, 184, 0.14);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+        background: rgba(15, 23, 34, 0.84);
+    }
+    .nav-flyout-title {
+        font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
+        color: rgba(148, 163, 184, 0.72);
+        margin-bottom: 8px; padding: 4px 8px 8px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .nav-flyout-item {
+        display: flex; align-items: center; position: relative;
+        padding: 10px 12px 10px 16px; margin: 4px 0;
+        border-radius: 10px; color: #c4d0df;
+        cursor: pointer; transition: all .2s ease;
+        font-size: 12px; line-height: 1.35; font-weight: 500; white-space: nowrap;
+    }
+    .nav-flyout-item:hover { background: rgba(30, 41, 59, 0.54); color: var(--text-primary); }
+    .nav-flyout-item.active { background: rgba(34, 197, 94, 0.08); color: var(--text-primary); }
+    .nav-flyout-item.active::before {
+        content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px;
+        width: 3px; border-radius: 999px;
+        background: linear-gradient(180deg, rgba(74, 222, 128, 0.95), rgba(34, 197, 94, 0.72));
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main-wrap {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex; 
+        flex-direction: column; 
+        overflow: hidden;
+    }
+
+    /* ===== CONTENT HEADER ===== */
+    .content-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+        background: rgba(19, 29, 44, 0.98); flex-shrink: 0;
+    }
+    .content-breadcrumb { font-size: 12px; color: var(--text-muted); }
+    .content-breadcrumb span { color: var(--text-secondary); }
+    .content-breadcrumb .sep { margin: 0 6px; }
+    .content-actions { display: flex; gap: 8px; align-items: center; }
+    .action-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 12px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(21, 29, 42, 0.92); color: var(--text-secondary);
+        font-size: 11px; font-weight: 600; cursor: pointer;
+        transition: all .18s; font-family: var(--font-ui);
+    }
+    .action-btn:hover { border-color: rgba(96, 165, 250, 0.24); color: var(--text-primary); }
+    .action-btn svg { width: 13px; height: 13px; }
+
+    /* ===== STATS CARDS ===== */
+    .stats-strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+        padding: 16px 20px;
+        background: var(--bg-base);
+        flex-shrink: 0;
+    }
+    .stat-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 14px 16px;
+        display: flex; flex-direction: column; gap: 4px;
+        transition: border-color .2s;
+    }
+    .stat-card:hover { border-color: var(--border-light); }
+    .stat-card .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .stat-card .stat-value { font-size: 24px; font-weight: 700; font-family: var(--font-data); }
+    .stat-card .stat-change { font-size: 10px; display: flex; align-items: center; gap: 4px; }
+    .stat-card .stat-change.up { color: var(--accent-red); }
+    .stat-card .stat-change.down { color: var(--accent-green); }
+    .stat-card.total .stat-value { color: var(--accent-blue); }
+    .stat-card.critical .stat-value { color: var(--accent-red); }
+    .stat-card.unresolved .stat-value { color: var(--accent-amber); }
+    .stat-card.unconfirmed .stat-value { color: var(--accent-purple); }
+    .stat-card.resolved .stat-value { color: var(--accent-green); }
+
+    /* ===== TOOLBAR ===== */
+    .toolbar {
+        display: flex; align-items: center; gap: 10px;
+        padding: 12px 20px; background: var(--bg-base); flex-shrink: 0; flex-wrap: wrap;
+    }
+    .search-box {
+        display: flex; align-items: center; gap: 8px;
+        padding: 7px 12px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.96); min-width: 220px;
+    }
+    .search-box svg { width: 14px; height: 14px; color: var(--text-muted); flex-shrink: 0; }
+    .search-box input {
+        border: none; background: transparent; color: var(--text-primary);
+        font-size: 12px; outline: none; width: 100%; font-family: var(--font-ui);
+    }
+    .search-box input::placeholder { color: var(--text-muted); }
+    .filter-select {
+        padding: 7px 28px 7px 10px; border-radius: 8px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.96); color: var(--text-primary);
+        font-size: 12px; outline: none; font-family: var(--font-ui);
+        cursor: pointer; appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: right 8px center;
+    }
+    .filter-select:focus { border-color: rgba(96, 165, 250, 0.3); }
+    .filter-chip {
+        padding: 5px 10px; border-radius: 6px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: transparent; color: var(--text-muted);
+        font-size: 11px; font-weight: 600; cursor: pointer;
+        transition: all .15s; font-family: var(--font-ui);
+    }
+    .filter-chip:hover { border-color: rgba(96, 165, 250, 0.2); color: var(--text-primary); }
+    .filter-chip.active { background: rgba(34, 197, 94, 0.12); border-color: rgba(34, 197, 94, 0.2); color: #86efac; }
+    .toolbar-spacer { flex: 1; }
+
+    /* ===== TABLE ===== */
+    .table-wrap {
+        flex: 1; min-height: 0; margin: 0 20px 20px;
+        border-radius: var(--radius-lg); border: 1px solid var(--border);
+        background: var(--bg-surface); overflow: hidden;
+        display: flex; flex-direction: column;
+    }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table thead { position: sticky; top: 0; z-index: 2; background: rgba(19, 29, 44, 0.98); }
+    .data-table th {
+        padding: 12px 16px; font-size: 11px; color: #8fa1b7;
+        text-transform: uppercase; letter-spacing: .06em;
+        border-bottom: 1px solid var(--border); text-align: left;
+        font-weight: 700; white-space: nowrap;
+    }
+    .data-table td {
+        padding: 12px 16px; font-size: 13px; color: var(--text-secondary);
+        border-bottom: 1px solid rgba(120, 142, 180, 0.06); vertical-align: middle;
+    }
+    .data-table tbody tr { transition: background .12s; cursor: pointer; }
+    .data-table tbody tr:hover { background: rgba(30, 41, 59, 0.4); }
+    .data-table .alarm-desc { color: var(--text-primary); font-weight: 500; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .data-table .mono { font-family: var(--font-data); font-size: 12px; }
+    .data-table .actions { display: flex; gap: 6px; align-items: center; }
+
+    /* ===== BADGES ===== */
+    .badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 3px 10px; border-radius: 6px;
+        font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .badge-info { background: rgba(59, 130, 246, 0.12); color: #bfdbfe; }
+    .badge-success { background: rgba(34, 197, 94, 0.12); color: #bbf7d0; }
+    .badge-warning { background: rgba(245, 158, 11, 0.12); color: #fde68a; }
+    .badge-danger { background: rgba(239, 68, 68, 0.12); color: #fecaca; }
+    .badge-purple { background: rgba(139, 92, 246, 0.12); color: #ddd6fe; }
+    .badge-orange { background: rgba(249, 115, 22, 0.12); color: #fed7aa; }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .badge-source { background: rgba(6, 182, 212, 0.12); color: #67e8f9; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 8px 14px; border-radius: 10px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(21, 29, 42, 0.92); color: #b5c0d3;
+        cursor: pointer; transition: .18s ease;
+        font-family: var(--font-ui); font-size: 12px; font-weight: 600; white-space: nowrap;
+    }
+    .btn:hover { border-color: rgba(96, 165, 250, 0.24); color: var(--text-primary); }
+    .btn-primary { background: rgba(59, 130, 246, 0.14); border-color: rgba(96, 165, 250, 0.2); color: #dbeafe; }
+    .btn-primary:hover { background: rgba(59, 130, 246, 0.22); }
+    .btn-danger { border-color: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.12); }
+    .btn-success { border-color: rgba(34, 197, 94, 0.2); color: #bbf7d0; }
+    .btn-success:hover { background: rgba(34, 197, 94, 0.12); }
+    .btn-warning { border-color: rgba(245, 158, 11, 0.2); color: #fde68a; }
+    .btn-warning:hover { background: rgba(245, 158, 11, 0.12); }
+    .btn-cyan { border-color: rgba(6, 182, 212, 0.2); color: #67e8f9; }
+    .btn-cyan:hover { background: rgba(6, 182, 212, 0.12); }
+    .btn-sm { padding: 5px 10px; font-size: 11px; }
+    .btn svg { width: 14px; height: 14px; }
+
+    /* ===== DRAWER ===== */
+    .drawer-overlay {
+        position: fixed;
+        inset: 0;
+        top: var(--topbar-h);
+        left: var(--nav-right-w);
+        background: rgba(2, 6, 23, 0.42);
+        z-index: 260;
+        display: none;
+    }
+    .drawer-overlay.open { display: block; }
+    .drawer-panel {
+        position: fixed;
+        top: var(--topbar-h);
+        right: 0;
+        width: min(560px, 90vw);
+        height: calc(100vh - var(--topbar-h));
+        border-left: 1px solid rgba(120, 142, 180, 0.12);
+        transform: translateX(100%);
+        transition: transform .22s ease;
+        z-index: 261;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-card);
+        box-shadow: -20px 0 48px rgba(2, 6, 23, 0.36);
+    }
+    .drawer-panel.open { transform: translateX(0); }
+    .drawer-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+        background: linear-gradient(180deg, rgba(19, 29, 44, 0.98), rgba(22, 34, 51, 0.96));
+        flex-shrink: 0;
+    }
+    .drawer-title { font-size: 14px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+    .drawer-close {
+        width: 28px; height: 28px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 6px; border: none; background: transparent;
+        color: var(--text-muted); cursor: pointer; transition: all .15s;
+    }
+    .drawer-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+    .drawer-foot {
+        display: flex; justify-content: flex-end; gap: 10px;
+        padding: 14px 20px; border-top: 1px solid rgba(120, 142, 180, 0.1);
+        background: rgba(22, 34, 51, 0.96);
+        flex-shrink: 0;
+    }
+
+    /* ===== CARD BLOCK ===== */
+    .card-block {
+        border-radius: 12px;
+        border: 1px solid rgba(120, 142, 180, 0.1);
+        background: rgba(16, 22, 34, 0.6);
+        overflow: hidden;
+        margin-bottom: 14px;
+    }
+    .card-block:last-child { margin-bottom: 0; }
+    .card-block-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(120, 142, 180, 0.08);
+        background: rgba(19, 29, 44, 0.5);
+    }
+    .card-block-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .card-block-sub { font-size: 11px; color: var(--text-muted); }
+    .card-block-body { padding: 14px 16px; }
+
+    /* ===== PARAM LIST ===== */
+    .param-list { display: flex; flex-direction: column; gap: 6px; }
+    .param-row {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 8px 12px; border-radius: 8px;
+        background: rgba(16, 22, 34, 0.6);
+        border: 1px solid rgba(120, 142, 180, 0.08);
+    }
+    .param-row.alert { border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.06); }
+    .param-row.normal { border-color: rgba(34, 197, 94, 0.15); background: rgba(34, 197, 94, 0.04); }
+    .param-name { font-size: 12px; font-weight: 500; color: var(--text-secondary); min-width: 100px; }
+    .param-value { font-size: 13px; font-weight: 600; font-family: var(--font-data); }
+    .param-value.high { color: var(--accent-red); }
+    .param-value.ok { color: var(--accent-green); }
+    .param-threshold { font-size: 11px; color: var(--text-muted); font-family: var(--font-data); }
+
+    /* ===== CHART ===== */
+    .trend-chart-wrap {
+        height: 200px;
+        position: relative;
+    }
+
+    /* ===== INFO GRID ===== */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .info-item {
+        display: flex; flex-direction: column; gap: 2px;
+    }
+    .info-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+    .info-value { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+
+    /* ===== CONFIRM MODAL ===== */
+    .confirm-overlay {
+        position: fixed; inset: 0; z-index: 510;
+        display: none; align-items: center; justify-content: center;
+        background: rgba(2, 6, 23, 0.6); backdrop-filter: blur(4px);
+    }
+    .confirm-overlay.open { display: flex; }
+    .confirm-card {
+        width: min(400px, calc(100vw - 48px));
+        border-radius: 16px; border: 1px solid var(--border);
+        background: var(--bg-surface);
+        box-shadow: 0 24px 64px rgba(2, 6, 23, 0.5); overflow: hidden;
+    }
+    .confirm-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 20px; border-bottom: 1px solid rgba(120, 142, 180, 0.1);
+    }
+    .confirm-title { font-size: 15px; font-weight: 700; }
+    .confirm-close {
+        width: 28px; height: 28px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 8px; border: none; background: transparent;
+        color: var(--text-muted); cursor: pointer; transition: all .15s;
+    }
+    .confirm-close:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+    .confirm-body { padding: 24px 20px; text-align: center; }
+    .confirm-body svg { width: 48px; height: 48px; color: var(--accent-amber); margin-bottom: 12px; }
+    .confirm-body h3 { font-size: 15px; margin-bottom: 8px; }
+    .confirm-body p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+    .confirm-foot {
+        display: flex; justify-content: flex-end; gap: 10px;
+        padding: 14px 20px; border-top: 1px solid rgba(120, 142, 180, 0.1);
+    }
+
+    /* ===== TOAST ===== */
+    .toast-container { position: fixed; top: 72px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+        padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 500;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+        display: flex; align-items: center; gap: 8px; animation: toastIn .3s ease; min-width: 260px;
+    }
+    .toast.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(74, 222, 128, 0.2); color: #bbf7d0; }
+    .toast.error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.2); color: #fecaca; }
+    .toast.info { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(96, 165, 250, 0.2); color: #bfdbfe; }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        flex: 1; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        color: var(--text-muted);
+    }
+    .empty-state svg { width: 48px; height: 48px; opacity: 0.3; margin-bottom: 12px; }
+    .empty-state p { font-size: 13px; }
+
+    /* ===== PAGINATION ===== */
+    .pagination {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 10px 0;
+    }
+    .page-info { font-size: 12px; color: var(--text-muted); }
+    .page-btns { display: flex; align-items: center; gap: 4px; }
+    .page-btn {
+        padding: 5px 10px; border-radius: 6px;
+        border: 1px solid rgba(120, 142, 180, 0.14);
+        background: rgba(16, 22, 34, 0.6);
+        color: var(--text-secondary);
+        font-size: 12px; font-weight: 500; cursor: pointer;
+        transition: all .15s; font-family: var(--font-ui);
+    }
+    .page-btn:hover:not(.disabled):not(.active) { border-color: rgba(96, 165, 250, 0.2); color: var(--text-primary); }
+    .page-btn.active { background: rgba(34, 197, 94, 0.12); border-color: rgba(34, 197, 94, 0.2); color: #86efac; }
+    .page-btn.disabled { opacity: 0.3; cursor: not-allowed; }
+    .page-dots { padding: 0 4px; color: var(--text-muted); font-size: 12px; }
+
+    /* ===== CONFIDENCE BAR ===== */
+    .conf-bar {
+        display: flex; align-items: center; gap: 6px;
+    }
+    .conf-bar-track {
+        width: 50px; height: 4px; border-radius: 2px;
+        background: rgba(120, 142, 180, 0.1); overflow: hidden;
+    }
+    .conf-bar-fill { height: 100%; border-radius: 2px; transition: width .4s; }
+    .conf-bar-fill.high { background: var(--accent-red); }
+    .conf-bar-fill.medium { background: var(--accent-amber); }
+    .conf-bar-fill.low { background: var(--accent-blue); }
+    .conf-bar-text { font-size: 11px; font-family: var(--font-data); color: var(--text-secondary); }
+</style>
+</head>
+<body>
+
+<!-- MAIN -->
+<div class="main-wrap">
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="content-breadcrumb">O&amp;M <span class="sep">/</span> <span>Alarm Center</span></div>
+        <div class="content-actions">
+            <button class="action-btn" onclick="refreshAlarms()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-strip" id="statsStrip"></div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search alarms..." id="searchInput">
+        </div>
+        <select class="filter-select" id="filterSource">
+            <option value="">All Sources</option>
+            <option value="device">🔧 Device</option>
+            <option value="rule">📋 Rule</option>
+            <option value="ai">🤖 AI</option>
+        </select>
+        <select class="filter-select" id="filterSev">
+            <option value="">All Severities</option>
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+        </select>
+        <button class="filter-chip active" data-status="">All Status</button>
+        <button class="filter-chip" data-status="active">Active</button>
+        <button class="filter-chip" data-status="resolved">Resolved</button>
+        <button class="filter-chip" data-status="unconfirmed">Unconfirmed</button>
+        <div class="toolbar-spacer"></div>
+        <span style="font-size:11px;color:var(--text-muted);" id="alarmCountLabel">0 alarms</span>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Source</th>
+                    <th>Severity</th>
+                    <th>Description</th>
+                    <th>Device</th>
+                    <th>Status</th>
+                    <th>Confirmed</th>
+                    <th>Occurred</th>
+                    <th>Duration</th>
+                    <th>Confidence</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="alarmsTbody"></tbody>
+        </table>
+    </div>
+    <div id="paginationWrap" style="padding:0 20px 16px;flex-shrink:0;"></div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer-overlay" id="detailOverlay" onclick="closeDetail()"></div>
+<div class="drawer-panel" id="detailPanel">
+    <div class="drawer-head">
+        <span class="drawer-title" id="detailTitle">Alarm Detail</span>
+        <button class="drawer-close" id="detailClose">✕</button>
+    </div>
+    <div class="drawer-body" id="detailBody"></div>
+    <div class="drawer-foot" id="detailFoot">
+        <button class="btn" onclick="closeDetail()">Close</button>
+        <button class="btn btn-warning" id="detailAckBtn" onclick="ackFromDetail()">Acknowledge</button>
+    </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="confirm-overlay" id="confirmModal">
+    <div class="confirm-card">
+        <div class="confirm-head">
+            <span class="confirm-title" id="confirmTitle">Confirm</span>
+            <button class="confirm-close" onclick="closeConfirm()">✕</button>
+        </div>
+        <div class="confirm-body">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <h3 id="confirmHeading">Are you sure?</h3>
+            <p id="confirmMessage">This action cannot be undone.</p>
+        </div>
+        <div class="confirm-foot">
+            <button class="btn" onclick="closeConfirm()">Cancel</button>
+            <button class="btn btn-primary" id="confirmAction">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ===== State =====
+var alarms = [];
+var viewingAlarmId = null;
+var trendChart = null;
+
+var sourceLabels = {device:'🔧 Device',rule:'📋 Rule',ai:'🤖 AI'};
+var sevLabels = {critical:'Critical',high:'High',medium:'Medium',low:'Low'};
+var sevBadge = {critical:'badge-danger',high:'badge-orange',medium:'badge-warning',low:'badge-info'};
+
+// ===== Init =====
+function init() {
+    initMockAlarms();
+    bindEvents();
+    renderStats();
+    renderTable();
+    updateClock();
+}
+
+function initMockAlarms() {
+    alarms = [
+        {id:'ALM-001',source:'rule',sourceName:'High BTSS Consumption',severity:'critical',
+         description:'BTSS main power exceeded 500 kW threshold for 15 minutes',
+         device:'BTSS Main Building',deviceId:'btss',
+         status:'active',confirmed:false,
+         occurredAt:'2026-04-08 14:32:15',resolvedAt:null,
+         confidence:null,
+         params:[{name:'Power',value:523,unit:'kW',threshold:500,op:'>'},{name:'Load Rate',value:92,unit:'%',threshold:85,op:'>'}],
+         trend:[{time:'14:00',value:480},{time:'14:10',value:495},{time:'14:20',value:510},{time:'14:30',value:523}]},
+        {id:'ALM-002',source:'device',sourceName:'',severity:'high',
+         description:'Chiller CH-1 communication timeout, no response for 30 seconds',
+         device:'Chiller CH-1',deviceId:'ch1',
+         status:'active',confirmed:false,
+         occurredAt:'2026-04-08 15:10:42',resolvedAt:null,
+         confidence:null,
+         params:[{name:'Comm Status',value:0,unit:'',threshold:1,op:'<'},{name:'Last Response',value:30,unit:'s',threshold:10,op:'>'}],
+         trend:[{time:'14:40',value:1},{time:'14:50',value:1},{time:'15:00',value:0},{time:'15:10',value:0}]},
+        {id:'ALM-003',source:'ai',sourceName:'',severity:'high',
+         description:'AI detected abnormal energy consumption pattern in Academic Building, 87% confidence',
+         device:'Academic Building',deviceId:'acad',
+         status:'active',confirmed:true,
+         occurredAt:'2026-04-08 13:45:00',resolvedAt:null,
+         confidence:87,
+         params:[{name:'Energy',value:340,unit:'kWh',threshold:280,op:'>'},{name:'Deviation',value:21.4,unit:'%',threshold:15,op:'>'}],
+         trend:[{time:'12:00',value:250},{time:'12:30',value:265},{time:'13:00',value:290},{time:'13:30',value:340}]},
+        {id:'ALM-004',source:'rule',sourceName:'Chiller Overload Protection',severity:'medium',
+         description:'CH-2 supply temperature exceeded 14°C threshold',
+         device:'Chiller CH-2',deviceId:'ch2',
+         status:'active',confirmed:false,
+         occurredAt:'2026-04-08 16:05:30',resolvedAt:null,
+         confidence:null,
+         params:[{name:'Supply Temp',value:15.2,unit:'°C',threshold:14,op:'>'},{name:'Load Rate',value:78,unit:'%',threshold:85,op:'<'}],
+         trend:[{time:'15:30',value:12.5},{time:'15:45',value:13.8},{time:'16:00',value:14.5},{time:'16:05',value:15.2}]},
+        {id:'ALM-005',source:'device',sourceName:'',severity:'low',
+         description:'Water main meter collection quality dropped below 95%',
+         device:'Water Main Meter',deviceId:'water_main',
+         status:'resolved',confirmed:true,
+         occurredAt:'2026-04-08 10:20:00',resolvedAt:'2026-04-08 11:05:00',
+         confidence:null,
+         params:[{name:'Quality',value:91,unit:'%',threshold:95,op:'<'}],
+         trend:[{time:'09:00',value:98},{time:'09:30',value:96},{time:'10:00',value:93},{time:'10:20',value:91}]},
+        {id:'ALM-006',source:'ai',sourceName:'',severity:'critical',
+         description:'AI predicted potential chiller failure within 48 hours based on vibration pattern analysis',
+         device:'Chiller CH-1',deviceId:'ch1',
+         status:'active',confirmed:false,
+         occurredAt:'2026-04-08 09:15:00',resolvedAt:null,
+         confidence:94,
+         params:[{name:'Vibration',value:4.8,unit:'mm/s',threshold:3.5,op:'>'},{name:'Bearing Temp',value:68,unit:'°C',threshold:60,op:'>'}],
+         trend:[{time:'06:00',value:3.2},{time:'07:00',value:3.8},{time:'08:00',value:4.2},{time:'09:00',value:4.8}]},
+        {id:'ALM-007',source:'rule',sourceName:'Night Energy Watch',severity:'low',
+         description:'BTSS HVAC energy consumption exceeded 200 kWh during night hours',
+         device:'BTSS Main Building',deviceId:'btss',
+         status:'resolved',confirmed:true,
+         occurredAt:'2026-04-08 02:30:00',resolvedAt:'2026-04-08 06:00:00',
+         confidence:null,
+         params:[{name:'HVAC Energy',value:245,unit:'kWh',threshold:200,op:'>'}],
+         trend:[{time:'00:00',value:180},{time:'01:00',value:195},{time:'02:00',value:220},{time:'02:30',value:245}]},
+        {id:'ALM-008',source:'device',sourceName:'',severity:'medium',
+         description:'AHU-1 filter differential pressure high, replacement recommended',
+         device:'Air Handling Unit AHU-1',deviceId:'ahu1',
+         status:'active',confirmed:false,
+         occurredAt:'2026-04-08 11:40:00',resolvedAt:null,
+         confidence:null,
+         params:[{name:'Filter DP',value:250,unit:'Pa',threshold:200,op:'>'},{name:'Airflow',value:85,unit:'%',threshold:90,op:'<'}],
+         trend:[{time:'10:00',value:180},{time:'10:30',value:200},{time:'11:00',value:225},{time:'11:40',value:250}]},
+        {id:'ALM-009',source:'ai',sourceName:'',severity:'medium',
+         description:'AI detected unusual power factor degradation in Residence building',
+         device:'Student Residence',deviceId:'res',
+         status:'active',confirmed:true,
+         occurredAt:'2026-04-08 14:00:00',resolvedAt:null,
+         confidence:72,
+         params:[{name:'Power Factor',value:0.78,unit:'',threshold:0.85,op:'<'},{name:'Reactive Power',value:45,unit:'kVAR',threshold:30,op:'>'}],
+         trend:[{time:'12:00',value:0.88},{time:'13:00',value:0.83},{time:'13:30',value:0.80},{time:'14:00',value:0.78}]},
+        {id:'ALM-010',source:'rule',sourceName:'Peak Demand Alert',severity:'critical',
+         description:'TTSS main meter power demand exceeded 800 kW peak limit',
+         device:'TTSS Main Meter',deviceId:'ttss_main',
+         status:'resolved',confirmed:true,
+         occurredAt:'2026-04-07 14:15:00',resolvedAt:'2026-04-07 14:45:00',
+         confidence:null,
+         params:[{name:'Demand',value:832,unit:'kW',threshold:800,op:'>'}],
+         trend:[{time:'13:30',value:750},{time:'13:45',value:780},{time:'14:00',value:810},{time:'14:15',value:832}]},
+        {id:'ALM-011',source:'device',sourceName:'',severity:'high',
+         description:'Cooling Tower CT-1 fan motor bearing temperature high',
+         device:'Cooling Tower CT-1',deviceId:'ct1',
+         status:'active',confirmed:false,
+         occurredAt:'2026-04-08 17:20:00',resolvedAt:null,
+         confidence:null,
+         params:[{name:'Bearing Temp',value:78,unit:'°C',threshold:70,op:'>'},{name:'Fan Speed',value:1450,unit:'rpm',threshold:1500,op:'<'}],
+         trend:[{time:'16:30',value:65},{time:'16:50',value:70},{time:'17:00',value:74},{time:'17:20',value:78}]},
+        {id:'ALM-012',source:'ai',sourceName:'',severity:'low',
+         description:'AI detected gradual efficiency decline in chilled water pump system',
+         device:'Chilled Water Pump CHWP-1',deviceId:'chwp1',
+         status:'active',confirmed:false,
+         occurredAt:'2026-04-08 10:00:00',resolvedAt:null,
+         confidence:65,
+         params:[{name:'Efficiency',value:72,unit:'%',threshold:80,op:'<'},{name:'Power',value:28,unit:'kW',threshold:25,op:'>'}],
+         trend:[{time:'08:00',value:78},{time:'09:00',value:76},{time:'09:30',value:74},{time:'10:00',value:72}]},
+        {id:'ALM-013',source:'rule',sourceName:'Meter Reading Anomaly',severity:'low',
+         description:'Academic Building Meter communication status lost for 5 minutes',
+         device:'Academic Building Meter',deviceId:'acad_meter',
+         status:'resolved',confirmed:true,
+         occurredAt:'2026-04-08 08:10:00',resolvedAt:'2026-04-08 08:18:00',
+         confidence:null,
+         params:[{name:'Comm Status',value:0,unit:'',threshold:1,op:'<'}],
+         trend:[{time:'07:30',value:1},{time:'07:50',value:1},{time:'08:00',value:0},{time:'08:10',value:0}]},
+        {id:'ALM-014',source:'device',sourceName:'',severity:'medium',
+         description:'Gas meter flow rate anomaly detected, possible leak',
+         device:'Gas Meter',deviceId:'gas_meter',
+         status:'active',confirmed:true,
+         occurredAt:'2026-04-08 12:30:00',resolvedAt:null,
+         confidence:null,
+         params:[{name:'Flow Rate',value:12.5,unit:'m³/h',threshold:8,op:'>'},{name:'Pressure',value:180,unit:'kPa',threshold:200,op:'<'}],
+         trend:[{time:'11:30',value:6.2},{time:'12:00',value:9.8},{time:'12:15',value:11.2},{time:'12:30',value:12.5}]},
+        {id:'ALM-015',source:'ai',sourceName:'',severity:'high',
+         description:'AI anomaly detection: irregular energy spike pattern in Library Building during off-hours',
+         device:'Library Building',deviceId:'library',
+         status:'active',confirmed:false,
+         occurredAt:'2026-04-08 03:15:00',resolvedAt:null,
+         confidence:89,
+         params:[{name:'Energy',value:185,unit:'kWh',threshold:120,op:'>'},{name:'Deviation',value:54.2,unit:'%',threshold:30,op:'>'}],
+         trend:[{time:'01:00',value:95},{time:'02:00',value:110},{time:'02:30',value:150},{time:'03:00',value:185}]},
+        {id:'ALM-016',source:'rule',sourceName:'High BTSS Consumption',severity:'critical',
+         description:'BTSS total power exceeded 600 kW emergency threshold',
+         device:'BTSS Main Building',deviceId:'btss',
+         status:'active',confirmed:false,
+         occurredAt:'2026-04-08 15:45:00',resolvedAt:null,
+         confidence:null,
+         params:[{name:'Total Power',value:612,unit:'kW',threshold:600,op:'>'},{name:'Current',value:890,unit:'A',threshold:850,op:'>'}],
+         trend:[{time:'15:00',value:540},{time:'15:15',value:565},{time:'15:30',value:590},{time:'15:45',value:612}]},
+        {id:'ALM-017',source:'device',sourceName:'',severity:'low',
+         description:'Lighting circuit LTG-MAIN ballast fault detected on floor 3',
+         device:'Main Lighting Circuit',deviceId:'ltg_main',
+         status:'resolved',confirmed:true,
+         occurredAt:'2026-04-07 09:30:00',resolvedAt:'2026-04-07 10:00:00',
+         confidence:null,
+         params:[{name:'Fault Count',value:3,unit:'count',threshold:1,op:'>'},{name:'Power',value:6.2,unit:'kW',threshold:8,op:'<'}],
+         trend:[{time:'08:00',value:0},{time:'08:30',value:1},{time:'09:00',value:2},{time:'09:30',value:3}]},
+        {id:'ALM-018',source:'ai',sourceName:'',severity:'medium',
+         description:'AI predictive maintenance: AHU-2 belt wear detected, replacement suggested within 2 weeks',
+         device:'Air Handling Unit AHU-2',deviceId:'ahu2',
+         status:'active',confirmed:false,
+         occurredAt:'2026-04-08 16:30:00',resolvedAt:null,
+         confidence:78,
+         params:[{name:'Vibration',value:3.8,unit:'mm/s',threshold:3.0,op:'>'},{name:'Airflow',value:82,unit:'%',threshold:85,op:'<'}],
+         trend:[{time:'14:00',value:3.0},{time:'15:00',value:3.3},{time:'15:30',value:3.5},{time:'16:00',value:3.8}]},
+        {id:'ALM-019',source:'rule',sourceName:'Chiller Overload Protection',severity:'high',
+         description:'CH-1 load rate exceeded 90% for extended period',
+         device:'Chiller CH-1',deviceId:'ch1',
+         status:'active',confirmed:true,
+         occurredAt:'2026-04-08 14:50:00',resolvedAt:null,
+         confidence:null,
+         params:[{name:'Load Rate',value:93,unit:'%',threshold:90,op:'>'},{name:'Power',value:340,unit:'kW',threshold:350,op:'<'}],
+         trend:[{time:'14:00',value:85},{time:'14:20',value:88},{time:'14:40',value:91},{time:'14:50',value:93}]},
+        {id:'ALM-020',source:'device',sourceName:'',severity:'medium',
+         description:'Residence Meter voltage fluctuation detected, phase imbalance warning',
+         device:'Residence Meter',deviceId:'res_meter',
+         status:'active',confirmed:false,
+         occurredAt:'2026-04-08 11:00:00',resolvedAt:null,
+         confidence:null,
+         params:[{name:'Voltage Imbalance',value:4.2,unit:'%',threshold:3,op:'>'},{name:'Frequency',value:49.8,unit:'Hz',threshold:50,op:'<'}],
+         trend:[{time:'10:00',value:2.8},{time:'10:30',value:3.5},{time:'10:45',value:3.9},{time:'11:00',value:4.2}]},
+    ];
+}
+
+// ===== Clock =====
+function updateClock() {
+    var el = document.getElementById('clock');
+    if (el) el.textContent = new Date().toLocaleTimeString('en-US', {hour12:false});
+}
+setInterval(updateClock, 1000);
+
+// ===== Events =====
+function bindEvents() {
+    document.getElementById('searchInput').addEventListener('input', function() { currentPage=1; renderTable(); });
+    document.getElementById('filterSource').addEventListener('change', function() { currentPage=1; renderTable(); });
+    document.getElementById('filterSev').addEventListener('change', function() { currentPage=1; renderTable(); });
+    document.querySelectorAll('.filter-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+            chip.classList.add('active');
+            currentPage = 1;
+            renderStats();
+            renderTable();
+        });
+    });
+    document.getElementById('detailClose').addEventListener('click', closeDetail);
+    document.getElementById('confirmModal').addEventListener('click', function(e){ if(e.target===this) closeConfirm(); });
+}
+
+// ===== Stats =====
+function renderStats() {
+    var filtered = getFiltered();
+    var total = alarms.length;
+    var critical = alarms.filter(function(a){return a.severity==='critical';}).length;
+    var unresolved = alarms.filter(function(a){return a.status==='active';}).length;
+    var unconfirmed = alarms.filter(function(a){return !a.confirmed && a.status==='active';}).length;
+    var resolved = alarms.filter(function(a){return a.status==='resolved';}).length;
+
+    document.getElementById('statsStrip').innerHTML =
+        '<div class="stat-card total"><span class="stat-label">Total Alarms</span><span class="stat-value">' + total + '</span><span class="stat-change down">↓ 8.3% vs yesterday</span></div>' +
+        '<div class="stat-card critical"><span class="stat-label">Critical</span><span class="stat-value">' + critical + '</span><span class="stat-change up">↑ 2 new today</span></div>' +
+        '<div class="stat-card unresolved"><span class="stat-label">Unresolved</span><span class="stat-value">' + unresolved + '</span></div>' +
+        '<div class="stat-card unconfirmed"><span class="stat-label">Unconfirmed</span><span class="stat-value">' + unconfirmed + '</span></div>' +
+        '<div class="stat-card resolved"><span class="stat-label">Resolved</span><span class="stat-value">' + resolved + '</span></div>';
+}
+
+// ===== Filter =====
+function getFiltered() {
+    var search = document.getElementById('searchInput').value.toLowerCase();
+    var srcFilter = document.getElementById('filterSource').value;
+    var sevFilter = document.getElementById('filterSev').value;
+    var statusFilter = document.querySelector('.filter-chip.active') ? document.querySelector('.filter-chip.active').dataset.status : '';
+
+    return alarms.filter(function(a) {
+        if (search && a.description.toLowerCase().indexOf(search) === -1 && a.device.toLowerCase().indexOf(search) === -1) return false;
+        if (srcFilter && a.source !== srcFilter) return false;
+        if (sevFilter && a.severity !== sevFilter) return false;
+        if (statusFilter === 'active' && a.status !== 'active') return false;
+        if (statusFilter === 'resolved' && a.status !== 'resolved') return false;
+        if (statusFilter === 'unconfirmed' && (a.confirmed || a.status !== 'active')) return false;
+        return true;
+    });
+}
+
+// ===== Pagination =====
+var currentPage = 1;
+var pageSize = 10;
+
+function renderPagination(filtered) {
+    var total = filtered.length;
+    var totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    var start = (currentPage - 1) * pageSize;
+    var end = Math.min(start + pageSize, total);
+    var pageData = filtered.slice(start, end);
+
+    var wrapper = document.getElementById('paginationWrap');
+    if (!wrapper) return pageData;
+
+    if (totalPages <= 1) {
+        wrapper.innerHTML = '';
+        return pageData;
+    }
+
+    var html = '<div class="pagination"><span class="page-info">Showing ' + (start+1) + '-' + end + ' of ' + total + '</span><div class="page-btns">';
+    html += '<button class="page-btn' + (currentPage===1?' disabled':'') + '" onclick="goPage(' + (currentPage-1) + ')">‹ Prev</button>';
+
+    var startP = Math.max(1, currentPage - 2);
+    var endP = Math.min(totalPages, currentPage + 2);
+    if (startP > 1) { html += '<button class="page-btn" onclick="goPage(1)">1</button>'; if(startP>2) html+='<span class="page-dots">…</span>'; }
+    for (var p = startP; p <= endP; p++) {
+        html += '<button class="page-btn' + (p===currentPage?' active':'') + '" onclick="goPage(' + p + ')">' + p + '</button>';
+    }
+    if (endP < totalPages) { if(endP<totalPages-1) html+='<span class="page-dots">…</span>'; html += '<button class="page-btn" onclick="goPage(' + totalPages + ')">' + totalPages + '</button>'; }
+    html += '<button class="page-btn' + (currentPage===totalPages?' disabled':'') + '" onclick="goPage(' + (currentPage+1) + ')">Next ›</button>';
+    html += '</div></div>';
+    wrapper.innerHTML = html;
+    return pageData;
+}
+
+function goPage(p) {
+    var filtered = getFiltered();
+    var totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+    if (p < 1 || p > totalPages) return;
+    currentPage = p;
+    renderTable();
+}
+
+// ===== Table =====
+function renderTable() {
+    var filtered = getFiltered();
+    document.getElementById('alarmCountLabel').textContent = filtered.length + ' alarm' + (filtered.length !== 1 ? 's' : '');
+
+    var pageData = renderPagination(filtered);
+
+    var tbody = document.getElementById('alarmsTbody');
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>No matching alarms found</p></div></td></tr>';
+        return;
+    }
+
+    var rows = filtered.map(function(a) {
+        var statusBadge = a.status === 'active'
+            ? '<span class="badge badge-danger"><span class="badge-dot"></span>Active</span>'
+            : '<span class="badge badge-success"><span class="badge-dot"></span>Resolved</span>';
+        var confBadge = a.confirmed
+            ? '<span class="badge badge-success">Yes</span>'
+            : '<span class="badge badge-warning">No</span>';
+        var duration = a.resolvedAt ? calcDuration(a.occurredAt, a.resolvedAt) : calcDurationNow(a.occurredAt);
+        var confHtml = a.source === 'ai' && a.confidence != null
+            ? '<div class="conf-bar"><div class="conf-bar-track"><div class="conf-bar-fill ' + (a.confidence>=80?'high':a.confidence>=60?'medium':'low') + '" style="width:' + a.confidence + '%"></div></div><span class="conf-bar-text">' + a.confidence + '%</span></div>'
+            : '<span style="color:var(--text-muted);font-size:11px;">--</span>';
+
+        var actions = '';
+        if (a.status === 'active' && !a.confirmed) {
+            actions += '<button class="btn btn-sm btn-warning" onclick="event.stopPropagation();confirmAck(\'' + a.id + '\')">Ack</button>';
+        }
+        actions += '<button class="btn btn-sm btn-cyan" onclick="event.stopPropagation();viewAlarm(\'' + a.id + '\')">View</button>';
+
+        return '<tr onclick="viewAlarm(\'' + a.id + '\')">' +
+            '<td><span class="badge badge-source">' + sourceLabels[a.source] + '</span></td>' +
+            '<td><span class="badge ' + sevBadge[a.severity] + '">' + sevLabels[a.severity] + '</span></td>' +
+            '<td><div class="alarm-desc" title="' + escHtml(a.description) + '">' + escHtml(a.description) + '</div></td>' +
+            '<td style="font-size:12px;">' + escHtml(a.device) + '</td>' +
+            '<td>' + statusBadge + '</td>' +
+            '<td>' + confBadge + '</td>' +
+            '<td class="mono" style="font-size:11px;">' + a.occurredAt + '</td>' +
+            '<td class="mono" style="font-size:11px;">' + duration + '</td>' +
+            '<td>' + confHtml + '</td>' +
+            '<td><div class="actions" style="justify-content:flex-end;">' + actions + '</div></td></tr>';
+    }).join('');
+
+    tbody.innerHTML = rows;
+}
+
+function filterAndRender() {
+    currentPage = 1;
+    renderStats();
+    renderTable();
+}
+
+function calcDuration(start, end) {
+    var s = new Date(start.replace(' ','T')).getTime();
+    var e = new Date(end.replace(' ','T')).getTime();
+    var diff = e - s;
+    var h = Math.floor(diff / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    return h > 0 ? h + 'h ' + m + 'm' : m + 'm';
+}
+
+function calcDurationNow(start) {
+    var s = new Date(start.replace(' ','T')).getTime();
+    var diff = Date.now() - s;
+    var h = Math.floor(diff / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    return h > 0 ? h + 'h ' + m + 'm' : m + 'm';
+}
+
+function escHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+}
+
+// ===== View Alarm Detail =====
+function viewAlarm(id) {
+    var alarm = null;
+    for (var i = 0; i < alarms.length; i++) { if (alarms[i].id === id) { alarm = alarms[i]; break; } }
+    if (!alarm) return;
+    viewingAlarmId = id;
+
+    document.getElementById('detailTitle').innerHTML = '<span class="badge ' + sevBadge[alarm.severity] + '">' + sevLabels[alarm.severity] + '</span> ' + escHtml(alarm.description);
+
+    var duration = alarm.resolvedAt ? calcDuration(alarm.occurredAt, alarm.resolvedAt) : calcDurationNow(alarm.occurredAt);
+
+    var infoHtml = '<div class="info-grid">' +
+        '<div class="info-item"><span class="info-label">Alarm ID</span><span class="info-value">' + alarm.id + '</span></div>' +
+        '<div class="info-item"><span class="info-label">Source</span><span class="info-value">' + sourceLabels[alarm.source] + '</span></div>' +
+        (alarm.source === 'rule' ? '<div class="info-item"><span class="info-label">Rule Name</span><span class="info-value">' + escHtml(alarm.sourceName) + '</span></div>' : '') +
+        '<div class="info-item"><span class="info-label">Severity</span><span class="info-value">' + sevLabels[alarm.severity] + '</span></div>' +
+        '<div class="info-item"><span class="info-label">Device</span><span class="info-value">' + escHtml(alarm.device) + '</span></div>' +
+        '<div class="info-item"><span class="info-label">Occurred At</span><span class="info-value">' + alarm.occurredAt + '</span></div>' +
+        '<div class="info-item"><span class="info-label">Duration</span><span class="info-value">' + duration + '</span></div>' +
+        '<div class="info-item"><span class="info-label">Status</span><span class="info-value">' + (alarm.status === 'active' ? '🔴 Active' : '🟢 Resolved') + '</span></div>' +
+        '<div class="info-item"><span class="info-label">Confirmed</span><span class="info-value">' + (alarm.confirmed ? '✅ Yes' : '❌ No') + '</span></div>' +
+        (alarm.source === 'ai' && alarm.confidence != null ? '<div class="info-item"><span class="info-label">Confidence</span><span class="info-value">' + alarm.confidence + '%</span></div>' : '') +
+        '</div>';
+
+    var paramsHtml = '';
+    if (alarm.params && alarm.params.length > 0) {
+        paramsHtml = '<div class="card-block"><div class="card-block-head"><span class="card-block-title">Key Parameters</span></div><div class="card-block-body"><div class="param-list">';
+        for (var i = 0; i < alarm.params.length; i++) {
+            var p = alarm.params[i];
+            var isAlert = false;
+            if (p.op === '>' && p.value > p.threshold) isAlert = true;
+            if (p.op === '<' && p.value < p.threshold) isAlert = true;
+            paramsHtml += '<div class="param-row ' + (isAlert ? 'alert' : 'normal') + '">' +
+                '<span class="param-name">' + p.name + '</span>' +
+                '<span class="param-value ' + (isAlert ? 'high' : 'ok') + '">' + p.value + ' ' + p.unit + '</span>' +
+                '<span class="param-threshold">' + p.op + ' ' + p.threshold + ' ' + p.unit + '</span>' +
+                '</div>';
+        }
+        paramsHtml += '</div></div></div>';
+    }
+
+    var chartHtml = '<div class="card-block"><div class="card-block-head"><span class="card-block-title">Parameter Trend</span><span class="card-block-sub">' + (alarm.params.length > 0 ? alarm.params[0].name : 'Trend') + ' over time</span></div><div class="card-block-body"><div class="trend-chart-wrap"><canvas id="trendCanvas"></canvas></div></div></div>';
+
+    document.getElementById('detailBody').innerHTML =
+        '<div class="card-block"><div class="card-block-head"><span class="card-block-title">Basic Information</span></div><div class="card-block-body">' + infoHtml + '</div></div>' +
+        paramsHtml +
+        chartHtml;
+
+    // Show/hide action buttons based on status
+    document.getElementById('detailAckBtn').style.display = (alarm.status === 'active' && !alarm.confirmed) ? '' : 'none';
+
+    document.getElementById('detailOverlay').classList.add('open');
+    document.getElementById('detailPanel').classList.add('open');
+
+    // Render trend chart
+    setTimeout(function() { renderTrendChart(alarm); }, 100);
+}
+
+function closeDetail() {
+    document.getElementById('detailOverlay').classList.remove('open');
+    document.getElementById('detailPanel').classList.remove('open');
+    viewingAlarmId = null;
+    if (trendChart) { trendChart.destroy(); trendChart = null; }
+}
+
+function renderTrendChart(alarm) {
+    var canvas = document.getElementById('trendCanvas');
+    if (!canvas) return;
+    if (trendChart) { trendChart.destroy(); trendChart = null; }
+
+    var ctx = canvas.getContext('2d');
+    var labels = alarm.trend.map(function(t){return t.time;});
+    var values = alarm.trend.map(function(t){return t.value;});
+
+    // Determine threshold
+    var threshold = null;
+    if (alarm.params && alarm.params.length > 0) {
+        threshold = alarm.params[0].threshold;
+    }
+
+    var datasets = [{
+        label: alarm.params.length > 0 ? alarm.params[0].name : 'Value',
+        data: values,
+        borderColor: '#EF4444',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 4,
+        pointBackgroundColor: '#EF4444',
+        borderWidth: 2
+    }];
+
+    if (threshold !== null) {
+        datasets.push({
+            label: 'Threshold',
+            data: labels.map(function(){return threshold;}),
+            borderColor: 'rgba(245, 158, 11, 0.6)',
+            borderDash: [6, 4],
+            pointRadius: 0,
+            borderWidth: 1.5,
+            fill: false
+        });
+    }
+
+    trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {labels: labels, datasets: datasets},
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {labels: {color: '#94A3B8', font: {size: 10}}}
+            },
+            scales: {
+                x: {ticks: {color: '#64748B', font: {size: 9}}, grid: {color: 'rgba(100,116,139,0.1)'}},
+                y: {ticks: {color: '#64748B', font: {size: 9}}, grid: {color: 'rgba(100,116,139,0.1)'}}
+            }
+        }
+    });
+}
+
+// ===== Acknowledge =====
+function confirmAck(id) {
+    var alarm = null;
+    for (var i = 0; i < alarms.length; i++) { if (alarms[i].id === id) { alarm = alarms[i]; break; } }
+    if (!alarm) return;
+    showConfirm('Acknowledge Alarm', 'Acknowledge "' + alarm.description.substring(0, 50) + '..."?', 'This will mark the alarm as acknowledged.', function() {
+        alarm.confirmed = true;
+        renderStats();
+        renderTable();
+        if (viewingAlarmId === id) viewAlarm(id);
+        showToast('Alarm acknowledged', 'success');
+        closeConfirm();
+    });
+}
+
+function ackFromDetail() {
+    if (viewingAlarmId) confirmAck(viewingAlarmId);
+}
+
+// ===== Refresh =====
+function refreshAlarms() {
+    currentPage = 1;
+    renderStats();
+    renderTable();
+    showToast('Alarms refreshed', 'info');
+}
+
+// ===== Confirm Modal =====
+var pendingAction = null;
+
+function showConfirm(title, heading, message, action) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmHeading').textContent = heading;
+    document.getElementById('confirmMessage').textContent = message;
+    pendingAction = action;
+    document.getElementById('confirmAction').onclick = function() { if (pendingAction) pendingAction(); };
+    document.getElementById('confirmModal').classList.add('open');
+}
+
+function closeConfirm() {
+    document.getElementById('confirmModal').classList.remove('open');
+    pendingAction = null;
+}
+
+// ===== Toast =====
+function showToast(message, type) {
+    if (!type) type = 'info';
+    var container = document.getElementById('toastContainer');
+    var icons = {success: '✓', error: '✕', info: 'ℹ'};
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = '<span>' + (icons[type] || 'ℹ') + '</span> ' + message;
+    container.appendChild(toast);
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(20px)';
+        toast.style.transition = 'all .3s';
+        setTimeout(function() { toast.remove(); }, 300);
+    }, 3000);
+}
+
+// ===== Start =====
+init();
+</script>
+</body>
+</html>
