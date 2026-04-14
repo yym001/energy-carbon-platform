@@ -143,17 +143,12 @@ function loadSubMenuPage(moduleId, subMenuName) {
     const iframe = document.getElementById('contentFrame');
     
     console.log(`Loading page: ${url}`);
-    
-    // Set onload handler BEFORE changing src
-    iframe.onload = () => {
-        // Small delay to ensure DOM is fully ready
-        setTimeout(() => {
-            injectStylesIntoIframe(iframe);
-        }, 100);
-    };
-    
-    // Change src to trigger reload
     iframe.src = url;
+    
+    // Inject styles after a short delay to ensure DOM is ready
+    setTimeout(() => {
+        injectStylesIntoIframe(iframe);
+    }, 150);
 }
 
 // Helper function to inject styles into iframe
@@ -240,17 +235,12 @@ function loadModulePage(moduleId) {
         const iframe = document.getElementById('contentFrame');
         
         console.log(`Loading module page: ${module.url}`);
-        
-        // Set onload handler BEFORE changing src
-        iframe.onload = () => {
-            // Small delay to ensure DOM is fully ready
-            setTimeout(() => {
-                injectStylesIntoIframe(iframe);
-            }, 100);
-        };
-        
-        // Change src to trigger reload
         iframe.src = module.url;
+        
+        // Inject styles after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            injectStylesIntoIframe(iframe);
+        }, 150);
     }
 }
 
