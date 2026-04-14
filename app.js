@@ -142,18 +142,18 @@ function loadSubMenuPage(moduleId, subMenuName) {
     const url = `./pages/${moduleId}/${subMenuName}.html`;
     const iframe = document.getElementById('contentFrame');
     
-    // Always reload to ensure fresh content and styles
-    iframe.src = 'about:blank';
+    console.log(`Loading page: ${url}`);
     
-    setTimeout(() => {
-        iframe.src = url;
-        console.log(`Loading page: ${url}`);
-        
-        // Inject styles after page loads
-        iframe.onload = () => {
+    // Set onload handler BEFORE changing src
+    iframe.onload = () => {
+        // Small delay to ensure DOM is fully ready
+        setTimeout(() => {
             injectStylesIntoIframe(iframe);
-        };
-    }, 50);
+        }, 100);
+    };
+    
+    // Change src to trigger reload
+    iframe.src = url;
 }
 
 // Helper function to inject styles into iframe
@@ -239,17 +239,18 @@ function loadModulePage(moduleId) {
     if (module && module.url) {
         const iframe = document.getElementById('contentFrame');
         
-        // Always reload to ensure fresh content and styles
-        iframe.src = 'about:blank';
+        console.log(`Loading module page: ${module.url}`);
         
-        setTimeout(() => {
-            iframe.src = module.url;
-            
-            // Inject styles after page loads
-            iframe.onload = () => {
+        // Set onload handler BEFORE changing src
+        iframe.onload = () => {
+            // Small delay to ensure DOM is fully ready
+            setTimeout(() => {
                 injectStylesIntoIframe(iframe);
-            };
-        }, 50);
+            }, 100);
+        };
+        
+        // Change src to trigger reload
+        iframe.src = module.url;
     }
 }
 
