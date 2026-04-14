@@ -141,57 +141,8 @@ function loadSubMenuPage(moduleId, subMenuName) {
     // Construct the URL based on module and submenu
     const url = `./pages/${moduleId}/${subMenuName}.html`;
     const iframe = document.getElementById('contentFrame');
-    
-    console.log(`Loading page: ${url}`);
     iframe.src = url;
-    
-    // Inject styles after a short delay to ensure DOM is ready
-    setTimeout(() => {
-        injectStylesIntoIframe(iframe);
-    }, 150);
-}
-
-// Helper function to inject styles into iframe
-function injectStylesIntoIframe(iframe) {
-    try {
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        if (iframeDoc && iframeDoc.head) {
-            // Remove existing injected style if any
-            const existingStyle = iframeDoc.getElementById('injected-navbar-style');
-            if (existingStyle) {
-                existingStyle.remove();
-            }
-            
-            // Create new style element
-            const style = iframeDoc.createElement('style');
-            style.id = 'injected-navbar-style';
-            style.textContent = `
-                * {
-                    margin: 0 !important;
-                    padding: 0 !important;
-                    box-sizing: border-box;
-                }
-                html, body {
-                    margin: 0 !important;
-                    padding: 0 !important;
-                    overflow: auto !important;
-                    height: auto !important;
-                    min-height: 100%;
-                    background: transparent !important;
-                }
-                body > *:first-child {
-                    margin-top: 0 !important;
-                }
-                body > *:last-child {
-                    margin-bottom: 0 !important;
-                }
-            `;
-            iframeDoc.head.insertBefore(style, iframeDoc.head.firstChild);
-            console.log('Styles injected successfully');
-        }
-    } catch(e) {
-        console.warn('Cannot inject styles into iframe:', e);
-    }
+    console.log(`Loading page: ${url}`);
 }
 
 function updateTopBar() {
@@ -233,14 +184,7 @@ function loadModulePage(moduleId) {
     const module = NAVBAR_CONFIG.navItems.find(m => m.id === moduleId);
     if (module && module.url) {
         const iframe = document.getElementById('contentFrame');
-        
-        console.log(`Loading module page: ${module.url}`);
         iframe.src = module.url;
-        
-        // Inject styles after a short delay to ensure DOM is ready
-        setTimeout(() => {
-            injectStylesIntoIframe(iframe);
-        }, 150);
     }
 }
 
