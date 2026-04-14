@@ -141,46 +141,62 @@ function loadSubMenuPage(moduleId, subMenuName) {
     // Construct the URL based on module and submenu
     const url = `./pages/${moduleId}/${subMenuName}.html`;
     const iframe = document.getElementById('contentFrame');
-    iframe.src = url;
-    console.log(`Loading page: ${url}`);
     
-    // Inject styles to remove margins and ensure proper rendering
+    // Always reload to ensure fresh content and styles
+    iframe.src = 'about:blank';
+    
     setTimeout(() => {
-        try {
-            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-            if (iframeDoc && iframeDoc.head) {
-                const existingStyle = iframeDoc.getElementById('injected-navbar-style');
-                if (!existingStyle) {
-                    const style = iframeDoc.createElement('style');
-                    style.id = 'injected-navbar-style';
-                    style.textContent = `
-                        * {
-                            margin: 0 !important;
-                            padding: 0 !important;
-                            box-sizing: border-box;
-                        }
-                        html, body {
-                            margin: 0 !important;
-                            padding: 0 !important;
-                            overflow: auto !important;
-                            height: auto !important;
-                            min-height: 100%;
-                            background: transparent !important;
-                        }
-                        body > *:first-child {
-                            margin-top: 0 !important;
-                        }
-                        body > *:last-child {
-                            margin-bottom: 0 !important;
-                        }
-                    `;
-                    iframeDoc.head.insertBefore(style, iframeDoc.head.firstChild);
-                }
+        iframe.src = url;
+        console.log(`Loading page: ${url}`);
+        
+        // Inject styles after page loads
+        iframe.onload = () => {
+            injectStylesIntoIframe(iframe);
+        };
+    }, 50);
+}
+
+// Helper function to inject styles into iframe
+function injectStylesIntoIframe(iframe) {
+    try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        if (iframeDoc && iframeDoc.head) {
+            // Remove existing injected style if any
+            const existingStyle = iframeDoc.getElementById('injected-navbar-style');
+            if (existingStyle) {
+                existingStyle.remove();
             }
-        } catch(e) {
-            console.warn('Cannot inject styles into iframe:', e);
+            
+            // Create new style element
+            const style = iframeDoc.createElement('style');
+            style.id = 'injected-navbar-style';
+            style.textContent = `
+                * {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    box-sizing: border-box;
+                }
+                html, body {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    overflow: auto !important;
+                    height: auto !important;
+                    min-height: 100%;
+                    background: transparent !important;
+                }
+                body > *:first-child {
+                    margin-top: 0 !important;
+                }
+                body > *:last-child {
+                    margin-bottom: 0 !important;
+                }
+            `;
+            iframeDoc.head.insertBefore(style, iframeDoc.head.firstChild);
+            console.log('Styles injected successfully');
         }
-    }, 100);
+    } catch(e) {
+        console.warn('Cannot inject styles into iframe:', e);
+    }
 }
 
 function updateTopBar() {
@@ -222,45 +238,18 @@ function loadModulePage(moduleId) {
     const module = NAVBAR_CONFIG.navItems.find(m => m.id === moduleId);
     if (module && module.url) {
         const iframe = document.getElementById('contentFrame');
-        iframe.src = module.url;
         
-        // Inject styles to remove margins and ensure proper rendering
+        // Always reload to ensure fresh content and styles
+        iframe.src = 'about:blank';
+        
         setTimeout(() => {
-            try {
-                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                if (iframeDoc && iframeDoc.head) {
-                    const existingStyle = iframeDoc.getElementById('injected-navbar-style');
-                    if (!existingStyle) {
-                        const style = iframeDoc.createElement('style');
-                        style.id = 'injected-navbar-style';
-                        style.textContent = `
-                            * {
-                                margin: 0 !important;
-                                padding: 0 !important;
-                                box-sizing: border-box;
-                            }
-                            html, body {
-                                margin: 0 !important;
-                                padding: 0 !important;
-                                overflow: auto !important;
-                                height: auto !important;
-                                min-height: 100%;
-                                background: transparent !important;
-                            }
-                            body > *:first-child {
-                                margin-top: 0 !important;
-                            }
-                            body > *:last-child {
-                                margin-bottom: 0 !important;
-                            }
-                        `;
-                        iframeDoc.head.insertBefore(style, iframeDoc.head.firstChild);
-                    }
-                }
-            } catch(e) {
-                console.warn('Cannot inject styles into iframe:', e);
-            }
-        }, 100);
+            iframe.src = module.url;
+            
+            // Inject styles after page loads
+            iframe.onload = () => {
+                injectStylesIntoIframe(iframe);
+            };
+        }, 50);
     }
 }
 
