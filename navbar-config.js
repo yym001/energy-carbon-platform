@@ -12,6 +12,7 @@ const NAVBAR_CONFIG = {
             greeting: 'Hello! I am iRun AI Assistant, how can I help you?',
             admin: 'Admin',
             role: 'Energy Manager',
+            cockpit: 'Dashboard',
             modules: {
                 montior: 'Monitor',
                 datacenter: 'Data Center',
@@ -49,7 +50,7 @@ const NAVBAR_CONFIG = {
             }
         },
         zh: {
-            brandName: '润建',
+            brandName: 'RundDo',
             sysName: '能源碳管理中心',
             weather: '晴',
             aiAssistant: 'iRun AI 助手',
@@ -58,6 +59,7 @@ const NAVBAR_CONFIG = {
             greeting: '你好！我是 iRun AI 助手，有什么可以帮助你的吗？',
             admin: '管理员',
             role: '能源经理',
+            cockpit: '驾驶仓',
             modules: {
                 montior: '监控',
                 datacenter: '数据中心',

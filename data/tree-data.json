@@ -1,0 +1,708 @@
+{
+  "space": {
+    "name": "TAR UMT",
+    "icon": "building-2",
+    "meta": {
+      "area": "17,124 m²",
+      "buildings": "3"
+    },
+    "children": [
+      {
+        "name": "Bangunan Tun Tan Siew Sin",
+        "icon": "building",
+        "meta": {
+          "area": "8,204 m²",
+          "floors": "7"
+        },
+        "children": [
+          {
+            "name": "Ground Floor",
+            "icon": "layers",
+            "meta": {
+              "area": "1,320 m²"
+            }
+          },
+          {
+            "name": "Level 1",
+            "icon": "layers",
+            "meta": {
+              "area": "1,280 m²"
+            }
+          },
+          {
+            "name": "Level 2",
+            "icon": "layers",
+            "meta": {
+              "area": "1,100 m²"
+            }
+          },
+          {
+            "name": "Level 3",
+            "icon": "layers",
+            "meta": {
+              "area": "1,050 m²"
+            }
+          },
+          {
+            "name": "Level 4",
+            "icon": "layers",
+            "meta": {
+              "area": "1,020 m²"
+            }
+          },
+          {
+            "name": "Level 5",
+            "icon": "layers",
+            "meta": {
+              "area": "980 m²"
+            }
+          },
+          {
+            "name": "District Cooling System Room",
+            "icon": "thermometer-snowflake",
+            "meta": {
+              "area": "1,454 m²",
+              "devices": "10"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "org": {
+    "name": "TAR UMT",
+    "icon": "building-2",
+    "meta": {
+      "headcount": "140"
+    },
+    "children": [
+      {
+        "name": "Administrative Departments",
+        "icon": "users",
+        "meta": {
+          "headcount": "50"
+        },
+        "children": [
+          {
+            "name": "Registrar's Office",
+            "icon": "user",
+            "meta": {
+              "headcount": "8"
+            }
+          },
+          {
+            "name": "Finance Department",
+            "icon": "user",
+            "meta": {
+              "headcount": "12"
+            }
+          },
+          {
+            "name": "Human Resources",
+            "icon": "user",
+            "meta": {
+              "headcount": "20"
+            }
+          },
+          {
+            "name": "Audit Department",
+            "icon": "user",
+            "meta": {
+              "headcount": "10"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Academic Departments",
+        "icon": "users",
+        "meta": {
+          "headcount": "60"
+        },
+        "children": [
+          {
+            "name": "Faculty of Computing and Information Technology",
+            "icon": "user",
+            "meta": {
+              "headcount": "35"
+            }
+          },
+          {
+            "name": "Faculty of New Energy",
+            "icon": "user",
+            "meta": {
+              "headcount": "25"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Research Management Department",
+        "icon": "users",
+        "meta": {
+          "headcount": "15"
+        }
+      },
+      {
+        "name": "Logistics Department",
+        "icon": "users",
+        "meta": {
+          "headcount": "15"
+        }
+      }
+    ]
+  },
+  "device": {
+    "name": "TAR UMT",
+    "icon": "building-2",
+    "meta": {
+      "type": "generic"
+    },
+    "children": [
+      {
+        "name": "Air Conditioning System",
+        "icon": "snowflake",
+        "meta": {
+          "type": "generic"
+        },
+        "children": [
+          {
+            "name": "Chiller System",
+            "icon": "layers",
+            "meta": {
+              "type": "chiller"
+            },
+            "children": [
+              {
+                "name": "CH-1",
+                "icon": "cpu",
+                "meta": {
+                  "type": "chiller",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "CH-2",
+                "icon": "cpu",
+                "meta": {
+                  "type": "chiller",
+                  "rated": "10 kW"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Cooling Water Pump System",
+            "icon": "cpu",
+            "meta": {
+              "type": "cooling-pump"
+            },
+            "children": [
+              {
+                "name": "CWP-1",
+                "icon": "droplets",
+                "meta": {
+                  "type": "cooling-pump",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "CWP-2",
+                "icon": "droplets",
+                "meta": {
+                  "type": "cooling-pump",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "CWP-3",
+                "icon": "droplets",
+                "meta": {
+                  "type": "cooling-pump",
+                  "rated": "10 kW"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Chilled Water Pump System",
+            "icon": "cpu",
+            "meta": {
+              "type": "pump"
+            },
+            "children": [
+              {
+                "name": "CHWP-1",
+                "icon": "droplets",
+                "meta": {
+                  "type": "chilled-pump",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "CHWP-2",
+                "icon": "droplets",
+                "meta": {
+                  "type": "chilled-pump",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "CHWP-3",
+                "icon": "droplets",
+                "meta": {
+                  "type": "chilled-pump",
+                  "rated": "10 kW"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Cooling Tower System",
+            "icon": "wind",
+            "meta": {
+              "type": "tower"
+            },
+            "children": [
+              {
+                "name": "CT-1",
+                "icon": "wind",
+                "meta": {
+                  "type": "tower",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "CT-2",
+                "icon": "wind",
+                "meta": {
+                  "type": "tower",
+                  "rated": "10 kW"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Air Handling Unit System",
+            "icon": "fan",
+            "meta": {
+              "type": "air"
+            },
+            "children": [
+              {
+                "name": "GF AHU",
+                "icon": "fan",
+                "meta": {
+                  "type": "air",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "L1 AHU-1",
+                "icon": "fan",
+                "meta": {
+                  "type": "air",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "L1 AHU-2",
+                "icon": "fan",
+                "meta": {
+                  "type": "air",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "L1 AHU-3",
+                "icon": "fan",
+                "meta": {
+                  "type": "air",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "L2 AHU-1",
+                "icon": "fan",
+                "meta": {
+                  "type": "air",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "L2 AHU-2",
+                "icon": "fan",
+                "meta": {
+                  "type": "air",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "L3 AHU-1",
+                "icon": "fan",
+                "meta": {
+                  "type": "air",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "L3 AHU-2",
+                "icon": "fan",
+                "meta": {
+                  "type": "air",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "L4 AHU-1",
+                "icon": "fan",
+                "meta": {
+                  "type": "air",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "L4 AHU-2",
+                "icon": "fan",
+                "meta": {
+                  "type": "air",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "L5 AHU-1",
+                "icon": "fan",
+                "meta": {
+                  "type": "air",
+                  "rated": "10 kW"
+                }
+              },
+              {
+                "name": "L5 AHU-2",
+                "icon": "fan",
+                "meta": {
+                  "type": "air",
+                  "rated": "10 kW"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Lighting System",
+        "icon": "lightbulb",
+        "meta": {
+          "type": "lighting"
+        },
+        "children": [
+          {
+            "name": "GF Lighting",
+            "icon": "lightbulb",
+            "meta": {
+              "type": "lighting",
+              "rated": "10 kW"
+            }
+          },
+          {
+            "name": "L1 Lighting",
+            "icon": "lightbulb",
+            "meta": {
+              "type": "lighting",
+              "rated": "10 kW"
+            }
+          },
+          {
+            "name": "L2 Lighting",
+            "icon": "lightbulb",
+            "meta": {
+              "type": "lighting",
+              "rated": "10 kW"
+            }
+          },
+          {
+            "name": "L3 Lighting",
+            "icon": "lightbulb",
+            "meta": {
+              "type": "lighting",
+              "rated": "10 kW"
+            }
+          },
+          {
+            "name": "L4 Lighting",
+            "icon": "lightbulb",
+            "meta": {
+              "type": "lighting",
+              "rated": "10 kW"
+            }
+          },
+          {
+            "name": "L5 Lighting",
+            "icon": "lightbulb",
+            "meta": {
+              "type": "lighting",
+              "rated": "10 kW"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "meter": {
+    "name": "TAR UMT",
+    "icon": "zap",
+    "meta": {
+      "protocol": "Modbus TCP",
+      "type": "meter"
+    },
+    "children": [
+      {
+        "name": "Electric Meter",
+        "icon": "zap",
+        "meta": {
+          "type": "meter",
+          "protocol": "Modbus TCP"
+        },
+        "children": [
+          {
+            "name": "TTSS Main Electric Meter",
+            "icon": "zap",
+            "meta": {
+              "type": "Virtual",
+              "virtual": true,
+              "protocol": "Calculated"
+            },
+            "children": [
+              {
+                "name": "CH-1 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "CH-2 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "CWP-1 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "CWP-2 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "CWP-3 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "CHWP-1 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "CHWP-2 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "CT-1 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "CT-2 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "GF Lighting Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L1 Lighting Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L2 Lighting Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L3 Lighting Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L4 Lighting Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L5 Lighting Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L1 AHU-1 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L1 AHU-2 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L1 AHU-3 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L2 AHU-1 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L2 AHU-2 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L3 AHU-1 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L3 AHU-2 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L4 AHU-1 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L4 AHU-2 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L5 AHU-1 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              },
+              {
+                "name": "L5 AHU-2 Meter",
+                "icon": "zap",
+                "meta": {
+                  "type": "Physical",
+                  "protocol": "Modbus TCP"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Water Meter",
+        "icon": "droplets",
+        "meta": {
+          "type": "meter",
+          "protocol": "Modbus TCP"
+        },
+        "children": [
+          {
+            "name": "Cooling Energy Meter 1",
+            "icon": "droplets",
+            "meta": {
+              "type": "Physical",
+              "protocol": "Modbus TCP"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

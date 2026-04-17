@@ -9742,119 +9742,56 @@
 
     <script>
         /* ============================================================
-           DATA: Tree structures for all 4 views
+           DATA: Tree structures for all 4 views (loaded from external JSON)
            ============================================================ */
-        const TREES = {
-            space: {
-                name: 'TAR UMT', icon: 'building-2', meta: { area: '17,124 m²', buildings: '3' },
-                children: [
-                    {
-                        name: 'Bangunan Tun Tan Siew Sin', icon: 'building', meta: { area: '8,204 m²', floors: '7' }, children: [
-                            { name: 'Ground Floor', icon: 'layers', meta: { area: '1,320 m²' } },
-                            { name: 'Level 1', icon: 'layers', meta: { area: '1,280 m²' } },
-                            { name: 'Level 2', icon: 'layers', meta: { area: '1,100 m²' } },
-                            { name: 'Level 3', icon: 'layers', meta: { area: '1,050 m²' } },
-                            { name: 'Level 4', icon: 'layers', meta: { area: '1,020 m²' } },
-                            { name: 'Level 5', icon: 'layers', meta: { area: '980 m²' } },
-                            { name: 'District Cooling System Room', icon: 'thermometer-snowflake', meta: { area: '1,454 m²', devices: '10' } }
-                        ]
-                    },
-                    { name: 'Academic Building', icon: 'building', meta: { area: '5,120 m²' } },
-                    { name: 'Student Residence', icon: 'home', meta: { area: '3,800 m²' } }
-                ]
-            },
-            org: {
-                name: 'TAR UMT', icon: 'building-2', meta: { headcount: '140' },
-                children: [
-                    {
-                        name: 'Administrative Departments', icon: 'users', meta: { headcount: '50' }, children: [
-                            { name: "Registrar's Office", icon: 'user', meta: { headcount: '8' } },
-                            { name: 'Finance Department', icon: 'user', meta: { headcount: '12' } },
-                            { name: 'Human Resources', icon: 'user', meta: { headcount: '20' } },
-                            { name: 'Audit Department', icon: 'user', meta: { headcount: '10' } }
-                        ]
-                    },
-                    {
-                        name: 'Academic Departments', icon: 'users', meta: { headcount: '60' }, children: [
-                            { name: 'Faculty of Computing and Information Technology', icon: 'user', meta: { headcount: '35' } },
-                            { name: 'Faculty of New Energy', icon: 'user', meta: { headcount: '25' } }
-                        ]
-                    },
-                    { name: 'Research Management Department', icon: 'users', meta: { headcount: '15' } },
-                    { name: 'Logistics Department', icon: 'users', meta: { headcount: '15' } }
-                ]
-            },
-            device: {
-                name: 'TAR UMT', icon: 'building-2', meta: { devices: '25' },
-                children: [
-                    {
-                        name: 'District Cooling System', icon: 'snowflake', meta: { devices: '10' }, children: [
-                            {
-                                name: 'Chiller', icon: 'thermometer-snowflake', meta: { rated: '278 kW total' }, children: [
-                                    { name: 'CH-1 (139kW)', icon: 'cpu', meta: { rated: '139 kW', type: 'Centrifugal Chiller', COP: '4.5', space: 'District Cooling Plant Room' } },
-                                    { name: 'CH-2 (139kW)', icon: 'cpu', meta: { rated: '139 kW', type: 'Centrifugal Chiller', COP: '4.5', space: 'District Cooling Plant Room' } }
-                                ]
-                            },
-                            {
-                                name: 'Chilled Water Pump', icon: 'droplets', meta: { rated: '22 kW' }, children: [
-                                    { name: 'CHWP-1 (22kW)', icon: 'cpu', meta: { rated: '22 kW', type: 'Centrifugal Pump', flow: '120 m³/h', space: 'Pump Bay A' } }
-                                ]
-                            },
-                            {
-                                name: 'Cooling Water Pump', icon: 'droplets', meta: { rated: '15 kW' }, children: [
-                                    { name: 'CWP-1 (15kW)', icon: 'cpu', meta: { rated: '15 kW', type: 'Centrifugal Pump', flow: '95 m³/h', space: 'Pump Bay B' } }
-                                ]
-                            },
-                            {
-                                name: 'Cooling Tower', icon: 'wind', meta: { rated: '5.5 kW' }, children: [
-                                    { name: 'CT-1 (5.5kW)', icon: 'cpu', meta: { rated: '5.5 kW', type: 'Cross-flow Tower', space: 'Cooling Tower Roof' } }
-                                ]
-                            },
-                            {
-                                name: 'End Air Cabinet', icon: 'fan', meta: { devices: '2' }, children: [
-                                    { name: 'GF1 FCU (3kW)', icon: 'cpu', meta: { rated: '3 kW', type: 'Fan Coil Unit', space: 'Ground Floor Lobby' } },
-                                    { name: 'GF1 AHU (11kW)', icon: 'cpu', meta: { rated: '11 kW', type: 'Air Handling Unit', space: 'Ground Floor Air Room' } }
-                                ]
-                            }
-                        ]
-                    }
-                    ,
-                    {
-                        name: 'Lighting System', icon: 'lightbulb', meta: { type: 'Lighting System' }, children: [
-                            { name: 'Ground Floor Lighting', icon: 'lightbulb', meta: { rated: '11 kW', type: 'Lighting System', illuminance: '350 lux', lightingRate: '82 %', space: 'Ground Floor Public Zone' } },
-                            { name: 'Level 1 Lighting', icon: 'lightbulb', meta: { rated: '12 kW', type: 'Lighting System', illuminance: '360 lux', lightingRate: '84 %', space: 'Level 1 Teaching Zone' } },
-                            { name: 'Level 2 Lighting', icon: 'lightbulb', meta: { rated: '10 kW', type: 'Lighting System', illuminance: '340 lux', lightingRate: '79 %', space: 'Level 2 Corridor' } },
-                            { name: 'Level 3 Lighting', icon: 'lightbulb', meta: { rated: '10.5 kW', type: 'Lighting System', illuminance: '345 lux', lightingRate: '76 %', space: 'Level 3 Office Zone' } },
-                            { name: 'Level 4 Lighting', icon: 'lightbulb', meta: { rated: '11.2 kW', type: 'Lighting System', illuminance: '352 lux', lightingRate: '81 %', space: 'Level 4 Office Zone' } }
-                        ]
-                    }
-                ]
-            },
-            meter: {
-                name: 'TAR UMT', icon: 'building-2', meta: { meters: '18' },
-                children: [
-                    {
-                        name: 'Electric Meter', icon: 'zap', meta: { meters: '12' }, children: [
-                            {
-                                name: 'TTSS Main Electric Meter', icon: 'gauge', meta: { type: '3-Phase Smart', ratio: '200/5 CT', protocol: 'Modbus TCP' }, children: [
-                                    { name: 'CH-1 Meter', icon: 'circle-dot', meta: { type: '3-Phase', ratio: '100/5 CT' } },
-                                    { name: 'CH-2 Meter', icon: 'circle-dot', meta: { type: '3-Phase', ratio: '100/5 CT' } },
-                                    { name: 'CHWP-1 Meter', icon: 'circle-dot', meta: { type: 'Single-Phase', ratio: '50/5 CT' } },
-                                    { name: 'CWP-1 Meter', icon: 'circle-dot', meta: { type: 'Single-Phase', ratio: '50/5 CT' } },
-                                    { name: 'CT-1 Meter', icon: 'circle-dot', meta: { type: 'Single-Phase', ratio: '30/5 CT' } },
-                                    { name: 'Lighting Meter', icon: 'circle-dot', meta: { type: 'Single-Phase', ratio: '100/5 CT' } }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: 'Water Meter', icon: 'droplets', meta: { meters: '6' }, children: [
-                            { name: 'TTSS Main Water Meter', icon: 'gauge', meta: { type: 'Ultrasonic', diameter: 'DN100', code: 'WM-01' } }
-                        ]
-                    }
-                ]
+        let TREES = null;
+        let treesLoaded = false;
+        let pendingInitCallbacks = [];
+
+        // Load tree data from external JSON file
+        async function loadTreeData() {
+            if (treesLoaded) return TREES;
+            try {
+                const response = await fetch('../../data/tree-data.json');
+                if (!response.ok) {
+                    throw new Error(`Failed to load tree data: ${response.status}`);
+                }
+                TREES = await response.json();
+                treesLoaded = true;
+                console.log('Tree data loaded successfully:', Object.keys(TREES));
+                
+                // Execute any pending initialization callbacks
+                pendingInitCallbacks.forEach(cb => cb());
+                pendingInitCallbacks = [];
+                
+                return TREES;
+            } catch (error) {
+                console.error('Error loading tree data:', error);
+                // Fallback: initialize with empty structure if loading fails
+                TREES = { 
+                    space: { name: 'TAR UMT', icon: 'building-2', meta: {}, children: [] },
+                    org: { name: 'TAR UMT', icon: 'building-2', meta: {}, children: [] },
+                    device: { name: 'TAR UMT', icon: 'building-2', meta: {}, children: [] },
+                    meter: { name: 'TAR UMT', icon: 'building-2', meta: {}, children: [] }
+                };
+                treesLoaded = true;
+                pendingInitCallbacks.forEach(cb => cb());
+                pendingInitCallbacks = [];
+                return TREES;
             }
-        };
+        }
+
+        // Helper to ensure trees are loaded before executing code
+        function onTreesReady(callback) {
+            if (treesLoaded) {
+                callback();
+            } else {
+                pendingInitCallbacks.push(callback);
+            }
+        }
+
+        // Start loading immediately
+        loadTreeData();
 
 
         /* ============================================================
@@ -10020,27 +9957,40 @@
         }
 
         function loadTree(treeKey) {
-            const container = document.getElementById('treeContent');
-            container.innerHTML = '';
-            const tree = TREES[treeKey];
-            container.appendChild(renderTree(tree));
-            if (!container.childNodes.length) {
-                container.innerHTML = `<div class="tree-empty-state">No nodes match the current keyword. Clear the search to restore the full tree.</div>`;
-            }
-            currentTree = treeKey;
-            if (currentModule === 'reports') {
-                const selection = statsTreeSelections[treeKey];
-                if (!selection.paths.length && statsQueryState.mode === 'scenario') {
-                    selection.depth = 0;
-                    selection.paths = [[tree.name]];
+            // Ensure TREES is loaded before rendering
+            onTreesReady(() => {
+                const container = document.getElementById('treeContent');
+                if (!container) return;
+                
+                container.innerHTML = '';
+                const tree = TREES[treeKey];
+                if (!tree) {
+                    console.warn(`Tree data for '${treeKey}' not found`);
+                    container.innerHTML = `<div class="tree-empty-state">Tree data not available.</div>`;
+                    currentTree = treeKey;
+                    lucide.createIcons();
+                    return;
                 }
-                selectedPath = selection.paths[0] || [];
-                syncStatsTreeSelectionUI();
+                
+                container.appendChild(renderTree(tree));
+                if (!container.childNodes.length) {
+                    container.innerHTML = `<div class="tree-empty-state">No nodes match the current keyword. Clear the search to restore the full tree.</div>`;
+                }
+                currentTree = treeKey;
+                if (currentModule === 'reports') {
+                    const selection = statsTreeSelections[treeKey];
+                    if (!selection.paths.length && statsQueryState.mode === 'scenario') {
+                        selection.depth = 0;
+                        selection.paths = [[tree.name]];
+                    }
+                    selectedPath = selection.paths[0] || [];
+                    syncStatsTreeSelectionUI();
+                    lucide.createIcons();
+                    return;
+                }
+                navigateToNode(tree, 0, [tree.name]);
                 lucide.createIcons();
-                return;
-            }
-            navigateToNode(tree, 0, [tree.name]);
-            lucide.createIcons();
+            });
         }
 
         function syncTreeSearchUI() {
@@ -16680,12 +16630,12 @@
         const statsScenarioLibrary = [
             { key: 'elec-space', title: 'Electricity by space', desc: 'Building and floor electricity, cost, carbon, and intensity.', unit: 'kWh', tree: 'space', badge: 'MOST USED', tags: [['Electricity', 'blue'], ['By space', 'teal']], color: 'linear-gradient(135deg, #4da3ff, #2563eb)', defaultPaths: [['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Ground Floor'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 1'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 2'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 3']] },
             { key: 'cost-org', title: 'Cost by organization', desc: 'Department cost, budget usage, and per-capita benchmark.', unit: 'MYR', tree: 'org', tags: [['Cost', 'amber'], ['By org', 'purple']], color: 'linear-gradient(135deg, #f59e0b, #d97706)', defaultPaths: [['TAR UMT', 'Administrative Departments', "Registrar's Office"], ['TAR UMT', 'Administrative Departments', 'Finance Department'], ['TAR UMT', 'Academic Departments', 'Faculty of Computing and Information Technology'], ['TAR UMT', 'Academic Departments', 'Faculty of New Energy']] },
-            { key: 'hvac-status', title: 'HVAC equipment status', desc: 'Runtime, load, COP, faults, and availability for HVAC devices.', unit: 'HVAC', tree: 'device', tags: [['HVAC', 'amber'], ['Status', 'purple']], color: 'linear-gradient(135deg, #fb923c, #f97316)', defaultPaths: [['TAR UMT', 'District Cooling System', 'Chiller', 'CH-1 (139kW)'], ['TAR UMT', 'District Cooling System', 'Chiller', 'CH-2 (139kW)'], ['TAR UMT', 'District Cooling System', 'Chilled Water Pump', 'CHWP-1 (22kW)'], ['TAR UMT', 'District Cooling System', 'Cooling Water Pump', 'CWP-1 (15kW)']] },
-            { key: 'water-space', title: 'Water by space', desc: 'Water use and intensity for buildings and floor scopes.', unit: 'm3', tree: 'space', tags: [['Water', 'teal']], color: 'linear-gradient(135deg, #2dd4bf, #0f766e)', defaultPaths: [['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Ground Floor'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 1'], ['TAR UMT', 'Academic Building'], ['TAR UMT', 'Student Residence']] },
+            { key: 'hvac-status', title: 'HVAC equipment status', desc: 'Runtime, load, COP, faults, and availability for HVAC devices.', unit: 'HVAC', tree: 'device', tags: [['HVAC', 'amber'], ['Status', 'purple']], color: 'linear-gradient(135deg, #fb923c, #f97316)', defaultPaths: [['TAR UMT', 'Air Conditioning System', 'Chiller System', 'CH-1'], ['TAR UMT', 'Air Conditioning System', 'Chiller System', 'CH-2'], ['TAR UMT', 'Air Conditioning System', 'Chilled Water Pump System', 'CHWP-1'], ['TAR UMT', 'Air Conditioning System', 'Cooling Water Pump System', 'CWP-1']] },
+            { key: 'water-space', title: 'Water by space', desc: 'Water use and intensity for buildings and floor scopes.', unit: 'm3', tree: 'space', tags: [['Water', 'teal']], color: 'linear-gradient(135deg, #2dd4bf, #0f766e)', defaultPaths: [['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Ground Floor'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 1'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 2'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 3']] },
             { key: 'cost-space', title: 'Electricity cost by space', desc: 'Tariff, cost, unit price, and allocation structure.', unit: 'MYR', tree: 'space', tags: [['Cost', 'amber']], color: 'linear-gradient(135deg, #f59e0b, #ea580c)', defaultPaths: [['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Ground Floor'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 1'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 2'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 3']] },
-            { key: 'carbon-space', title: 'Carbon by space', desc: 'Scope 2 emissions rolled up by building and floor.', unit: 'CO2', tree: 'space', tags: [['Carbon', 'green']], color: 'linear-gradient(135deg, #34d399, #059669)', defaultPaths: [['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Ground Floor'], ['TAR UMT', 'Academic Building'], ['TAR UMT', 'Student Residence']] },
-            { key: 'elec-device', title: 'Electrical equipment', desc: 'Transformer and switchgear load, PF, and stability overview.', unit: 'DEV', tree: 'device', tags: [['Electrical', 'coral']], color: 'linear-gradient(135deg, #fb923c, #c2410c)', defaultPaths: [['TAR UMT', 'Lighting System', 'Ground Floor Lighting'], ['TAR UMT', 'Lighting System', 'Level 1 Lighting'], ['TAR UMT', 'Lighting System', 'Level 2 Lighting']] },
-            { key: 'meter-quality', title: 'Meter data quality', desc: 'Collection success, anomaly count, and communication status.', unit: 'MTR', tree: 'meter', tags: [['Meters', 'teal']], color: 'linear-gradient(135deg, #64748b, #334155)', defaultPaths: [['TAR UMT', 'Electric Meter', 'TTSS Main Electric Meter', 'CH-1 Meter'], ['TAR UMT', 'Electric Meter', 'TTSS Main Electric Meter', 'CH-2 Meter'], ['TAR UMT', 'Electric Meter', 'TTSS Main Electric Meter', 'CHWP-1 Meter'], ['TAR UMT', 'Water Meter', 'TTSS Main Water Meter']] }
+            { key: 'carbon-space', title: 'Carbon by space', desc: 'Scope 2 emissions rolled up by building and floor.', unit: 'CO2', tree: 'space', tags: [['Carbon', 'green']], color: 'linear-gradient(135deg, #34d399, #059669)', defaultPaths: [['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Ground Floor'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 1'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 2']] },
+            { key: 'elec-device', title: 'Electrical equipment', desc: 'Transformer and switchgear load, PF, and stability overview.', unit: 'DEV', tree: 'device', tags: [['Electrical', 'coral']], color: 'linear-gradient(135deg, #fb923c, #c2410c)', defaultPaths: [['TAR UMT', 'Lighting System', 'GF Lighting'], ['TAR UMT', 'Lighting System', 'L1 Lighting'], ['TAR UMT', 'Lighting System', 'L2 Lighting']] },
+            { key: 'meter-quality', title: 'Meter data quality', desc: 'Collection success, anomaly count, and communication status.', unit: 'MTR', tree: 'meter', tags: [['Meters', 'teal']], color: 'linear-gradient(135deg, #64748b, #334155)', defaultPaths: [['TAR UMT', 'Electric Meter', 'TTSS Main Electric Meter', 'CH-1 Meter'], ['TAR UMT', 'Electric Meter', 'TTSS Main Electric Meter', 'CH-2 Meter'], ['TAR UMT', 'Electric Meter', 'TTSS Main Electric Meter', 'CHWP-1 Meter'], ['TAR UMT', 'Water Meter', 'Cooling Energy Meter 1']] }
         ];
         const statsIndicatorMap = {
             space: [
@@ -22072,15 +22022,17 @@
                     activateDataCenterSection('statistics-query');
                     
                     // Ensure tree is loaded and root node is selected
-                    setTimeout(() => {
-                        const treeContent = document.getElementById('treeContent');
-                        if (treeContent && !treeContent.querySelector('.tree-node-row.selected')) {
-                            const spaceTree = TREES.space;
-                            if (spaceTree) {
-                                navigateToNode(spaceTree, 0, [spaceTree.name]);
+                    onTreesReady(() => {
+                        setTimeout(() => {
+                            const treeContent = document.getElementById('treeContent');
+                            if (treeContent && !treeContent.querySelector('.tree-node-row.selected')) {
+                                const spaceTree = TREES.space;
+                                if (spaceTree) {
+                                    navigateToNode(spaceTree, 0, [spaceTree.name]);
+                                }
                             }
-                        }
-                    }, 150);
+                        }, 150);
+                    });
                 }, 50);
             });
             

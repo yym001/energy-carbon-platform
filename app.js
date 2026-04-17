@@ -199,6 +199,7 @@ function toggleLanguage() {
     document.getElementById('weatherText').textContent = `32°C ${t('weather')}`;
     document.getElementById('userName').textContent = t('admin');
     document.getElementById('userRole').textContent = t('role');
+    document.getElementById('cockpitText').textContent = t('cockpit');
     document.getElementById('aiTitle').textContent = t('aiAssistant');
     document.getElementById('aiGreeting').textContent = t('greeting');
     document.getElementById('aiInput').placeholder = t('aiPlaceholder');
@@ -220,6 +221,7 @@ function toggleLanguage() {
 function init() {
     renderSidebar();
     selectModule(NAVBAR_CONFIG.defaultModule);
+    document.getElementById('cockpitText').textContent = t('cockpit');
     
     document.getElementById('langToggle').addEventListener('click', toggleLanguage);
     

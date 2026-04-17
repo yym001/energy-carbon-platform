@@ -10426,119 +10426,56 @@
 
     <script>
         /* ============================================================
-           DATA: Tree structures for all 4 views
+           DATA: Tree structures for all 4 views (loaded from external JSON)
            ============================================================ */
-        const TREES = {
-            space: {
-                name: 'TAR UMT', icon: 'building-2', meta: { area: '17,124 m²', buildings: '3' },
-                children: [
-                    {
-                        name: 'Bangunan Tun Tan Siew Sin', icon: 'building', meta: { area: '8,204 m²', floors: '7' }, children: [
-                            { name: 'Ground Floor', icon: 'layers', meta: { area: '1,320 m²' } },
-                            { name: 'Level 1', icon: 'layers', meta: { area: '1,280 m²' } },
-                            { name: 'Level 2', icon: 'layers', meta: { area: '1,100 m²' } },
-                            { name: 'Level 3', icon: 'layers', meta: { area: '1,050 m²' } },
-                            { name: 'Level 4', icon: 'layers', meta: { area: '1,020 m²' } },
-                            { name: 'Level 5', icon: 'layers', meta: { area: '980 m²' } },
-                            { name: 'District Cooling System Room', icon: 'thermometer-snowflake', meta: { area: '1,454 m²', devices: '10' } }
-                        ]
-                    },
-                    { name: 'Academic Building', icon: 'building', meta: { area: '5,120 m²' } },
-                    { name: 'Student Residence', icon: 'home', meta: { area: '3,800 m²' } }
-                ]
-            },
-            org: {
-                name: 'TAR UMT', icon: 'building-2', meta: { headcount: '140' },
-                children: [
-                    {
-                        name: 'Administrative Departments', icon: 'users', meta: { headcount: '50' }, children: [
-                            { name: "Registrar's Office", icon: 'user', meta: { headcount: '8' } },
-                            { name: 'Finance Department', icon: 'user', meta: { headcount: '12' } },
-                            { name: 'Human Resources', icon: 'user', meta: { headcount: '20' } },
-                            { name: 'Audit Department', icon: 'user', meta: { headcount: '10' } }
-                        ]
-                    },
-                    {
-                        name: 'Academic Departments', icon: 'users', meta: { headcount: '60' }, children: [
-                            { name: 'Faculty of Computing and Information Technology', icon: 'user', meta: { headcount: '35' } },
-                            { name: 'Faculty of New Energy', icon: 'user', meta: { headcount: '25' } }
-                        ]
-                    },
-                    { name: 'Research Management Department', icon: 'users', meta: { headcount: '15' } },
-                    { name: 'Logistics Department', icon: 'users', meta: { headcount: '15' } }
-                ]
-            },
-            device: {
-                name: 'TAR UMT', icon: 'building-2', meta: { devices: '25' },
-                children: [
-                    {
-                        name: 'District Cooling System', icon: 'snowflake', meta: { devices: '10' }, children: [
-                            {
-                                name: 'Chiller', icon: 'thermometer-snowflake', meta: { rated: '278 kW total' }, children: [
-                                    { name: 'CH-1 (139kW)', icon: 'cpu', meta: { rated: '139 kW', type: 'Centrifugal Chiller', COP: '4.5', space: 'District Cooling Plant Room' } },
-                                    { name: 'CH-2 (139kW)', icon: 'cpu', meta: { rated: '139 kW', type: 'Centrifugal Chiller', COP: '4.5', space: 'District Cooling Plant Room' } }
-                                ]
-                            },
-                            {
-                                name: 'Chilled Water Pump', icon: 'droplets', meta: { rated: '22 kW' }, children: [
-                                    { name: 'CHWP-1 (22kW)', icon: 'cpu', meta: { rated: '22 kW', type: 'Centrifugal Pump', flow: '120 m³/h', space: 'Pump Bay A' } }
-                                ]
-                            },
-                            {
-                                name: 'Cooling Water Pump', icon: 'droplets', meta: { rated: '15 kW' }, children: [
-                                    { name: 'CWP-1 (15kW)', icon: 'cpu', meta: { rated: '15 kW', type: 'Centrifugal Pump', flow: '95 m³/h', space: 'Pump Bay B' } }
-                                ]
-                            },
-                            {
-                                name: 'Cooling Tower', icon: 'wind', meta: { rated: '5.5 kW' }, children: [
-                                    { name: 'CT-1 (5.5kW)', icon: 'cpu', meta: { rated: '5.5 kW', type: 'Cross-flow Tower', space: 'Cooling Tower Roof' } }
-                                ]
-                            },
-                            {
-                                name: 'End Air Cabinet', icon: 'fan', meta: { devices: '2' }, children: [
-                                    { name: 'GF1 FCU (3kW)', icon: 'cpu', meta: { rated: '3 kW', type: 'Fan Coil Unit', space: 'Ground Floor Lobby' } },
-                                    { name: 'GF1 AHU (11kW)', icon: 'cpu', meta: { rated: '11 kW', type: 'Air Handling Unit', space: 'Ground Floor Air Room' } }
-                                ]
-                            }
-                        ]
-                    }
-                    ,
-                    {
-                        name: 'Lighting System', icon: 'lightbulb', meta: { type: 'Lighting System' }, children: [
-                            { name: 'Ground Floor Lighting', icon: 'lightbulb', meta: { rated: '11 kW', type: 'Lighting System', illuminance: '350 lux', lightingRate: '82 %', space: 'Ground Floor Public Zone' } },
-                            { name: 'Level 1 Lighting', icon: 'lightbulb', meta: { rated: '12 kW', type: 'Lighting System', illuminance: '360 lux', lightingRate: '84 %', space: 'Level 1 Teaching Zone' } },
-                            { name: 'Level 2 Lighting', icon: 'lightbulb', meta: { rated: '10 kW', type: 'Lighting System', illuminance: '340 lux', lightingRate: '79 %', space: 'Level 2 Corridor' } },
-                            { name: 'Level 3 Lighting', icon: 'lightbulb', meta: { rated: '10.5 kW', type: 'Lighting System', illuminance: '345 lux', lightingRate: '76 %', space: 'Level 3 Office Zone' } },
-                            { name: 'Level 4 Lighting', icon: 'lightbulb', meta: { rated: '11.2 kW', type: 'Lighting System', illuminance: '352 lux', lightingRate: '81 %', space: 'Level 4 Office Zone' } }
-                        ]
-                    }
-                ]
-            },
-            meter: {
-                name: 'TAR UMT', icon: 'building-2', meta: { meters: '18' },
-                children: [
-                    {
-                        name: 'Electric Meter', icon: 'zap', meta: { meters: '12' }, children: [
-                            {
-                                name: 'TTSS Main Electric Meter', icon: 'gauge', meta: { type: '3-Phase Smart', ratio: '200/5 CT', protocol: 'Modbus TCP' }, children: [
-                                    { name: 'CH-1 Meter', icon: 'circle-dot', meta: { type: '3-Phase', ratio: '100/5 CT' } },
-                                    { name: 'CH-2 Meter', icon: 'circle-dot', meta: { type: '3-Phase', ratio: '100/5 CT' } },
-                                    { name: 'CHWP-1 Meter', icon: 'circle-dot', meta: { type: 'Single-Phase', ratio: '50/5 CT' } },
-                                    { name: 'CWP-1 Meter', icon: 'circle-dot', meta: { type: 'Single-Phase', ratio: '50/5 CT' } },
-                                    { name: 'CT-1 Meter', icon: 'circle-dot', meta: { type: 'Single-Phase', ratio: '30/5 CT' } },
-                                    { name: 'Lighting Meter', icon: 'circle-dot', meta: { type: 'Single-Phase', ratio: '100/5 CT' } }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: 'Water Meter', icon: 'droplets', meta: { meters: '6' }, children: [
-                            { name: 'TTSS Main Water Meter', icon: 'gauge', meta: { type: 'Ultrasonic', diameter: 'DN100', code: 'WM-01' } }
-                        ]
-                    }
-                ]
+        let TREES = null;
+        let treesLoaded = false;
+        let pendingInitCallbacks = [];
+
+        // Load tree data from external JSON file
+        async function loadTreeData() {
+            if (treesLoaded) return TREES;
+            try {
+                const response = await fetch('../../data/tree-data.json');
+                if (!response.ok) {
+                    throw new Error(`Failed to load tree data: ${response.status}`);
+                }
+                TREES = await response.json();
+                treesLoaded = true;
+                console.log('Tree data loaded successfully:', Object.keys(TREES));
+                
+                // Execute any pending initialization callbacks
+                pendingInitCallbacks.forEach(cb => cb());
+                pendingInitCallbacks = [];
+                
+                return TREES;
+            } catch (error) {
+                console.error('Error loading tree data:', error);
+                // Fallback: initialize with empty structure if loading fails
+                TREES = { 
+                    space: { name: 'TAR UMT', icon: 'building-2', meta: {}, children: [] },
+                    org: { name: 'TAR UMT', icon: 'building-2', meta: {}, children: [] },
+                    device: { name: 'TAR UMT', icon: 'building-2', meta: {}, children: [] },
+                    meter: { name: 'TAR UMT', icon: 'building-2', meta: {}, children: [] }
+                };
+                treesLoaded = true;
+                pendingInitCallbacks.forEach(cb => cb());
+                pendingInitCallbacks = [];
+                return TREES;
             }
-        };
+        }
+
+        // Helper to ensure trees are loaded before executing code
+        function onTreesReady(callback) {
+            if (treesLoaded) {
+                callback();
+            } else {
+                pendingInitCallbacks.push(callback);
+            }
+        }
+
+        // Start loading immediately
+        loadTreeData();
 
 
         /* ============================================================
@@ -10704,27 +10641,38 @@
         }
 
         function loadTree(treeKey) {
-            const container = document.getElementById('treeContent');
-            container.innerHTML = '';
-            const tree = TREES[treeKey];
-            container.appendChild(renderTree(tree));
-            if (!container.childNodes.length) {
-                container.innerHTML = `<div class="tree-empty-state">No nodes match the current keyword. Clear the search to restore the full tree.</div>`;
-            }
-            currentTree = treeKey;
-            if (currentModule === 'reports') {
-                const selection = statsTreeSelections[treeKey];
-                if (!selection.paths.length && statsQueryState.mode === 'scenario') {
-                    selection.depth = 0;
-                    selection.paths = [[tree.name]];
+            // Ensure TREES is loaded before rendering
+            onTreesReady(() => {
+                const container = document.getElementById('treeContent');
+                if (!container) return;
+                
+                container.innerHTML = '';
+                const tree = TREES[treeKey];
+                if (!tree) {
+                    console.warn(`Tree data for '${treeKey}' not found`);
+                    container.innerHTML = `<div class="tree-empty-state">Tree data not available.</div>`;
+                    return;
                 }
-                selectedPath = selection.paths[0] || [];
-                syncStatsTreeSelectionUI();
+                
+                container.appendChild(renderTree(tree));
+                if (!container.childNodes.length) {
+                    container.innerHTML = `<div class="tree-empty-state">No nodes match the current keyword. Clear the search to restore the full tree.</div>`;
+                }
+                currentTree = treeKey;
+                if (currentModule === 'reports') {
+                    const selection = statsTreeSelections[treeKey];
+                    if (!selection.paths.length && statsQueryState.mode === 'scenario') {
+                        selection.depth = 0;
+                        selection.paths = [[tree.name]];
+                    }
+                    selectedPath = selection.paths[0] || [];
+                    syncStatsTreeSelectionUI();
+                    lucide.createIcons();
+                    return;
+                }
+                navigateToNode(tree, 0, [tree.name]);
                 lucide.createIcons();
-                return;
-            }
-            navigateToNode(tree, 0, [tree.name]);
-            lucide.createIcons();
+            });
         }
 
         function syncTreeSearchUI() {
@@ -10842,7 +10790,7 @@
         }
 
         function isWaterMainMeterNode(node) {
-            if (!node || node.name !== 'TTSS Main Water Meter') return false;
+            if (!node) return false;
             const parent = findParent(TREES.meter, node);
             return parent?.name === 'Water Meter';
         }
@@ -10960,7 +10908,7 @@
             if (type.includes('cooling water pump')) return 'cooling-pump';
             if (type.includes('pump')) return 'pump';
             if (type.includes('tower')) return 'tower';
-            if (type.includes('fan coil') || type.includes('air handling') || type.includes('ahu') || type.includes('fcu')) return 'air';
+            if (type === 'air' || type.includes('fan coil') || type.includes('air handling') || type.includes('ahu') || type.includes('fcu')) return 'air';
             return 'generic';
         }
 
@@ -11091,24 +11039,27 @@
 
         function getChillerLeafParams(node, profile) {
             return [
-                ['compressor_current', 'Compressor Current', '152.3', 'A', true],
-                ['compressor_frequency', 'Compressor Frequency', '85', '%', true],
-                ['evaporator_pressure', 'Evaporator Pressure', '4.2', 'bar', true],
-                ['condenser_pressure', 'Condenser Pressure', '12.8', 'bar', true],
-                ['chw_outlet_temp', 'CHW Outlet Temp', '14.2', '°C', false],
+                ['chw_outlet_temp', 'CHW Outlet Temp', '14.2', '°C', true],
                 ['chw_return_temp', 'CHW Return Temp', '12.8', '°C', true],
-                ['chw_flow', 'CHW Flow', node?.meta?.flow || '120', 'm³/h', true],
-                ['chw_delta_t', 'CHW Delta T', '1.4', '°C', false],
                 ['cw_outlet_temp', 'CW Outlet Temp', '35.2', '°C', true],
                 ['cw_return_temp', 'CW Return Temp', '30.1', '°C', true],
-                ['cw_flow', 'CW Flow', '145', 'm³/h', true],
-                ['cw_delta_t', 'CW Delta T', '5.1', '°C', true],
+                ['condenser_pressure', 'Condenser Pressure', '12.8', 'bar', true],
+                ['evaporator_pressure', 'Evaporator Pressure', '4.2', 'bar', true],
+                ['condenser_temp', 'Condenser Refrig. Temp', '38.5', '°C', true],
+                ['evaporator_temp', 'Evaporator Refrig. Temp', '5.8', '°C', true],
                 ['discharge_temp', 'Discharge Temp', '78.5', '°C', true],
-                ['suction_temp', 'Suction Temp', '5.2', '°C', true],
-                ['oil_pressure', 'Oil Pressure', '6.8', 'bar', true],
-                ['oil_temp', 'Oil Temp', '52', '°C', true],
-                ['load_rate', 'Load Rate', String(profile.load || 84.2), '%', true],
-                ['runtime', 'Accumulated Runtime', '12,840', 'h', true]
+                ['oil_temp', 'Oil Tank Temp', '52', '°C', true],
+                ['oil_pressure', 'Oil Pressure Diff', '6.8', 'bar', true],
+                ['evaporator_approach', 'Evaporator Approach ΔT', '1.6', '°C', true],
+                ['condenser_approach', 'Condenser Approach ΔT', '3.3', '°C', true],
+                ['discharge_superheat', 'Discharge Superheat', '12.5', '°C', true],
+                ['actual_load', 'Actual Load', String(profile.load || 84.2), '%', true],
+                ['rated_power', 'Rated Power', node?.meta?.rated || '139 kW', '', true],
+                ['runtime', 'Compressor Runtime', '12,840', 'h', true],
+                ['cw_flow_switch', 'CW Flow Switch', 'ON', '', true],
+                ['chw_valve', 'CHW Valve Status', 'OPEN', '', true],
+                ['cw_valve', 'CW Valve Status', 'OPEN', '', true],
+                ['status', 'Status', 'Running', '', true]
             ];
         }
 
@@ -11195,6 +11146,48 @@
                 ],
                 load: [
                     { label: 'Load Rate', data: mapSeries(basePower.map(v => v ? Math.min(100, (v / 139) * 100) : 0)), borderColor: CHART_COLORS.purple, backgroundColor: CHART_COLORS.purpleAlpha, fill: true }
+                ],
+                condenser_temp: [
+                    { label: 'Condenser Refrig. Temp', data: mapSeries(basePower.map(v => v ? 38.5 + (v / 139) * 1.5 : 0)), borderColor: CHART_COLORS.amber, backgroundColor: CHART_COLORS.amberAlpha, fill: true }
+                ],
+                evaporator_temp: [
+                    { label: 'Evaporator Refrig. Temp', data: mapSeries(basePower.map(v => v ? 5.8 - (v / 139) * 0.8 : 0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
+                ],
+                evaporator_approach: [
+                    { label: 'Evaporator Approach ΔT', data: mapSeries(basePower.map(v => v ? 1.6 + (v / 139) * 0.4 : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
+                ],
+                condenser_approach: [
+                    { label: 'Condenser Approach ΔT', data: mapSeries(basePower.map(v => v ? 3.3 + (v / 139) * 0.5 : 0)), borderColor: CHART_COLORS.red, backgroundColor: 'rgba(239,68,68,.08)', fill: true }
+                ],
+                discharge_superheat: [
+                    { label: 'Discharge Superheat', data: mapSeries(basePower.map(v => v ? 12.5 + (v / 139) * 2.5 : 0)), borderColor: CHART_COLORS.amber, backgroundColor: CHART_COLORS.amberAlpha, fill: true }
+                ],
+                actual_load: [
+                    { label: 'Actual Load', data: mapSeries(basePower.map(v => v ? Math.min(100, (v / 139) * 100) : 0)), borderColor: CHART_COLORS.purple, backgroundColor: CHART_COLORS.purpleAlpha, fill: true }
+                ],
+                runtime: [
+                    { label: 'Compressor Runtime', data: mapSeries(Array.from({ length: 24 }, (_, i) => 12820 + i * 0.8)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                ],
+                outlet_setpoint: [
+                    { label: 'CHW Outlet Setpoint', data: mapSeries(basePower.map(() => 7.0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: false }
+                ],
+                rated_power: [
+                    { label: 'Rated Power', data: mapSeries(basePower.map(() => 139)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: false }
+                ],
+                rated_cooling: [
+                    { label: 'Rated Cooling Capacity', data: mapSeries(basePower.map(() => 560)), borderColor: CHART_COLORS.purple, backgroundColor: CHART_COLORS.purpleAlpha, fill: false }
+                ],
+                cw_flow_switch: [
+                    { label: 'CW Flow Switch', data: mapSeries(basePower.map(v => v ? 1 : 0)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                ],
+                chw_valve: [
+                    { label: 'CHW Valve Status', data: mapSeries(basePower.map(v => v ? 1 : 0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
+                ],
+                cw_valve: [
+                    { label: 'CW Valve Status', data: mapSeries(basePower.map(v => v ? 1 : 0)), borderColor: CHART_COLORS.amber, backgroundColor: CHART_COLORS.amberAlpha, fill: true }
+                ],
+                status: [
+                    { label: 'Status', data: mapSeries(basePower.map(v => v ? 1 : 0)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
                 ]
             };
         }
@@ -11282,7 +11275,6 @@
                                     <text x="660" y="170" text-anchor="middle" fill="#e8edf5" font-size="10" font-family="Fira Sans" font-weight="600">CW Pump</text>
                                     <text x="660" y="184" text-anchor="middle" fill="#fbbf24" font-family="Fira Code" font-size="11" font-weight="600">42Hz</text>
                                     <text x="660" y="68" text-anchor="middle" fill="#e8edf5" font-size="9" font-family="Fira Sans" font-weight="600">Cooling Tower</text>
-                                    <text x="660" y="46" text-anchor="middle" fill="#fbbf24" font-family="Fira Code" font-size="9">28.4°C</text>
 
                                     <rect x="24" y="295" width="72" height="32" rx="6" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.2)" stroke-width="1"/>
                                     <text x="60" y="315" text-anchor="middle" fill="#8896ab" font-size="10" font-family="Fira Sans">To Terminals</text>
@@ -11364,24 +11356,11 @@
 
         function getTowerLeafParams(node, profile) {
             return [
-                ['inlet_temp', 'Inlet Water Temp', '32.1', '°C', true],
-                ['outlet_temp', 'Outlet Water Temp', '28.4', '°C', true],
-                ['delta_t', 'Delta T', '3.7', '°C', true],
-                ['wet_bulb_temp', 'Wet Bulb Temp', '26.2', '°C', true],
-                ['approach', 'Approach', '2.2', '°C', true],
-                ['cooling_efficiency', 'Cooling Efficiency', '63', '%', true],
-                ['circulation_flow', 'Circulation Flow', node?.meta?.flow || '150', 'm³/h', true],
-                ['fan_power', 'Fan Power', String(profile.power || 4.8), 'kW', true],
-                ['fan_frequency', 'Fan Frequency', '45', 'Hz', true],
-                ['fan_current', 'Fan Current', '82.5', 'A', true],
-                ['fan_vibration', 'Fan Vibration', '2.3', 'mm/s', true],
-                ['makeup_water', 'Make-up Water Today', '4.8', 'm³', true],
-                ['blowdown', 'Blowdown Today', '1.2', 'm³', true],
-                ['concentration_ratio', 'Cycles of Concentration', '3.8', '', true],
-                ['conductivity', 'Conductivity', '850', 'μS/cm', true],
-                ['today_energy', 'Today Energy', String(profile.today || 57), 'kWh', true],
-                ['runtime', 'Accumulated Runtime', '8,420', 'h', true],
-                ['last_cleaning', 'Last Cleaning', '28', 'days', true]
+                ['power', 'Real-time Power', String(profile.power || 4.8), 'kW', true],
+                ['energy', 'Accumulated Energy', String(profile.today || 57), 'kWh', true],
+                ['frequency', 'Frequency Feedback', '45', 'Hz', true],
+                ['runtime', 'Accumulated Runtime', String(profile.runtime || 8420), 'h', true],
+                ['status', 'Status', profile.status || 'Running', '', true]
             ];
         }
 
@@ -11401,59 +11380,20 @@
             const basePower = profile.trend || Array.from({ length: 24 }, (_, i) => (i >= 7 && i <= 18 ? 3 + Math.sin((i - 7) / 11 * Math.PI) * 2 : 0));
             const mapSeries = values => values.map(v => Number(v.toFixed(1)));
             return {
-                inlet_temp: [
-                    { label: 'Inlet Water Temp', data: mapSeries(basePower.map((v, i) => v ? 31.2 + Math.sin(i / 24 * Math.PI * 2) * 1.1 : 0)), borderColor: CHART_COLORS.amber, backgroundColor: CHART_COLORS.amberAlpha, fill: false }
+                power: [
+                    { label: 'Real-time Power', data: mapSeries(basePower), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
                 ],
-                outlet_temp: [
-                    { label: 'Outlet Water Temp', data: mapSeries(basePower.map((v, i) => v ? 28 + Math.sin(i / 24 * Math.PI * 2) * 0.8 : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: false }
+                energy: [
+                    { label: 'Accumulated Energy', data: mapSeries(basePower.map((_, i) => i === 0 ? 0 : basePower.slice(0, i + 1).reduce((sum, v) => sum + v, 0) * 0.78)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
                 ],
-                delta_t: [
-                    { label: 'Delta T', data: mapSeries(basePower.map((v, i) => v ? 3.2 + Math.sin(i / 24 * Math.PI * 2) * 0.5 : 0)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
-                ],
-                wet_bulb_temp: [
-                    { label: 'Wet Bulb Temp', data: mapSeries(basePower.map((v, i) => v ? 26 + Math.sin(i / 24 * Math.PI * 2) * 0.6 : 0)), borderColor: '#94a3b8', backgroundColor: 'rgba(148,163,184,.08)', fill: true }
-                ],
-                approach: [
-                    { label: 'Approach', data: mapSeries(basePower.map((v, i) => v ? 2.5 - Math.sin(i / 24 * Math.PI * 2) * 0.3 : 0)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
-                ],
-                cooling_efficiency: [
-                    { label: 'Cooling Efficiency', data: mapSeries(basePower.map((v, i) => v ? 61 + Math.sin(i / 24 * Math.PI * 2) * 4 : 0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
-                ],
-                circulation_flow: [
-                    { label: 'Circulation Flow', data: mapSeries(basePower.map(v => v ? 142 + (v / 5) * 8 : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
-                ],
-                fan_power: [
-                    { label: 'Fan Power', data: mapSeries(basePower), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
-                ],
-                fan_frequency: [
-                    { label: 'Fan Frequency', data: mapSeries(basePower.map(v => v ? 39 + v * 1.2 : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
-                ],
-                fan_current: [
-                    { label: 'Fan Current', data: mapSeries(basePower.map(v => v ? 66 + v * 3.4 : 0)), borderColor: CHART_COLORS.amber, backgroundColor: CHART_COLORS.amberAlpha, fill: true }
-                ],
-                fan_vibration: [
-                    { label: 'Fan Vibration', data: mapSeries(basePower.map((v, i) => v ? 1.9 + Math.abs(Math.sin(i / 24 * Math.PI * 2)) * 0.7 : 0)), borderColor: CHART_COLORS.purple, backgroundColor: CHART_COLORS.purpleAlpha, fill: true }
-                ],
-                makeup_water: [
-                    { label: 'Make-up Water', data: mapSeries(basePower.map(v => v ? 0.18 + (v / 5) * 0.08 : 0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
-                ],
-                blowdown: [
-                    { label: 'Blowdown', data: mapSeries(basePower.map(v => v ? 0.05 + (v / 5) * 0.03 : 0)), borderColor: CHART_COLORS.red, backgroundColor: 'rgba(239,68,68,.08)', fill: true }
-                ],
-                concentration_ratio: [
-                    { label: 'Cycles of Concentration', data: mapSeries(basePower.map((v, i) => v ? 3.6 + Math.sin(i / 24 * Math.PI * 2) * 0.2 : 0)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
-                ],
-                conductivity: [
-                    { label: 'Conductivity', data: mapSeries(basePower.map((v, i) => v ? 820 + Math.sin(i / 24 * Math.PI * 2) * 55 : 0)), borderColor: CHART_COLORS.amber, backgroundColor: CHART_COLORS.amberAlpha, fill: true }
-                ],
-                today_energy: [
-                    { label: 'Today Energy', data: mapSeries(basePower.map((_, i) => i === 0 ? 0 : basePower.slice(0, i + 1).reduce((sum, value) => sum + value, 0) * 0.78)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
+                frequency: [
+                    { label: 'Frequency Feedback', data: mapSeries(basePower.map(v => v ? 39 + v * 1.2 : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
                 ],
                 runtime: [
-                    { label: 'Runtime', data: mapSeries(Array.from({ length: 24 }, (_, i) => 8400 + i * 0.4)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                    { label: 'Accumulated Runtime', data: mapSeries(Array.from({ length: 24 }, (_, i) => 8400 + i * 0.4)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
                 ],
-                last_cleaning: [
-                    { label: 'Days Since Cleaning', data: mapSeries(Array.from({ length: 24 }, () => 28)), borderColor: '#94a3b8', backgroundColor: 'rgba(148,163,184,.08)', fill: true }
+                status: [
+                    { label: 'Status', data: mapSeries(basePower.map(v => v ? 1 : 0)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
                 ]
             };
         }
@@ -11509,7 +11449,7 @@
                                         <line x1="340" y1="170" x2="335" y2="180" stroke="#f59e0b" stroke-width="0.8"/>
                                         <line x1="340" y1="170" x2="345" y2="180" stroke="#f59e0b" stroke-width="0.8"/>
                                     </g>
-                                    <text x="280" y="166" text-anchor="middle" fill="#fbbf24" font-size="8" font-family="Fira Sans">Distribution · 32.1°C</text>
+                                    <text x="280" y="166" text-anchor="middle" fill="#fbbf24" font-size="8" font-family="Fira Sans">Distribution</text>
 
                                     <rect x="204" y="185" width="152" height="60" rx="3" fill="none" stroke="rgba(6,182,212,0.12)" stroke-width="0.5" stroke-dasharray="3 3"/>
                                     <g opacity="0.15" stroke="#06b6d4" stroke-width="0.5">
@@ -11518,7 +11458,7 @@
                                     <text x="280" y="218" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Fill Media</text>
 
                                     <rect x="200" y="268" width="160" height="24" rx="3" fill="rgba(6,182,212,0.06)" stroke="rgba(6,182,212,0.25)" stroke-width="1"/>
-                                    <text x="280" y="284" text-anchor="middle" fill="#22d3ee" font-size="9" font-family="Fira Sans">Cold Basin · 28.4°C</text>
+                                    <text x="280" y="284" text-anchor="middle" fill="#22d3ee" font-size="9" font-family="Fira Sans">Cold Basin</text>
 
                                     <circle cx="280" cy="85" r="18" fill="#111827" stroke="#06b6d4" stroke-width="1"/>
                                     <g>
@@ -11546,23 +11486,9 @@
                                         <use href="#towerDroplet"><animateMotion path="M340,180 L342,250" dur="1.7s" begin="0.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.5;0.15" dur="1.7s" begin="0.5s" repeatCount="indefinite"/></use>
                                     </g>
 
-                                    <path d="M460,170 L360,170" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="12 8" opacity="0.8"><animate attributeName="stroke-dashoffset" from="0" to="40" dur="1.5s" repeatCount="indefinite"/></path>
-                                    <use href="#towerHotDot"><animateMotion path="M460,170 L360,170" dur="2s" repeatCount="indefinite"/></use>
-                                    <use href="#towerHotDotSm"><animateMotion path="M460,170 L360,170" dur="2s" begin="0.7s" repeatCount="indefinite"/></use>
-                                    <text x="420" y="162" text-anchor="middle" fill="#fbbf24" font-family="Fira Code" font-size="10" font-weight="600">32.1°C</text>
-                                    <text x="420" y="186" text-anchor="middle" fill="rgba(245,158,11,0.5)" font-size="8" font-family="Fira Sans">Inlet Water</text>
-                                    <path d="M385,165 L377,170 L385,175" fill="none" stroke="#fbbf24" stroke-width="1.5" opacity="0.7"/>
-                                    <rect x="460" y="155" width="80" height="30" rx="6" fill="#111827" stroke="rgba(245,158,11,0.3)" stroke-width="1"/>
-                                    <text x="500" y="174" text-anchor="middle" fill="#8896ab" font-size="9" font-family="Fira Sans">From Condenser</text>
 
-                                    <path d="M360,280 L460,280" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="12 8" opacity="0.8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="1.5s" repeatCount="indefinite"/></path>
-                                    <use href="#towerColdDot"><animateMotion path="M360,280 L460,280" dur="2s" repeatCount="indefinite"/></use>
-                                    <use href="#towerColdDotSm"><animateMotion path="M360,280 L460,280" dur="2s" begin="0.7s" repeatCount="indefinite"/></use>
-                                    <text x="420" y="272" text-anchor="middle" fill="#22d3ee" font-family="Fira Code" font-size="10" font-weight="600">28.4°C</text>
-                                    <text x="420" y="296" text-anchor="middle" fill="rgba(6,182,212,0.5)" font-size="8" font-family="Fira Sans">Outlet Water</text>
-                                    <path d="M445,275 L453,280 L445,285" fill="none" stroke="#22d3ee" stroke-width="1.5" opacity="0.7"/>
-                                    <rect x="460" y="265" width="80" height="30" rx="6" fill="#111827" stroke="rgba(6,182,212,0.3)" stroke-width="1"/>
-                                    <text x="500" y="284" text-anchor="middle" fill="#8896ab" font-size="9" font-family="Fira Sans">To Condenser</text>
+
+
 
                                     <path d="M120,280 L200,280" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 6" opacity="0.4"><animate attributeName="stroke-dashoffset" from="0" to="-24" dur="2s" repeatCount="indefinite"/></path>
                                     <text x="155" y="272" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">Make-up Water</text>
@@ -11580,12 +11506,8 @@
                                     <text x="148" y="256" text-anchor="end" fill="#5a6a80" font-size="8" font-family="Fira Sans">Air In</text>
                                     <text x="412" y="256" text-anchor="start" fill="#5a6a80" font-size="8" font-family="Fira Sans">Air In</text>
 
-                                    <text x="280" y="334" text-anchor="middle" fill="#06b6d4" font-family="Fira Code" font-size="12" font-weight="600">ΔT 3.7°C</text>
-                                    <text x="280" y="350" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Inlet / Outlet Delta</text>
-                                    <text x="130" y="340" text-anchor="middle" fill="#22c55e" font-family="Fira Code" font-size="11" font-weight="600">${profile.power} kW</text>
-                                    <text x="130" y="354" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Fan Power</text>
-                                    <text x="430" y="340" text-anchor="middle" fill="#8896ab" font-family="Fira Code" font-size="11" font-weight="600">${node?.meta?.flow || '150 m³/h'}</text>
-                                    <text x="430" y="354" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Water Flow</text>
+                                    <text x="280" y="340" text-anchor="middle" fill="#22c55e" font-family="Fira Code" font-size="11" font-weight="600">${profile.power} kW</text>
+                                    <text x="280" y="356" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Fan Power</text>
 
                                     </g>
                                     </svg>
@@ -11696,25 +11618,23 @@
 
         function getPumpLeafParams(node, profile) {
             const ctx = getPumpLeafContext(node, profile);
+            if (ctx.isChilled) {
+                return [
+                    ['power', 'Real-time Power', ctx.power, 'kW', true],
+                    ['energy', 'Accumulated Energy', String(profile.today || 312), 'kWh', true],
+                    ['vfd_pid_frequency', 'VFD PID Output Freq', ctx.frequency, 'Hz', true],
+                    ['frequency_feedback', 'Frequency Feedback', String((Number(ctx.frequency) - 0.5).toFixed(1)), 'Hz', true],
+                    ['running_status', 'Running Status', 'Running', '', true],
+                    ['status', 'Status', 'Normal', '', true]
+                ];
+            }
             return [
-                ['frequency', 'Operating Frequency', ctx.frequency, 'Hz', true],
                 ['power', 'Real-time Power', ctx.power, 'kW', true],
-                ['motor_current', 'Motor Current', ctx.isChilled ? '68.2' : '82.6', 'A', true],
-                ['motor_voltage', 'Motor Voltage', '380', 'V', true],
-                ['flow', 'Real-time Flow', ctx.flow, '', true],
-                ['speed', 'Rotational Speed', ctx.isChilled ? '1,350' : '1,260', 'rpm', true],
-                ['suction_pressure', 'Suction Pressure', ctx.suctionPressure, 'MPa', true],
-                ['discharge_pressure', 'Discharge Pressure', ctx.dischargePressure, 'MPa', true],
-                ['pressure_delta', 'Pressure Delta', ctx.pressureDelta, 'MPa', true],
-                ['efficiency', 'Pump Efficiency', ctx.isChilled ? '78.5' : '75.2', '%', true],
-                ['inlet_temp', ctx.isChilled ? 'Inlet Water Temp' : 'Inlet Temp (From Tower)', ctx.inletTemp, '°C', true],
-                ['outlet_temp', ctx.isChilled ? 'Outlet Water Temp' : 'Outlet Temp (To Condenser)', ctx.outletTemp, '°C', true],
-                ['bearing_temp_de', 'Bearing Temp (DE)', ctx.isChilled ? '52' : '56', '°C', true],
-                ['bearing_temp_nde', 'Bearing Temp (NDE)', ctx.isChilled ? '48' : '51', '°C', true],
-                ['vibration_horizontal', 'Vibration (Horizontal)', ctx.isChilled ? '1.8' : '2.1', 'mm/s', true],
-                ['vibration_vertical', 'Vibration (Vertical)', ctx.isChilled ? '1.5' : '1.8', 'mm/s', true],
-                ['today_energy', 'Today Energy', String(profile.today || (ctx.isChilled ? 312 : 385)), 'kWh', true],
-                ['runtime', 'Accumulated Runtime', ctx.isChilled ? '9,650' : '8,920', 'h', true]
+                ['energy', 'Accumulated Energy', String(profile.today || 385), 'kWh', true],
+                ['vfd_pid_frequency', 'VFD PID Output Freq', ctx.frequency, 'Hz', true],
+                ['frequency_feedback', 'Frequency Feedback', String((Number(ctx.frequency) - 0.5).toFixed(1)), 'Hz', true],
+                ['runtime', 'Accumulated Runtime', '8,920', 'h', true],
+                ['status', 'Status', 'Normal', '', true]
             ];
         }
 
@@ -11786,26 +11706,35 @@
                 inlet_temp: [
                     { label: 'Inlet Water Temp', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.inletTemp) + Math.sin(i / 24 * Math.PI * 2) * 0.5 : 0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
                 ],
-                outlet_temp: [
-                    { label: 'Outlet Water Temp', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.outletTemp) + Math.sin(i / 24 * Math.PI * 2) * 0.4 : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
+                energy: [
+                    { label: 'Accumulated Energy', data: mapSeries(basePower.map((_, i) => i === 0 ? 0 : basePower.slice(0, i + 1).reduce((sum, v) => sum + v, 0) * 0.8)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
                 ],
-                bearing_temp_de: [
-                    { label: 'Bearing Temp (DE)', data: mapSeries(basePower.map((v, i) => v ? (ctx.isChilled ? 52 : 49) + Math.sin(i / 24 * Math.PI * 2) * 2 : 0)), borderColor: CHART_COLORS.red, backgroundColor: 'rgba(239,68,68,.08)', fill: true }
+                chw_outlet_temp: [
+                    { label: 'CHW Outlet Temp', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.outletTemp) + Math.sin(i / 24 * Math.PI * 2) * 0.4 : 0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
                 ],
-                bearing_temp_nde: [
-                    { label: 'Bearing Temp (NDE)', data: mapSeries(basePower.map((v, i) => v ? (ctx.isChilled ? 48 : 46) + Math.sin(i / 24 * Math.PI * 2) * 1.8 : 0)), borderColor: CHART_COLORS.amber, backgroundColor: CHART_COLORS.amberAlpha, fill: true }
+                chw_return_temp: [
+                    { label: 'CHW Return Temp', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.inletTemp) + Math.sin(i / 24 * Math.PI * 2) * 0.5 : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
                 ],
-                vibration_horizontal: [
-                    { label: 'Vibration (Horizontal)', data: mapSeries(basePower.map((v, i) => v ? 1.3 + Math.abs(Math.sin(i / 24 * Math.PI * 2)) * 0.8 : 0)), borderColor: CHART_COLORS.purple, backgroundColor: CHART_COLORS.purpleAlpha, fill: true }
+                chw_supply_pressure: [
+                    { label: 'CHW Supply Pressure', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.dischargePressure) + Math.sin(i / 24 * Math.PI * 2) * 0.04 : 0)), borderColor: CHART_COLORS.amber, backgroundColor: CHART_COLORS.amberAlpha, fill: true }
                 ],
-                vibration_vertical: [
-                    { label: 'Vibration (Vertical)', data: mapSeries(basePower.map((v, i) => v ? 1.1 + Math.abs(Math.cos(i / 24 * Math.PI * 2)) * 0.6 : 0)), borderColor: CHART_COLORS.purple, backgroundColor: CHART_COLORS.purpleAlpha, fill: true }
+                chw_return_pressure: [
+                    { label: 'CHW Return Pressure', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.suctionPressure) + Math.sin(i / 24 * Math.PI * 2) * 0.03 : 0)), borderColor: CHART_COLORS.purple, backgroundColor: CHART_COLORS.purpleAlpha, fill: true }
                 ],
-                today_energy: [
-                    { label: 'Today Energy', data: mapSeries(basePower.map((_, i) => i === 0 ? 0 : basePower.slice(0, i + 1).reduce((sum, value) => sum + value, 0) * 0.8)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                vfd_pid_frequency: [
+                    { label: 'VFD PID Output Freq', data: mapSeries(basePower.map(v => v ? Number(ctx.frequency) * (0.9 + (v / Math.max(...basePower, 1)) * 0.12) : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
+                ],
+                frequency_feedback: [
+                    { label: 'Frequency Feedback', data: mapSeries(basePower.map(v => v ? Number(ctx.frequency) * (0.89 + (v / Math.max(...basePower, 1)) * 0.12) : 0)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                ],
+                running_status: [
+                    { label: 'Running Status', data: mapSeries(basePower.map(v => v ? 1 : 0)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                ],
+                status: [
+                    { label: 'Status', data: mapSeries(basePower.map(v => v ? 1 : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
                 ],
                 runtime: [
-                    { label: 'Runtime', data: mapSeries(Array.from({ length: 24 }, (_, i) => (ctx.isChilled ? 9650 : 8340) + i * 0.5)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                    { label: 'Accumulated Runtime', data: mapSeries(Array.from({ length: 24 }, (_, i) => (ctx.isChilled ? 9650 : 8920) + i * 0.5)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
                 ]
             };
         }
@@ -11864,9 +11793,6 @@
                                     <use href="#pumpFlowDotSm"><animateMotion path="M60,205 L225,205" dur="2.2s" begin="0.7s" repeatCount="indefinite"/></use>
                                     <use href="#pumpFlowDotSm"><animateMotion path="M60,205 L225,205" dur="2.2s" begin="1.4s" repeatCount="indefinite"/></use>
                                     <path d="M195,200 L203,205 L195,210" fill="none" stroke="${ctx.inletText}" stroke-width="1.5" opacity="0.7"/>
-                                    <text x="140" y="195" text-anchor="middle" fill="${ctx.inletText}" font-family="Fira Code" font-size="10" font-weight="600">${ctx.inletTemp}°C</text>
-                                    <text x="140" y="222" text-anchor="middle" fill="${ctx.isChilled ? 'rgba(59,130,246,0.5)' : 'rgba(6,182,212,0.5)'}" font-size="8" font-family="Fira Sans">${ctx.isChilled ? 'Suction Inlet' : 'Tower Inlet'}</text>
-                                    <text x="100" y="240" text-anchor="middle" fill="#5a6a80" font-family="Fira Code" font-size="9">P₁ ${ctx.suctionPressure} MPa</text>
                                     <rect x="14" y="192" width="64" height="26" rx="5" fill="#111827" stroke="${ctx.isChilled ? 'rgba(59,130,246,0.2)' : 'rgba(6,182,212,0.2)'}" stroke-width="0.8"/>
                                     <text x="46" y="209" text-anchor="middle" fill="#8896ab" font-size="8" font-family="Fira Sans">${ctx.sourceLabel}</text>
 
@@ -11875,22 +11801,11 @@
                                     <use href="#pumpFlowDotSm"><animateMotion path="M335,205 L500,205" dur="1.8s" begin="0.6s" repeatCount="indefinite"/></use>
                                     <use href="#pumpFlowDotSm"><animateMotion path="M335,205 L500,205" dur="1.8s" begin="1.2s" repeatCount="indefinite"/></use>
                                     <path d="M470,200 L478,205 L470,210" fill="none" stroke="${ctx.outletText}" stroke-width="1.5" opacity="0.7"/>
-                                    <text x="420" y="195" text-anchor="middle" fill="${ctx.outletText}" font-family="Fira Code" font-size="10" font-weight="600">${ctx.outletTemp}°C</text>
-                                    <text x="420" y="222" text-anchor="middle" fill="${ctx.isChilled ? 'rgba(6,182,212,0.5)' : 'rgba(245,158,11,0.5)'}" font-size="8" font-family="Fira Sans">${ctx.isChilled ? 'Discharge Outlet' : 'To Condenser'}</text>
-                                    <text x="460" y="240" text-anchor="middle" fill="#5a6a80" font-family="Fira Code" font-size="9">P₂ ${ctx.dischargePressure} MPa</text>
                                     <rect x="490" y="192" width="56" height="26" rx="5" fill="#111827" stroke="${ctx.isChilled ? 'rgba(6,182,212,0.2)' : 'rgba(245,158,11,0.2)'}" stroke-width="0.8"/>
                                     <text x="518" y="209" text-anchor="middle" fill="#8896ab" font-size="8" font-family="Fira Sans">${ctx.destinationLabel}</text>
 
-                                    ${ctx.isChilled ? '' : `<path d="M500,218 L500,252 L60,252 L60,218" fill="none" stroke="rgba(239,68,68,0.2)" stroke-width="1.5" stroke-dasharray="6 5"><animate attributeName="stroke-dashoffset" from="0" to="22" dur="2s" repeatCount="indefinite"/></path>
-                                    <text x="280" y="265" text-anchor="middle" fill="rgba(239,68,68,0.4)" font-size="8" font-family="Fira Sans">Condenser return 35.2°C, cooled by tower to 28.4°C before pump inlet</text>`}
-
-                                    <path d="M370,195 L380,205 L370,215 M390,195 L380,205 L390,215" fill="none" stroke="${ctx.isChilled ? 'rgba(6,182,212,0.5)' : 'rgba(245,158,11,0.5)'}" stroke-width="1.2"/>
-                                    <circle cx="170" cy="175" r="10" fill="#111827" stroke="${ctx.isChilled ? 'rgba(59,130,246,0.3)' : 'rgba(6,182,212,0.3)'}" stroke-width="0.8"/>
-                                    <text x="170" y="179" text-anchor="middle" fill="${ctx.inletText}" font-size="7" font-family="Fira Sans">P₁</text>
-                                    <line x1="170" y1="185" x2="170" y2="200" stroke="${ctx.isChilled ? 'rgba(59,130,246,0.2)' : 'rgba(6,182,212,0.2)'}" stroke-width="0.5" stroke-dasharray="2 2"/>
-                                    <circle cx="420" cy="175" r="10" fill="#111827" stroke="${ctx.isChilled ? 'rgba(6,182,212,0.3)' : 'rgba(245,158,11,0.3)'}" stroke-width="0.8"/>
-                                    <text x="420" y="179" text-anchor="middle" fill="${ctx.outletText}" font-size="7" font-family="Fira Sans">P₂</text>
-                                    <line x1="420" y1="185" x2="420" y2="200" stroke="${ctx.isChilled ? 'rgba(6,182,212,0.2)' : 'rgba(245,158,11,0.2)'}" stroke-width="0.5" stroke-dasharray="2 2"/>
+                                    <circle cx="480" cy="72" r="4" fill="#22c55e"><animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite"/></circle>
+                                    <text x="490" y="76" fill="#22c55e" font-size="9" font-family="Fira Sans" font-weight="500">Running</text>
 
                                     <rect x="352" y="68" width="68" height="40" rx="6" fill="#111827" stroke="rgba(168,85,247,0.3)" stroke-width="0.8"/>
                                     <text x="386" y="85" text-anchor="middle" fill="#8896ab" font-size="8" font-family="Fira Sans">VFD</text>
@@ -11898,14 +11813,11 @@
                                     <line x1="352" y1="88" x2="345" y2="88" stroke="rgba(168,85,247,0.3)" stroke-width="1" stroke-dasharray="3 3"/>
                                     <path d="M345,88 L345,95 L310,95" fill="none" stroke="rgba(168,85,247,0.3)" stroke-width="1" stroke-dasharray="3 3"/>
 
-                                    <text x="140" y="320" text-anchor="middle" fill="${ctx.isChilled ? '#3b82f6' : '#f59e0b'}" font-family="Fira Code" font-size="13" font-weight="600">${ctx.flow}</text>
-                                    <text x="140" y="336" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Real-time Flow</text>
+                                    <text x="140" y="320" text-anchor="middle" fill="${ctx.isChilled ? '#3b82f6' : '#f59e0b'}" font-family="Fira Code" font-size="13" font-weight="600">${ctx.frequency} Hz</text>
+                                    <text x="140" y="336" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">VFD PID Output Freq</text>
                                     <text x="280" y="320" text-anchor="middle" fill="#22c55e" font-family="Fira Code" font-size="13" font-weight="600">${ctx.power} kW</text>
                                     <text x="280" y="336" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Real-time Power</text>
-                                    <text x="420" y="320" text-anchor="middle" fill="#06b6d4" font-family="Fira Code" font-size="13" font-weight="600">ΔP ${ctx.pressureDelta} MPa</text>
-                                    <text x="420" y="336" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Pressure Delta</text>
-                                    <text x="280" y="370" text-anchor="middle" fill="#a855f7" font-family="Fira Code" font-size="12" font-weight="600">η ${ctx.isChilled ? '78.5' : '75.2'}%</text>
-                                    <text x="280" y="386" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Pump Efficiency</text>
+                                    ${ctx.isChilled ? `<text x="420" y="320" text-anchor="middle" fill="#22c55e" font-family="Fira Code" font-size="13" font-weight="600">Running</text><text x="420" y="336" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Running Status</text>` : `<text x="420" y="320" text-anchor="middle" fill="#06b6d4" font-family="Fira Code" font-size="13" font-weight="600">8,920 h</text><text x="420" y="336" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Accumulated Runtime</text>`}
                                     </g>
                                     </svg>
                             </div>
@@ -12005,27 +11917,25 @@
 
         function getAirLeafParams(node, profile) {
             const ctx = getAirLeafContext(node, profile);
+            const halfPower = (Number(ctx.fanPower) / 2).toFixed(1);
+            const halfCurrent = (Number(ctx.fanCurrent) / 2).toFixed(1);
             return [
                 ['supply_temp', 'Supply Air Temp', ctx.supplyTemp, '°C', true],
-                ['return_temp', 'Return Air Temp', ctx.returnTemp, '°C', true],
-                ['fresh_temp', 'Fresh Air Temp', ctx.freshTemp, '°C', true],
-                ['mixed_temp', 'Mixed Air Temp', ctx.mixedTemp, '°C', true],
-                ['supply_rh', 'Supply Air Humidity', ctx.supplyRh, '%RH', true],
-                ['return_rh', 'Return Air Humidity', ctx.returnRh, '%RH', true],
-                ['fan_frequency', 'Fan Frequency', ctx.fanFrequency, 'Hz', true],
-                ['fan_power', 'Fan Power', ctx.fanPower, 'kW', true],
-                ['fan_current', 'Fan Current', ctx.fanCurrent, 'A', true],
-                ['airflow', 'Real-time Airflow', ctx.airflow, 'm³/h', true],
-                ['static_pressure', 'Static Pressure', ctx.staticPressure, 'Pa', true],
-                ['filter_dp', 'Filter Differential Pressure', ctx.filterDp, 'Pa', true],
-                ['chw_inlet', 'CHW Inlet Temp', ctx.chwInlet, '°C', true],
-                ['chw_return', 'CHW Return Temp', ctx.chwReturn, '°C', true],
-                ['chw_delta', 'CHW Delta T', ctx.chwDelta, '°C', true],
-                ['water_valve', 'Water Valve Position', ctx.valveOpen, '%', true],
-                ['fresh_damper', 'Fresh Air Damper', ctx.freshDamper, '%', true],
-                ['return_damper', 'Return Air Damper', ctx.returnDamper, '%', true],
-                ['today_energy', 'Today Energy', ctx.todayEnergy, 'kWh', true],
-                ['runtime', 'Accumulated Runtime', ctx.runtime, 'h', true]
+                ['fan1_speed', 'Fan 1# Speed Feedback', '1,420', 'rpm', true],
+                ['fan1_power', 'Fan 1# Power Feedback', halfPower, 'kW', true],
+                ['fan1_voltage', 'Fan 1# Voltage Feedback', '228', 'V', true],
+                ['fan1_current', 'Fan 1# Current Feedback', halfCurrent, 'A', true],
+                ['fan1_ipm_temp', 'Fan 1# IPM Temp', '42', '°C', true],
+                ['fan2_speed', 'Fan 2# Speed Feedback', '1,385', 'rpm', true],
+                ['fan2_power', 'Fan 2# Power Feedback', halfPower, 'kW', true],
+                ['fan2_voltage', 'Fan 2# Voltage Feedback', '226', 'V', true],
+                ['fan2_current', 'Fan 2# Current Feedback', halfCurrent, 'A', true],
+                ['fan2_ipm_temp', 'Fan 2# IPM Temp', '44', '°C', true],
+                ['runtime', 'Accumulated Runtime', ctx.runtime, 'h', true],
+                ['total_power', 'Total Real-time Power', ctx.fanPower, 'kW', true],
+                ['energy', 'Accumulated Energy', ctx.todayEnergy, 'kWh', true],
+                ['status', 'Running Status', 'Running', '', true],
+                ['comm_status', 'Communication Status', 'Normal', '', true]
             ];
         }
 
@@ -12050,62 +11960,50 @@
                 supply_temp: [
                     { label: 'Supply Air Temp', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.supplyTemp) + Math.sin(i / 24 * Math.PI * 2) * 0.8 : 0)), borderColor: '#14b8a6', backgroundColor: 'rgba(20,184,166,.08)', fill: false }
                 ],
-                return_temp: [
-                    { label: 'Return Air Temp', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.returnTemp) + Math.sin(i / 24 * Math.PI * 2) * 1.2 : 0)), borderColor: CHART_COLORS.amber, backgroundColor: CHART_COLORS.amberAlpha, fill: false }
+                fan1_speed: [
+                    { label: 'Fan 1# Speed', data: mapSeries(basePower.map(v => v ? 1420 * (0.92 + (v / Math.max(...basePower, 1)) * 0.08) : 0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
                 ],
-                fresh_temp: [
-                    { label: 'Fresh Air Temp', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.freshTemp) + Math.sin(i / 24 * Math.PI * 2) * 2.5 : 0)), borderColor: CHART_COLORS.red, backgroundColor: 'rgba(239,68,68,.08)', fill: false }
+                fan1_power: [
+                    { label: 'Fan 1# Power', data: mapSeries(basePower.map(v => v ? (Number(ctx.fanPower) / 2) * (0.86 + (v / Math.max(...basePower, 1)) * 0.18) : 0)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
                 ],
-                mixed_temp: [
-                    { label: 'Mixed Air Temp', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.mixedTemp) + Math.sin(i / 24 * Math.PI * 2) * 0.9 : 0)), borderColor: '#94a3b8', backgroundColor: 'rgba(148,163,184,.08)', fill: false }
+                fan1_voltage: [
+                    { label: 'Fan 1# Voltage', data: mapSeries(basePower.map(v => v ? 228 + Math.sin(v) * 2 : 0)), borderColor: CHART_COLORS.purple, backgroundColor: CHART_COLORS.purpleAlpha, fill: true }
                 ],
-                supply_rh: [
-                    { label: 'Supply Air Humidity', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.supplyRh) + Math.sin(i / 24 * Math.PI * 2) * 4 : 0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
+                fan1_current: [
+                    { label: 'Fan 1# Current', data: mapSeries(basePower.map(v => v ? (Number(ctx.fanCurrent) / 2) * (0.9 + (v / Math.max(...basePower, 1)) * 0.16) : 0)), borderColor: CHART_COLORS.amber, backgroundColor: CHART_COLORS.amberAlpha, fill: true }
                 ],
-                return_rh: [
-                    { label: 'Return Air Humidity', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.returnRh) + Math.sin(i / 24 * Math.PI * 2) * 5 : 0)), borderColor: CHART_COLORS.purple, backgroundColor: CHART_COLORS.purpleAlpha, fill: true }
+                fan1_ipm_temp: [
+                    { label: 'Fan 1# IPM Temp', data: mapSeries(basePower.map((v, i) => v ? 42 + Math.sin(i / 24 * Math.PI * 2) * 4 : 0)), borderColor: CHART_COLORS.red, backgroundColor: 'rgba(239,68,68,.08)', fill: true }
                 ],
-                fan_frequency: [
-                    { label: 'Fan Frequency', data: mapSeries(basePower.map(v => v ? Number(ctx.fanFrequency) * (0.92 + (v / Math.max(...basePower, 1)) * 0.08) : 0)), borderColor: '#14b8a6', backgroundColor: 'rgba(20,184,166,.08)', fill: true }
+                fan2_speed: [
+                    { label: 'Fan 2# Speed', data: mapSeries(basePower.map(v => v ? 1385 * (0.92 + (v / Math.max(...basePower, 1)) * 0.08) : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
                 ],
-                fan_power: [
-                    { label: 'Fan Power', data: mapSeries(basePower.map(v => v ? Number(ctx.fanPower) * (0.86 + (v / Math.max(...basePower, 1)) * 0.18) : 0)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                fan2_power: [
+                    { label: 'Fan 2# Power', data: mapSeries(basePower.map(v => v ? (Number(ctx.fanPower) / 2) * (0.85 + (v / Math.max(...basePower, 1)) * 0.19) : 0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
                 ],
-                fan_current: [
-                    { label: 'Fan Current', data: mapSeries(basePower.map(v => v ? Number(ctx.fanCurrent) * (0.9 + (v / Math.max(...basePower, 1)) * 0.16) : 0)), borderColor: CHART_COLORS.amber, backgroundColor: CHART_COLORS.amberAlpha, fill: true }
+                fan2_voltage: [
+                    { label: 'Fan 2# Voltage', data: mapSeries(basePower.map(v => v ? 226 + Math.sin(v) * 2 : 0)), borderColor: CHART_COLORS.purple, backgroundColor: CHART_COLORS.purpleAlpha, fill: true }
                 ],
-                airflow: [
-                    { label: 'Real-time Airflow', data: mapSeries(basePower.map(v => v ? Number(ctx.airflow.replace(/,/g, '')) * (0.88 + (v / Math.max(...basePower, 1)) * 0.14) : 0)), borderColor: '#14b8a6', backgroundColor: 'rgba(20,184,166,.08)', fill: true }
+                fan2_current: [
+                    { label: 'Fan 2# Current', data: mapSeries(basePower.map(v => v ? (Number(ctx.fanCurrent) / 2) * (0.88 + (v / Math.max(...basePower, 1)) * 0.18) : 0)), borderColor: CHART_COLORS.amber, backgroundColor: CHART_COLORS.amberAlpha, fill: true }
                 ],
-                static_pressure: [
-                    { label: 'Static Pressure', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.staticPressure) + Math.sin(i / 24 * Math.PI * 2) * 18 : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
-                ],
-                filter_dp: [
-                    { label: 'Filter Differential Pressure', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.filterDp) + Math.sin(i / 24 * Math.PI * 2) * 12 : 0)), borderColor: CHART_COLORS.red, backgroundColor: 'rgba(239,68,68,.08)', fill: true }
-                ],
-                chw_inlet: [
-                    { label: 'CHW Inlet Temp', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.chwInlet) + Math.sin(i / 24 * Math.PI * 2) * 0.3 : 0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
-                ],
-                chw_return: [
-                    { label: 'CHW Return Temp', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.chwReturn) + Math.sin(i / 24 * Math.PI * 2) * 0.4 : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
-                ],
-                chw_delta: [
-                    { label: 'CHW Delta T', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.chwDelta) + Math.sin(i / 24 * Math.PI * 2) * 0.5 : 0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
-                ],
-                water_valve: [
-                    { label: 'Water Valve Position', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.valveOpen) + Math.sin(i / 24 * Math.PI * 2) * 8 : 0)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: false }
-                ],
-                fresh_damper: [
-                    { label: 'Fresh Air Damper', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.freshDamper) + Math.sin(i / 24 * Math.PI * 2) * 4 : 0)), borderColor: '#14b8a6', backgroundColor: 'rgba(20,184,166,.08)', fill: false }
-                ],
-                return_damper: [
-                    { label: 'Return Air Damper', data: mapSeries(basePower.map((v, i) => v ? Number(ctx.returnDamper) + Math.sin(i / 24 * Math.PI * 2) * 6 : 0)), borderColor: '#94a3b8', backgroundColor: 'rgba(148,163,184,.08)', fill: false }
-                ],
-                today_energy: [
-                    { label: 'Today Energy', data: mapSeries(basePower.map((_, i) => i === 0 ? 0 : basePower.slice(0, i + 1).reduce((sum, value) => sum + value, 0) * 0.82)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                fan2_ipm_temp: [
+                    { label: 'Fan 2# IPM Temp', data: mapSeries(basePower.map((v, i) => v ? 44 + Math.sin(i / 24 * Math.PI * 2) * 4 : 0)), borderColor: CHART_COLORS.red, backgroundColor: 'rgba(239,68,68,.08)', fill: true }
                 ],
                 runtime: [
-                    { label: 'Runtime', data: mapSeries(Array.from({ length: 24 }, (_, i) => Number(ctx.runtime) + i * 0.4)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                    { label: 'Accumulated Runtime', data: mapSeries(Array.from({ length: 24 }, (_, i) => 6340 + i * 0.4)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                ],
+                total_power: [
+                    { label: 'Total Real-time Power', data: mapSeries(basePower.map(v => v ? Number(ctx.fanPower) * (0.86 + (v / Math.max(...basePower, 1)) * 0.18) : 0)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                ],
+                energy: [
+                    { label: 'Accumulated Energy', data: mapSeries(basePower.map((_, i) => i === 0 ? 0 : basePower.slice(0, i + 1).reduce((sum, v) => sum + v, 0) * 0.82)), borderColor: CHART_COLORS.blue, backgroundColor: CHART_COLORS.blueAlpha, fill: true }
+                ],
+                status: [
+                    { label: 'Running Status', data: mapSeries(basePower.map(v => v ? 1 : 0)), borderColor: CHART_COLORS.green, backgroundColor: CHART_COLORS.greenAlpha, fill: true }
+                ],
+                comm_status: [
+                    { label: 'Communication Status', data: mapSeries(basePower.map(v => v ? 1 : 0)), borderColor: CHART_COLORS.cyan, backgroundColor: CHART_COLORS.cyanAlpha, fill: true }
                 ]
             };
         }
@@ -12129,121 +12027,102 @@
                         </div>
                         <div style="padding:12px">
                             <div class="leaf-schematic-wrap" style="height:440px;">
-                                    <svg viewBox="0 0 620 430" xmlns="http://www.w3.org/2000/svg">
+                                    <svg viewBox="0 0 640 420" xmlns="http://www.w3.org/2000/svg">
                                     <defs>
                                         <pattern id="airLeafGrid" width="20" height="20" patternUnits="userSpaceOnUse">
                                             <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.025)" stroke-width="0.5"/>
                                         </pattern>
-                                        <circle id="airFlowDot" r="2.5" fill="#94a3b8"/>
-                                        <circle id="airFlowDotSm" r="1.8" fill="#cbd5e1" opacity="0.5"/>
-                                        <circle id="airColdDot" r="2.5" fill="#60a5fa"/>
-                                        <circle id="airColdDotSm" r="1.8" fill="#38bdf8" opacity="0.6"/>
+                                        <circle id="airSupplyDot" r="2.5" fill="#14b8a6"/>
+                                        <circle id="airSupplyDotSm" r="1.8" fill="#2dd4bf" opacity="0.5"/>
                                     </defs>
-                                    <rect width="620" height="430" fill="url(#airLeafGrid)"/>
-                                    <g transform="translate(0,-20)">
-                                    <rect x="80" y="95" width="460" height="160" rx="8" fill="#111827" stroke="rgba(20,184,166,0.3)" stroke-width="1"/>
-                                    <line x1="175" y1="95" x2="175" y2="255" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
-                                    <line x1="265" y1="95" x2="265" y2="255" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
-                                    <line x1="385" y1="95" x2="385" y2="255" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
-                                    <line x1="470" y1="95" x2="470" y2="255" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
-
-                                    <text x="127" y="115" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">Mixing</text>
-                                    <line x1="95" y1="140" x2="95" y2="160" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" opacity="0.6"><animateTransform attributeName="transform" type="rotate" from="-20 95 150" to="20 95 150" dur="4s" repeatCount="indefinite"/></line>
-                                    <line x1="95" y1="175" x2="95" y2="195" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" opacity="0.6"><animateTransform attributeName="transform" type="rotate" from="20 95 185" to="-20 95 185" dur="4s" repeatCount="indefinite"/></line>
-                                    <text x="127" y="178" text-anchor="middle" fill="#14b8a6" font-family="Fira Code" font-size="9">${ctx.freshDamper}% fresh</text>
-                                    <text x="127" y="192" text-anchor="middle" fill="#5a6a80" font-family="Fira Code" font-size="8">${ctx.returnDamper}% return</text>
-                                    <text x="127" y="240" text-anchor="middle" fill="#8896ab" font-family="Fira Code" font-size="9">Mixed ${ctx.mixedTemp}°C</text>
-
-                                    <text x="220" y="115" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">Filter</text>
-                                    <g opacity="0.4">
-                                        <line x1="205" y1="130" x2="205" y2="240" stroke="#14b8a6" stroke-width="0.8"/>
-                                        <line x1="212" y1="130" x2="212" y2="240" stroke="#14b8a6" stroke-width="0.8"/>
-                                        <line x1="219" y1="130" x2="219" y2="240" stroke="#14b8a6" stroke-width="0.8"/>
-                                        <line x1="226" y1="130" x2="226" y2="240" stroke="#14b8a6" stroke-width="0.8"/>
-                                        <line x1="233" y1="130" x2="233" y2="240" stroke="#14b8a6" stroke-width="0.8"/>
-                                    </g>
-                                    <text x="220" y="178" text-anchor="middle" fill="#14b8a6" font-family="Fira Code" font-size="9">G4+F7</text>
-                                    <text x="220" y="240" text-anchor="middle" fill="#8896ab" font-family="Fira Code" font-size="8">ΔP ${ctx.filterDp} Pa</text>
-
-                                    <text x="325" y="115" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">Cooling Coil</text>
-                                    <g opacity="0.5">
-                                        <path d="M280,135 Q290,145 280,155 Q270,165 280,175 Q290,185 280,195 Q270,205 280,215 Q290,225 280,235" fill="none" stroke="#3b82f6" stroke-width="1.2"/>
-                                        <path d="M295,135 Q305,145 295,155 Q285,165 295,175 Q305,185 295,195 Q285,205 295,215 Q305,225 295,235" fill="none" stroke="#3b82f6" stroke-width="1.2"/>
-                                        <path d="M310,135 Q320,145 310,155 Q300,165 310,175 Q320,185 310,195 Q300,205 310,215 Q320,225 310,235" fill="none" stroke="#3b82f6" stroke-width="1.2"/>
-                                        <path d="M325,135 Q335,145 325,155 Q315,165 325,175 Q335,185 325,195 Q315,205 325,215 Q335,225 325,235" fill="none" stroke="#3b82f6" stroke-width="1.2"/>
-                                        <path d="M340,135 Q350,145 340,155 Q330,165 340,175 Q350,185 340,195 Q330,205 340,215 Q350,225 340,235" fill="none" stroke="#3b82f6" stroke-width="1.2"/>
-                                        <path d="M355,135 Q365,145 355,155 Q345,165 355,175 Q365,185 355,195 Q345,205 355,215 Q365,225 355,235" fill="none" stroke="#3b82f6" stroke-width="1.2"/>
-                                        <path d="M370,135 Q380,145 370,155 Q360,165 370,175 Q380,185 370,195 Q360,205 370,215 Q380,225 370,235" fill="none" stroke="#3b82f6" stroke-width="1.2"/>
-                                    </g>
-                                    <text x="325" y="178" text-anchor="middle" fill="#3b82f6" font-family="Fira Code" font-size="10" font-weight="600">${ctx.chwInlet}→${ctx.chwReturn}°C</text>
-
-                                    <text x="427" y="115" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">Fan</text>
-                                    <circle cx="427" cy="175" r="32" fill="#0d1220" stroke="#14b8a6" stroke-width="1.2"/>
+                                    <rect width="640" height="420" fill="url(#airLeafGrid)"/>
                                     <g>
-                                        <line x1="407" y1="175" x2="447" y2="175" stroke="#14b8a6" stroke-width="2.5" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 427 175" to="360 427 175" dur="0.8s" repeatCount="indefinite"/></line>
-                                        <line x1="427" y1="155" x2="427" y2="195" stroke="#14b8a6" stroke-width="2.5" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 427 175" to="360 427 175" dur="0.8s" repeatCount="indefinite"/></line>
-                                        <line x1="413" y1="161" x2="441" y2="189" stroke="#14b8a6" stroke-width="2" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 427 175" to="360 427 175" dur="0.8s" repeatCount="indefinite"/></line>
-                                        <line x1="441" y1="161" x2="413" y2="189" stroke="#14b8a6" stroke-width="2" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 427 175" to="360 427 175" dur="0.8s" repeatCount="indefinite"/></line>
+                                    <!-- AHU casing: tall box, two fans stacked vertically -->
+                                    <rect x="58" y="50" width="522" height="310" rx="8" fill="#111827" stroke="rgba(20,184,166,0.3)" stroke-width="1"/>
+                                    <!-- Horizontal divider: Fan 1# (top) | Fan 2# (bottom) -->
+                                    <line x1="60" y1="200" x2="435" y2="200" stroke="rgba(255,255,255,0.06)" stroke-width="0.8"/>
+                                    <!-- Vertical divider: fan+data | supply air -->
+                                    <line x1="435" y1="52" x2="435" y2="358" stroke="rgba(255,255,255,0.06)" stroke-width="0.8"/>
+                                    <!-- Section labels -->
+                                    <text x="246" y="67" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">EC Fan 1#</text>
+                                    <text x="246" y="217" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">EC Fan 2#</text>
+                                    <text x="507" y="67" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">Supply Air</text>
+                                    <!-- Air intake (center-left, splits up/down) -->
+                                    <path d="M15,200 L58,200" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="10 7" opacity="0.6"><animate attributeName="stroke-dashoffset" from="0" to="-34" dur="1.5s" repeatCount="indefinite"/></path>
+                                    <use href="#airSupplyDot"><animateMotion path="M15,200 L58,200" dur="1.5s" repeatCount="indefinite"/></use>
+                                    <text x="36" y="193" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">Air In</text>
+                                    <path d="M58,200 L58,125" fill="none" stroke="rgba(148,163,184,0.3)" stroke-width="1.5" stroke-dasharray="6 5"><animate attributeName="stroke-dashoffset" from="0" to="22" dur="1.5s" repeatCount="indefinite"/></path>
+                                    <path d="M58,200 L58,270" fill="none" stroke="rgba(148,163,184,0.3)" stroke-width="1.5" stroke-dasharray="6 5"><animate attributeName="stroke-dashoffset" from="0" to="-22" dur="1.5s" repeatCount="indefinite"/></path>
+                                    <!-- Flow ribbons -->
+                                    <path d="M60,120 L435,120" fill="none" stroke="rgba(148,163,184,0.035)" stroke-width="22" stroke-linecap="round"/>
+                                    <path d="M60,265 L435,265" fill="none" stroke="rgba(148,163,184,0.035)" stroke-width="22" stroke-linecap="round"/>
+                                    <!-- Fan 1# (teal) -->
+                                    <circle cx="160" cy="125" r="43" fill="#0d1220" stroke="#14b8a6" stroke-width="1.3"/>
+                                    <circle cx="160" cy="125" r="30" fill="none" stroke="rgba(20,184,166,0.09)" stroke-width="6"/>
+                                    <g>
+                                        <line x1="135" y1="125" x2="185" y2="125" stroke="#14b8a6" stroke-width="2.5" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 160 125" to="360 160 125" dur="0.7s" repeatCount="indefinite"/></line>
+                                        <line x1="160" y1="100" x2="160" y2="150" stroke="#14b8a6" stroke-width="2.5" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 160 125" to="360 160 125" dur="0.7s" repeatCount="indefinite"/></line>
+                                        <line x1="142" y1="107" x2="178" y2="143" stroke="#14b8a6" stroke-width="2" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 160 125" to="360 160 125" dur="0.7s" repeatCount="indefinite"/></line>
+                                        <line x1="178" y1="107" x2="142" y2="143" stroke="#14b8a6" stroke-width="2" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 160 125" to="360 160 125" dur="0.7s" repeatCount="indefinite"/></line>
                                     </g>
-                                    <circle cx="427" cy="175" r="32" fill="none" stroke="#14b8a6" stroke-width="0.6" stroke-dasharray="6 4" opacity="0.4"><animateTransform attributeName="transform" type="rotate" from="0 427 175" to="360 427 175" dur="2.5s" repeatCount="indefinite"/></circle>
-                                    <text x="427" y="220" text-anchor="middle" fill="#14b8a6" font-family="Fira Code" font-size="10" font-weight="600">${ctx.fanFrequency} Hz</text>
-                                    <text x="427" y="240" text-anchor="middle" fill="#8896ab" font-family="Fira Code" font-size="8">${ctx.fanPower} kW</text>
-
-                                    <text x="505" y="115" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">Supply Air</text>
-                                    <text x="505" y="178" text-anchor="middle" fill="#14b8a6" font-family="Fira Code" font-size="10" font-weight="600">${ctx.supplyTemp}°C</text>
-                                    <text x="505" y="194" text-anchor="middle" fill="#5a6a80" font-family="Fira Code" font-size="8">RH ${ctx.supplyRh}%</text>
-
-                                    <path d="M90,175 L540,175" fill="none" stroke="rgba(148,163,184,0.15)" stroke-width="30" stroke-linecap="round"/>
-                                    <use href="#airFlowDot"><animateMotion path="M90,168 L540,168" dur="3.5s" repeatCount="indefinite"/></use>
-                                    <use href="#airFlowDotSm"><animateMotion path="M90,175 L540,175" dur="3.5s" begin="0.5s" repeatCount="indefinite"/></use>
-                                    <use href="#airFlowDotSm"><animateMotion path="M90,182 L540,182" dur="3.5s" begin="1.0s" repeatCount="indefinite"/></use>
-                                    <use href="#airFlowDot"><animateMotion path="M90,175 L540,175" dur="3.5s" begin="1.8s" repeatCount="indefinite"/></use>
-
-                                    <path d="M80,65 L80,95" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="8 6" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1.5s" repeatCount="indefinite"/></path>
-                                    <use href="#airFlowDotSm"><animateMotion path="M80,55 L80,95" dur="1.5s" repeatCount="indefinite"/></use>
-                                    <text x="80" y="55" text-anchor="middle" fill="#8896ab" font-family="Fira Code" font-size="9">${ctx.returnTemp}°C</text>
-                                    <text x="80" y="44" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">Return</text>
-
-                                    <path d="M30,80 L80,120" fill="none" stroke="#14b8a6" stroke-width="2" stroke-dasharray="6 5" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-22" dur="1.8s" repeatCount="indefinite"/></path>
-                                    <text x="30" y="72" text-anchor="middle" fill="#14b8a6" font-family="Fira Code" font-size="9">${ctx.freshTemp}°C</text>
-                                    <text x="30" y="60" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">Fresh</text>
-
-                                    <path d="M540,175 L595,175" fill="none" stroke="#14b8a6" stroke-width="2.5" stroke-dasharray="10 7" opacity="0.8"><animate attributeName="stroke-dashoffset" from="0" to="-34" dur="1s" repeatCount="indefinite"/></path>
-                                    <use href="#airFlowDot"><animateMotion path="M540,175 L595,175" dur="1.2s" repeatCount="indefinite"/></use>
-                                    <path d="M583,170 L593,175 L583,180" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.7"/>
-
-                                    <path d="M280,255 L280,310 L370,310" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="10 7" opacity="0.7"><animate attributeName="stroke-dashoffset" from="0" to="-34" dur="1.5s" repeatCount="indefinite"/></path>
-                                    <use href="#airColdDot"><animateMotion path="M280,255 L280,310 L370,310" dur="2.5s" repeatCount="indefinite"/></use>
-                                    <use href="#airColdDotSm"><animateMotion path="M280,255 L280,310 L370,310" dur="2.5s" begin="1.2s" repeatCount="indefinite"/></use>
-                                    <text x="270" y="290" text-anchor="end" fill="#60a5fa" font-family="Fira Code" font-size="9" font-weight="600">${ctx.chwInlet}°C</text>
-                                    <text x="270" y="302" text-anchor="end" fill="rgba(59,130,246,0.5)" font-size="7" font-family="Fira Sans">CHW Supply</text>
-
-                                    <path d="M370,330 L280,330 L280,340" fill="none" stroke="#06b6d4" stroke-width="2" stroke-dasharray="10 7" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="34" dur="1.8s" repeatCount="indefinite"/></path>
-                                    <use href="#airColdDotSm"><animateMotion path="M370,330 L280,330 L280,345" dur="2.8s" repeatCount="indefinite"/></use>
-                                    <text x="270" y="340" text-anchor="end" fill="#22d3ee" font-family="Fira Code" font-size="9">${ctx.chwReturn}°C</text>
-                                    <text x="270" y="352" text-anchor="end" fill="rgba(6,182,212,0.5)" font-size="7" font-family="Fira Sans">CHW Return</text>
-
-                                    <path d="M365,302 L375,310 L365,318 M385,302 L375,310 L385,318" fill="none" stroke="rgba(59,130,246,0.5)" stroke-width="1.2"/>
-                                    <path d="M365,322 L375,330 L365,338 M385,322 L375,330 L385,338" fill="none" stroke="rgba(6,182,212,0.4)" stroke-width="1.2"/>
-                                    <text x="400" y="314" fill="#3b82f6" font-family="Fira Code" font-size="9" font-weight="600">Open ${ctx.valveOpen}%</text>
-                                    <text x="400" y="326" fill="#5a6a80" font-size="7" font-family="Fira Sans">2-way Valve</text>
-
-                                    <circle cx="475" cy="105" r="4" fill="#22c55e"><animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite"/></circle>
-                                    <text x="485" y="109" fill="#22c55e" font-size="9" font-family="Fira Sans" font-weight="500">Running</text>
-
-                                    <text x="120" y="400" text-anchor="middle" fill="#14b8a6" font-family="Fira Code" font-size="12" font-weight="600">${ctx.airflow} m³/h</text>
-                                    <text x="120" y="416" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Real-time Airflow</text>
-                                    <text x="310" y="400" text-anchor="middle" fill="#22c55e" font-family="Fira Code" font-size="12" font-weight="600">${ctx.fanPower} kW</text>
-                                    <text x="310" y="416" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Fan Power</text>
-                                    <text x="500" y="400" text-anchor="middle" fill="#3b82f6" font-family="Fira Code" font-size="12" font-weight="600">ΔT ${ctx.chwDelta}°C</text>
-                                    <text x="500" y="416" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">CHW Delta T</text>
-
+                                    <circle cx="160" cy="125" r="43" fill="none" stroke="#14b8a6" stroke-width="0.6" stroke-dasharray="6 4" opacity="0.4"><animateTransform attributeName="transform" type="rotate" from="0 160 125" to="360 160 125" dur="2.5s" repeatCount="indefinite"/></circle>
+                                    <text x="160" y="129" text-anchor="middle" fill="#e8edf5" font-size="9" font-family="Fira Sans" font-weight="700">1#</text>
+                                    <!-- Fan 1# data -->
+                                    <text x="215" y="97" fill="#e8edf5" font-size="9" font-family="Fira Sans" font-weight="600">Fan 1# Parameters</text>
+                                    <text x="215" y="113" fill="#14b8a6" font-family="Fira Code" font-size="12" font-weight="600">1,420 rpm</text>
+                                    <text x="215" y="129" fill="#8896ab" font-family="Fira Code" font-size="9">${(Number(ctx.fanPower)/2).toFixed(1)} kW · 228 V · ${(Number(ctx.fanCurrent)/2).toFixed(1)} A</text>
+                                    <text x="215" y="145" fill="#8896ab" font-family="Fira Code" font-size="9">IPM Temp 42°C</text>
+                                    <!-- Flow Fan 1# to supply -->
+                                    <path d="M203,125 L435,125" fill="none" stroke="#14b8a6" stroke-width="1.5" stroke-dasharray="8 6" opacity="0.4"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1s" repeatCount="indefinite"/></path>
+                                    <use href="#airSupplyDot"><animateMotion path="M203,125 L435,125" dur="1.2s" repeatCount="indefinite"/></use>
+                                    <path d="M423,121 L431,125 L423,129" fill="none" stroke="rgba(20,184,166,0.5)" stroke-width="1.3"/>
+                                    <!-- Fan 2# (cyan) -->
+                                    <circle cx="160" cy="270" r="43" fill="#0d1220" stroke="#06b6d4" stroke-width="1.3"/>
+                                    <circle cx="160" cy="270" r="30" fill="none" stroke="rgba(6,182,212,0.09)" stroke-width="6"/>
+                                    <g>
+                                        <line x1="135" y1="270" x2="185" y2="270" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 160 270" to="360 160 270" dur="0.75s" repeatCount="indefinite"/></line>
+                                        <line x1="160" y1="245" x2="160" y2="295" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 160 270" to="360 160 270" dur="0.75s" repeatCount="indefinite"/></line>
+                                        <line x1="142" y1="252" x2="178" y2="288" stroke="#06b6d4" stroke-width="2" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 160 270" to="360 160 270" dur="0.75s" repeatCount="indefinite"/></line>
+                                        <line x1="178" y1="252" x2="142" y2="288" stroke="#06b6d4" stroke-width="2" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 160 270" to="360 160 270" dur="0.75s" repeatCount="indefinite"/></line>
+                                    </g>
+                                    <circle cx="160" cy="270" r="43" fill="none" stroke="#06b6d4" stroke-width="0.6" stroke-dasharray="6 4" opacity="0.4"><animateTransform attributeName="transform" type="rotate" from="0 160 270" to="360 160 270" dur="2.5s" repeatCount="indefinite"/></circle>
+                                    <text x="160" y="274" text-anchor="middle" fill="#e8edf5" font-size="9" font-family="Fira Sans" font-weight="700">2#</text>
+                                    <!-- Fan 2# data -->
+                                    <text x="215" y="242" fill="#e8edf5" font-size="9" font-family="Fira Sans" font-weight="600">Fan 2# Parameters</text>
+                                    <text x="215" y="258" fill="#06b6d4" font-family="Fira Code" font-size="12" font-weight="600">1,385 rpm</text>
+                                    <text x="215" y="274" fill="#8896ab" font-family="Fira Code" font-size="9">${(Number(ctx.fanPower)/2).toFixed(1)} kW · 226 V · ${(Number(ctx.fanCurrent)/2).toFixed(1)} A</text>
+                                    <text x="215" y="290" fill="#8896ab" font-family="Fira Code" font-size="9">IPM Temp 44°C</text>
+                                    <!-- Flow Fan 2# to supply -->
+                                    <path d="M203,270 L435,270" fill="none" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="8 6" opacity="0.4"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1s" begin="0.3s" repeatCount="indefinite"/></path>
+                                    <use href="#airSupplyDotSm"><animateMotion path="M203,270 L435,270" dur="1.2s" begin="0.4s" repeatCount="indefinite"/></use>
+                                    <path d="M423,266 L431,270 L423,274" fill="none" stroke="rgba(6,182,212,0.5)" stroke-width="1.3"/>
+                                    <!-- Supply plenum: merge flows -->
+                                    <path d="M435,125 L435,196" fill="none" stroke="rgba(20,184,166,0.3)" stroke-width="1.5" stroke-dasharray="6 5"><animate attributeName="stroke-dashoffset" from="0" to="-22" dur="1s" repeatCount="indefinite"/></path>
+                                    <path d="M435,270 L435,204" fill="none" stroke="rgba(6,182,212,0.3)" stroke-width="1.5" stroke-dasharray="6 5"><animate attributeName="stroke-dashoffset" from="0" to="22" dur="1s" repeatCount="indefinite"/></path>
+                                    <!-- Supply air temp -->
+                                    <text x="507" y="194" text-anchor="middle" fill="#14b8a6" font-family="Fira Code" font-size="17" font-weight="600">${ctx.supplyTemp}°C</text>
+                                    <text x="507" y="212" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Supply Air Temp</text>
+                                    <!-- Supply outlet -->
+                                    <path d="M580,200 L618,200" fill="none" stroke="#14b8a6" stroke-width="2.5" stroke-dasharray="10 7" opacity="0.8"><animate attributeName="stroke-dashoffset" from="0" to="-34" dur="1s" repeatCount="indefinite"/></path>
+                                    <use href="#airSupplyDot"><animateMotion path="M580,200 L618,200" dur="1.2s" repeatCount="indefinite"/></use>
+                                    <path d="M607,195 L617,200 L607,205" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.7"/>
+                                    <text x="599" y="214" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">Air Out</text>
+                                    <!-- Status indicator -->
+                                    <circle cx="88" cy="64" r="4" fill="#22c55e"><animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite"/></circle>
+                                    <text x="98" y="68" fill="#22c55e" font-size="9" font-family="Fira Sans" font-weight="500">Running</text>
+                                    <!-- Bottom stats -->
+                                    <text x="160" y="385" text-anchor="middle" fill="#22c55e" font-family="Fira Code" font-size="13" font-weight="600">${ctx.fanPower} kW</text>
+                                    <text x="160" y="400" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Total Real-time Power</text>
+                                    <text x="320" y="385" text-anchor="middle" fill="#3b82f6" font-family="Fira Code" font-size="13" font-weight="600">${ctx.todayEnergy} kWh</text>
+                                    <text x="320" y="400" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Accumulated Energy</text>
+                                    <text x="490" y="385" text-anchor="middle" fill="#06b6d4" font-family="Fira Code" font-size="13" font-weight="600">${ctx.runtime} h</text>
+                                    <text x="490" y="400" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">Accumulated Runtime</text>
                                     </g>
                                     </svg>
                             </div>
                         </div>
                     </div>
-                    <div class="chart-card leaf-full-width">
+                                        <div class="chart-card leaf-full-width">
                         <div class="chart-header">
                             <span class="chart-title">Operating Parameters</span>
                             <div class="card-actions"><span class="leaf-card-meta active">Updated ${new Date().getHours()}:${String(new Date().getMinutes()).padStart(2, '0')}</span></div>
@@ -12376,10 +12255,11 @@
 
         function getMeterRootMeters() {
             return [
+                { name: 'TTSS Main Electric Meter', loc: 'Main Switch Room', code: 'TTSS-M01', type: 'virtual', virtual: true, p: 1079, ia: 0, ib: 0, ic: 0, va: 229, vb: 230, vc: 229, pf: 0.93, kwh: 9492, cap: 0, status: 'on' },
                 { name: '1# Chiller', loc: 'Switch Room A · 1AT', code: '1AT-01', type: 'hvac', p: 320, ia: 168, ib: 162, ic: 160, va: 228, vb: 230, vc: 229, pf: 0.95, kwh: 2640, cap: 380, status: 'on' },
                 { name: '2# Chiller', loc: 'Switch Room A · 1AT', code: '1AT-02', type: 'hvac', p: 285, ia: 148, ib: 145, ic: 142, va: 229, vb: 230, vc: 228, pf: 0.96, kwh: 2520, cap: 380, status: 'on' },
-                { name: 'CHWP-1', loc: 'Switch Room A · 1AT', code: '1AT-03', type: 'hvac', p: 37, ia: 19, ib: 18, ic: 19, va: 230, vb: 229, vc: 230, pf: 0.88, kwh: 312, cap: 55, status: 'on' },
-                { name: 'CWP-1', loc: 'Switch Room A · 1AT', code: '1AT-05', type: 'hvac', p: 45, ia: 24, ib: 23, ic: 22, va: 229, vb: 230, vc: 229, pf: 0.90, kwh: 385, cap: 55, status: 'on' },
+                { name: 'CWP-1', loc: 'Switch Room A · 1AT', code: '1AT-03', type: 'hvac', p: 37, ia: 19, ib: 18, ic: 19, va: 230, vb: 229, vc: 230, pf: 0.88, kwh: 312, cap: 55, status: 'on' },
+                { name: 'CHWP-1', loc: 'Switch Room A · 1AT', code: '1AT-05', type: 'hvac', p: 45, ia: 24, ib: 23, ic: 22, va: 229, vb: 230, vc: 229, pf: 0.90, kwh: 385, cap: 55, status: 'on' },
                 { name: 'Cooling Tower B', loc: 'Switch Room A · 1AT', code: '1AT-08', type: 'hvac', p: 48, ia: 25, ib: 24, ic: 24, va: 228, vb: 229, vc: 228, pf: 0.87, kwh: 405, cap: 55, status: 'warn' },
                 { name: 'Ground Floor Lighting', loc: 'Switch Room A · 1AL', code: '1AL-01', type: 'lighting', p: 22, ia: 12, ib: 11, ic: 11, va: 230, vb: 230, vc: 229, pf: 0.92, kwh: 176, cap: 40, status: 'on' },
                 { name: 'Level 2 Lighting', loc: 'Switch Room A · 1AL', code: '1AL-02', type: 'lighting', p: 28, ia: 15, ib: 14, ic: 14, va: 229, vb: 230, vc: 230, pf: 0.93, kwh: 224, cap: 45, status: 'on' },
@@ -12397,8 +12277,8 @@
             const configs = {
                 'CH-1 Meter': { code: '1AT-01', title: '1# Chiller Circuit', location: 'Switch Room A · 1AT HVAC Board · Circuit 01', ctRatio: '600/5', rated: 380, power: 320, current: 490, voltage: 229, pf: 0.950, reactive: 108, apparent: 337, frequency: 50.01, loadPct: 84, peakPower: 365, avgPower: 278, runtime: 9.5, today: 2640, yesterday: 2520, month: 52.8, lastMonth: 71.2, trendBase: 320, currentBase: 490, asset: '1# Chiller' },
                 'CH-2 Meter': { code: '1AT-02', title: '2# Chiller Circuit', location: 'Switch Room A · 1AT HVAC Board · Circuit 02', ctRatio: '600/5', rated: 380, power: 285, current: 438, voltage: 229, pf: 0.960, reactive: 92, apparent: 300, frequency: 50.00, loadPct: 75, peakPower: 332, avgPower: 251, runtime: 9.2, today: 2520, yesterday: 2440, month: 49.6, lastMonth: 68.1, trendBase: 285, currentBase: 438, asset: '2# Chiller' },
-                'CHWP-1 Meter': { code: '1AT-03', title: 'CHWP-1 Circuit', location: 'Switch Room A · 1AT HVAC Board · Circuit 03', ctRatio: '100/5', rated: 55, power: 37, current: 56, voltage: 230, pf: 0.880, reactive: 12, apparent: 42, frequency: 50.02, loadPct: 67, peakPower: 43, avgPower: 34, runtime: 10.8, today: 312, yesterday: 298, month: 6.8, lastMonth: 9.2, trendBase: 37, currentBase: 56, asset: 'Chilled Water Pump 1' },
-                'CWP-1 Meter': { code: '1AT-05', title: 'CWP-1 Circuit', location: 'Switch Room A · 1AT HVAC Board · Circuit 05', ctRatio: '100/5', rated: 55, power: 45, current: 68, voltage: 229, pf: 0.900, reactive: 16, apparent: 50, frequency: 50.01, loadPct: 82, peakPower: 51, avgPower: 41, runtime: 10.2, today: 385, yesterday: 366, month: 7.9, lastMonth: 10.4, trendBase: 45, currentBase: 68, asset: 'Cooling Water Pump 1' },
+                'CHWP-1 Meter': { code: '1AT-03', title: 'CWP-1 Circuit', location: 'Switch Room A · 1AT HVAC Board · Circuit 03', ctRatio: '100/5', rated: 55, power: 37, current: 56, voltage: 230, pf: 0.880, reactive: 12, apparent: 42, frequency: 50.02, loadPct: 67, peakPower: 43, avgPower: 34, runtime: 10.8, today: 312, yesterday: 298, month: 6.8, lastMonth: 9.2, trendBase: 37, currentBase: 56, asset: 'Chilled Water Pump 1' },
+                'CWP-1 Meter': { code: '1AT-05', title: 'CHWP-1 Circuit', location: 'Switch Room A · 1AT HVAC Board · Circuit 05', ctRatio: '100/5', rated: 55, power: 45, current: 68, voltage: 229, pf: 0.900, reactive: 16, apparent: 50, frequency: 50.01, loadPct: 82, peakPower: 51, avgPower: 41, runtime: 10.2, today: 385, yesterday: 366, month: 7.9, lastMonth: 10.4, trendBase: 45, currentBase: 68, asset: 'Cooling Water Pump 1' },
                 'CT-1 Meter': { code: '1AT-08', title: 'Cooling Tower Circuit', location: 'Switch Room A · 1AT HVAC Board · Circuit 08', ctRatio: '80/5', rated: 55, power: 48, current: 72, voltage: 228, pf: 0.870, reactive: 18, apparent: 55, frequency: 49.99, loadPct: 87, peakPower: 53, avgPower: 44, runtime: 11.1, today: 405, yesterday: 392, month: 8.4, lastMonth: 10.9, trendBase: 48, currentBase: 72, asset: 'Cooling Tower 1' },
                 'Lighting Meter': { code: '1AL-01', title: 'Lighting Circuit', location: 'Switch Room A · 1AL Lighting Board · Circuit 01', ctRatio: '100/5', rated: 80, power: 68, current: 103, voltage: 230, pf: 0.930, reactive: 20, apparent: 73, frequency: 50.00, loadPct: 85, peakPower: 74, avgPower: 58, runtime: 12.0, today: 612, yesterday: 584, month: 12.2, lastMonth: 16.8, trendBase: 68, currentBase: 103, asset: 'Ground Floor Lighting' }
             };
@@ -12553,9 +12433,9 @@
                         <div class="device-kpi-meta"><span class="kpi-meta-emphasis">21 days</span><span class="kpi-meta-note">Est. ${(cfg.month * 1.42).toFixed(1)} MWh</span></div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label"><i data-lucide="activity" style="width:14px;height:14px;color:var(--accent-green)"></i>Power Factor</div>
-                        <div class="kpi-value">${cfg.pf.toFixed(3)}</div>
-                        <div class="device-kpi-meta"><span class="kpi-meta-emphasis">Reactive ${cfg.reactive} kvar</span><span class="kpi-meta-note">Load ${cfg.loadPct}%</span></div>
+                        <div class="kpi-label"><i data-lucide="bar-chart-2" style="width:14px;height:14px;color:var(--accent-green)"></i>Load Rate</div>
+                        <div class="kpi-value">${cfg.loadPct}<small style="font-size:12px;color:var(--text-muted)"> %</small></div>
+                        <div class="device-kpi-meta"><span class="kpi-meta-emphasis">Rated ${cfg.rated} kW</span><span class="kpi-meta-note">Reactive ${cfg.reactive} kvar</span></div>
                     </div>
                 </div>
 
@@ -12566,7 +12446,6 @@
                             <button class="meter-root-filter-btn ${meterBranchChartMetric === 'power' ? 'active' : ''}" data-meter-branch-chart="power">Power</button>
                             <button class="meter-root-filter-btn ${meterBranchChartMetric === 'voltage' ? 'active' : ''}" data-meter-branch-chart="voltage">Voltage</button>
                             <button class="meter-root-filter-btn ${meterBranchChartMetric === 'current' ? 'active' : ''}" data-meter-branch-chart="current">Current</button>
-                            <button class="meter-root-filter-btn ${meterBranchChartMetric === 'pf' ? 'active' : ''}" data-meter-branch-chart="pf">Power Factor</button>
                         </div>
                     </div>
                     <div style="padding:16px 20px">
@@ -12588,7 +12467,6 @@
                                     <th>Real-time Power</th>
                                     <th>Current A/B/C</th>
                                     <th>Voltage A/B/C</th>
-                                    <th>Power Factor</th>
                                     <th>Interval Energy</th>
                                     <th>Load Rate</th>
                                 </tr>
@@ -12603,7 +12481,6 @@
                                             <td class="mono" style="color:var(--text-primary);font-weight:600">${row.power} kW</td>
                                             <td class="mono">${row.ia} / ${row.ib} / ${row.ic}</td>
                                             <td class="mono">${row.va} / ${row.vb} / ${row.vc}</td>
-                                            <td class="mono">${row.pf}</td>
                                             <td class="mono">${row.energy} kWh</td>
                                             <td class="mono"><span class="meter-root-load"><span>${row.loadPct}%</span><span class="meter-root-load-bar"><span class="meter-root-load-fill" style="width:${row.loadPct}%;background:${loadColor}"></span></span></span></td>
                                         </tr>
@@ -12910,8 +12787,9 @@
 
         function getWaterMeterScopeMeters() {
             return [
-                { name: 'TTSS Main Water Meter', loc: 'Campus Inlet Chamber', code: 'WM-01', type: 'main', flow: 32.8, pressure: 3.2, today: 385, total: 12540, status: 'on' },
-                { name: 'GF Water Meter', loc: 'Public Area Water Loop', code: 'WM-02', type: 'domestic', flow: 8.4, pressure: 2.8, today: 96, total: 1280.5, status: 'off' },
+                { name: 'Cooling Energy Meter 1', loc: 'Cooling Plant Room', code: 'WM-01', type: 'cooling', flow: 28.4, pressure: 3.1, today: 385, total: 12540, status: 'on' },
+                { name: 'TTSS Main Water Meter', loc: 'Campus Inlet Chamber', code: 'WM-02', type: 'main', flow: 32.8, pressure: 3.2, today: 385, total: 12540, status: 'on' },
+                { name: 'GF Water Meter', loc: 'Public Area Water Loop', code: 'WM-03', type: 'domestic', flow: 8.4, pressure: 2.8, today: 96, total: 1280.5, status: 'off' },
                 { name: 'Cooling Plant Make-up', loc: 'Cooling Plant 1F', code: 'WM-03', type: 'cooling', flow: 11.2, pressure: 3.0, today: 142, total: 4210.8, status: 'on' },
                 { name: 'Level 2 Pantry', loc: 'Block FA · Level 2', code: 'WM-04', type: 'domestic', flow: 3.6, pressure: 2.5, today: 44, total: 864.2, status: 'on' },
                 { name: 'Landscape Irrigation', loc: 'Campus East Lawn', code: 'WM-05', type: 'irrigation', flow: 5.1, pressure: 2.1, today: 58, total: 2144.1, status: 'warn' },
@@ -12923,6 +12801,17 @@
             const meters = getWaterMeterScopeMeters();
             const base = meters.find(item => item.name === node?.name) || meters[0];
             const profiles = {
+                'Cooling Energy Meter 1': {
+                    title: 'Cooling system thermal energy meter',
+                    health: [
+                        ['Flow Stability', '28.4', 'm³/h', 'ok', '20-40'],
+                        ['Inlet Temperature', '7.2', '°C', 'ok', '6-8'],
+                        ['Outlet Temperature', '12.4', '°C', 'ok', '11-14'],
+                        ['Pulse Collection', '99.1', '%', 'ok', '≥98%'],
+                        ['Meter Battery', '88', '%', 'ok', '≥30%'],
+                        ['Communication', 'Normal', '', 'ok', 'Modbus TCP']
+                    ]
+                },
                 'TTSS Main Water Meter': {
                     title: 'Main campus inlet water meter',
                     health: [
@@ -13372,50 +13261,168 @@
                     </div>
                     <div style="padding:12px">
                         <div class="meter-topology-wrap">
-                            <svg viewBox="0 0 1100 400" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="display:block">
+                            <svg viewBox="0 0 960 192" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="display:block">
                                 <defs>
-                                    <pattern id="meterGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-                                        <path d="M20 0L0 0 0 20" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="0.5"/>
+                                    <pattern id="emGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                        <path d="M20 0L0 0 0 20" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
                                     </pattern>
-                                    <filter id="meterGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                                    <circle id="meterDot" r="2.5" fill="#818cf8" filter="url(#meterGlow)"/>
-                                    <circle id="meterDotSm" r="1.8" fill="#a5b4fc" opacity="0.6"/>
                                 </defs>
-                                <rect width="1100" height="400" fill="url(#meterGrid)"/>
-                                <rect x="16" y="165" width="70" height="50" rx="6" fill="#111827" stroke="#6366f1" stroke-width="1.2"/>
-                                <text x="51" y="186" text-anchor="middle" fill="#e8edf5" font-size="9" font-family="Fira Sans" font-weight="600">Grid 10kV</text>
-                                <text x="51" y="200" text-anchor="middle" fill="#6366f1" font-family="Fira Code" font-size="9" font-weight="600">Dual Feed</text>
-                                <circle cx="26" cy="175" r="3" fill="#22c55e"><animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite"/></circle>
-                                <path d="M86,190 L140,190" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-dasharray="10 7" opacity="0.8"><animate attributeName="stroke-dashoffset" from="0" to="-34" dur="1.2s" repeatCount="indefinite"/></path>
-                                <use href="#meterDot"><animateMotion path="M86,190 L140,190" dur="1.5s" repeatCount="indefinite"/></use>
-                                <line x1="140" y1="130" x2="140" y2="250" stroke="#6366f1" stroke-width="3" opacity="0.7"/>
-                                <text x="140" y="122" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">10kV Bus</text>
-                                <path d="M140,160 L190,160" fill="none" stroke="#6366f1" stroke-width="2" stroke-dasharray="8 6" opacity="0.6"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1.2s" repeatCount="indefinite"/></path>
-                                <circle cx="210" cy="160" r="18" fill="#111827" stroke="#8b5cf6" stroke-width="1.2"/>
-                                <text x="210" y="157" text-anchor="middle" fill="#e8edf5" font-size="7" font-family="Fira Sans" font-weight="600">T1</text>
-                                <text x="210" y="167" text-anchor="middle" fill="#8b5cf6" font-family="Fira Code" font-size="7">1000kVA</text>
-                                <path d="M140,220 L190,220" fill="none" stroke="#6366f1" stroke-width="2" stroke-dasharray="8 6" opacity="0.6"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1.2s" repeatCount="indefinite"/></path>
-                                <circle cx="210" cy="220" r="18" fill="#111827" stroke="#8b5cf6" stroke-width="1.2"/>
-                                <text x="210" y="217" text-anchor="middle" fill="#e8edf5" font-size="7" font-family="Fira Sans" font-weight="600">T2</text>
-                                <text x="210" y="227" text-anchor="middle" fill="#8b5cf6" font-family="Fira Code" font-size="7">800kVA</text>
-                                <path d="M228,160 L280,160" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="8 6" opacity="0.6"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1s" repeatCount="indefinite"/></path>
-                                <line x1="280" y1="65" x2="280" y2="190" stroke="#8b5cf6" stroke-width="2.5" opacity="0.6"/>
-                                <text x="280" y="57" text-anchor="middle" fill="#5a6a80" font-size="8" font-family="Fira Sans">0.4kV Bus A</text>
-                                <text x="280" y="198" text-anchor="middle" fill="#8b5cf6" font-family="Fira Code" font-size="8" font-weight="600">860 kW</text>
-                                <path d="M228,220 L280,220" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="8 6" opacity="0.6"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1s" repeatCount="indefinite"/></path>
-                                <line x1="280" y1="220" x2="280" y2="360" stroke="#8b5cf6" stroke-width="2.5" opacity="0.6"/>
-                                <text x="280" y="368" text-anchor="middle" fill="#8b5cf6" font-family="Fira Code" font-size="8" font-weight="600">385 kW</text>
-                                <g font-family="Fira Sans" font-size="8">
-                                    <path d="M280,80 L360,80" fill="none" stroke="#3b82f6" stroke-width="1.8" stroke-dasharray="8 6" opacity="0.6"/><rect x="360" y="62" width="100" height="36" rx="5" fill="#111827" stroke="#3b82f6" stroke-width="1"/><text x="410" y="78" text-anchor="middle" fill="#e8edf5" font-weight="600">1AT HVAC Board</text><text x="410" y="92" text-anchor="middle" fill="#3b82f6" font-family="Fira Code" font-size="9" font-weight="600">520 kW</text>
-                                    <path d="M280,130 L360,130" fill="none" stroke="#06b6d4" stroke-width="1.8" stroke-dasharray="8 6" opacity="0.6"/><rect x="360" y="112" width="100" height="36" rx="5" fill="#111827" stroke="#06b6d4" stroke-width="1"/><text x="410" y="128" text-anchor="middle" fill="#e8edf5" font-weight="600">1AL Lighting</text><text x="410" y="142" text-anchor="middle" fill="#06b6d4" font-family="Fira Code" font-size="9" font-weight="600">68 kW</text>
-                                    <path d="M280,175 L360,175" fill="none" stroke="#a855f7" stroke-width="1.8" stroke-dasharray="8 6" opacity="0.6"/><rect x="360" y="157" width="100" height="36" rx="5" fill="#111827" stroke="#a855f7" stroke-width="1"/><text x="410" y="173" text-anchor="middle" fill="#e8edf5" font-weight="600">1AP Power</text><text x="410" y="187" text-anchor="middle" fill="#a855f7" font-family="Fira Code" font-size="9" font-weight="600">142 kW</text>
-                                    <path d="M280,250 L360,250" fill="none" stroke="#3b82f6" stroke-width="1.8" stroke-dasharray="8 6" opacity="0.6"/><rect x="360" y="232" width="100" height="36" rx="5" fill="#111827" stroke="#3b82f6" stroke-width="1"/><text x="410" y="248" text-anchor="middle" fill="#e8edf5" font-weight="600">2AT HVAC</text><text x="410" y="262" text-anchor="middle" fill="#3b82f6" font-family="Fira Code" font-size="9" font-weight="600">180 kW</text>
-                                    <path d="M280,300 L360,300" fill="none" stroke="#06b6d4" stroke-width="1.8" stroke-dasharray="8 6" opacity="0.6"/><rect x="360" y="282" width="100" height="36" rx="5" fill="#111827" stroke="#06b6d4" stroke-width="1"/><text x="410" y="298" text-anchor="middle" fill="#e8edf5" font-weight="600">2AL Lighting</text><text x="410" y="312" text-anchor="middle" fill="#06b6d4" font-family="Fira Code" font-size="9" font-weight="600">52 kW</text>
-                                    <path d="M280,345 L360,345" fill="none" stroke="#14b8a6" stroke-width="1.8" stroke-dasharray="8 6" opacity="0.6"/><rect x="360" y="327" width="100" height="36" rx="5" fill="#111827" stroke="#14b8a6" stroke-width="1"/><text x="410" y="343" text-anchor="middle" fill="#e8edf5" font-weight="600">2AP Special</text><text x="410" y="357" text-anchor="middle" fill="#14b8a6" font-family="Fira Code" font-size="9" font-weight="600">153 kW</text>
-                                </g>
-                                <rect x="780" y="170" width="120" height="44" rx="8" fill="#111827" stroke="rgba(99,102,241,0.3)" stroke-width="1"/>
-                                <text x="840" y="188" text-anchor="middle" fill="#5a6a80" font-size="9" font-family="Fira Sans">System Total Power</text>
-                                <text x="840" y="206" text-anchor="middle" fill="#6366f1" font-family="Fira Code" font-size="16" font-weight="700">${totalPower.toLocaleString()} kW</text>
+                                <rect width="960" height="192" fill="url(#emGrid)"/>
+                                <!-- TTSS Main Electric Meter (virtual aggregator) -->
+                                <rect x="260" y="8" width="440" height="62" rx="8" fill="#111827" stroke="#6366f1" stroke-width="1.5"/>
+                                <rect x="260" y="8" width="440" height="62" rx="8" fill="rgba(99,102,241,0.06)"/>
+                                <circle cx="273" cy="18" r="3" fill="#6366f1"><animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/></circle>
+                                <text x="480" y="30" text-anchor="middle" fill="#94a3b8" font-family="Fira Sans" font-size="9">TTSS Main Electric Meter</text>
+                                <text x="480" y="54" text-anchor="middle" fill="#6366f1" font-family="Fira Code" font-size="22" font-weight="700">${totalPower.toLocaleString()} kW</text>
+                                <text x="480" y="65" text-anchor="middle" fill="#5a6a80" font-family="Fira Sans" font-size="8">Virtual · Aggregated · PF ${avgPf.toFixed(2)}</text>
+                                <!-- Vertical connector TTSS Main to bus -->
+                                <line x1="480" y1="70" x2="480" y2="98" stroke="#6366f1" stroke-width="1.5" opacity="0.7"/>
+                                <!-- Horizontal collection bus -->
+                                <line x1="30" y1="98" x2="930" y2="98" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
+                                <text x="8" y="94" fill="#3d4f66" font-family="Fira Sans" font-size="7" text-anchor="start">Bus</text>
+                                <!-- Vertical taps bus → sub-meters -->
+                                <line x1="48" y1="98" x2="48" y2="110" stroke="#3b82f6" stroke-width="1" opacity="0.4"/>
+                                <line x1="144" y1="98" x2="144" y2="110" stroke="#3b82f6" stroke-width="1" opacity="0.4"/>
+                                <line x1="240" y1="98" x2="240" y2="110" stroke="#06b6d4" stroke-width="1" opacity="0.4"/>
+                                <line x1="336" y1="98" x2="336" y2="110" stroke="#06b6d4" stroke-width="1" opacity="0.4"/>
+                                <line x1="432" y1="98" x2="432" y2="110" stroke="#06b6d4" stroke-width="1" opacity="0.4"/>
+                                <line x1="528" y1="98" x2="528" y2="110" stroke="#3b82f6" stroke-width="1" opacity="0.4"/>
+                                <line x1="624" y1="98" x2="624" y2="110" stroke="#3b82f6" stroke-width="1" opacity="0.4"/>
+                                <line x1="720" y1="98" x2="720" y2="110" stroke="#f59e0b" stroke-width="1" opacity="0.4"/>
+                                <line x1="816" y1="98" x2="816" y2="110" stroke="#f59e0b" stroke-width="1" opacity="0.4"/>
+                                <line x1="912" y1="98" x2="912" y2="110" stroke="#eab308" stroke-width="1" opacity="0.4"/>
+                                <!-- Animated energy flow dots (sub-meter → bus → TTSS Main) -->
+                                <circle r="2.5" fill="#3b82f6" opacity="0.85">
+                                    <animateMotion path="M48,184 L48,98 L480,98 L480,70" dur="2.5s" begin="0.0s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.85;0.85;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="0.0s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="1.6" fill="#3b82f6" opacity="0.5">
+                                    <animateMotion path="M48,184 L48,98 L480,98 L480,70" dur="2.5s" begin="1.25s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.5;0.5;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="1.25s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="2.5" fill="#3b82f6" opacity="0.85">
+                                    <animateMotion path="M144,184 L144,98 L480,98 L480,70" dur="2.5s" begin="0.25s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.85;0.85;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="0.25s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="1.6" fill="#3b82f6" opacity="0.5">
+                                    <animateMotion path="M144,184 L144,98 L480,98 L480,70" dur="2.5s" begin="1.5s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.5;0.5;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="1.5s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="2.5" fill="#06b6d4" opacity="0.85">
+                                    <animateMotion path="M240,184 L240,98 L480,98 L480,70" dur="2.5s" begin="0.5s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.85;0.85;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="0.5s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="1.6" fill="#06b6d4" opacity="0.5">
+                                    <animateMotion path="M240,184 L240,98 L480,98 L480,70" dur="2.5s" begin="1.75s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.5;0.5;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="1.75s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="2.5" fill="#06b6d4" opacity="0.85">
+                                    <animateMotion path="M336,184 L336,98 L480,98 L480,70" dur="2.5s" begin="0.75s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.85;0.85;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="0.75s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="1.6" fill="#06b6d4" opacity="0.5">
+                                    <animateMotion path="M336,184 L336,98 L480,98 L480,70" dur="2.5s" begin="2.0s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.5;0.5;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="2.0s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="2.5" fill="#06b6d4" opacity="0.85">
+                                    <animateMotion path="M432,184 L432,98 L480,98 L480,70" dur="2.5s" begin="1.0s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.85;0.85;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="1.0s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="1.6" fill="#06b6d4" opacity="0.5">
+                                    <animateMotion path="M432,184 L432,98 L480,98 L480,70" dur="2.5s" begin="2.25s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.5;0.5;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="2.25s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="2.5" fill="#3b82f6" opacity="0.85">
+                                    <animateMotion path="M528,184 L528,98 L480,98 L480,70" dur="2.5s" begin="1.25s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.85;0.85;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="1.25s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="1.6" fill="#3b82f6" opacity="0.5">
+                                    <animateMotion path="M528,184 L528,98 L480,98 L480,70" dur="2.5s" begin="2.5s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.5;0.5;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="2.5s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="2.5" fill="#3b82f6" opacity="0.85">
+                                    <animateMotion path="M624,184 L624,98 L480,98 L480,70" dur="2.5s" begin="1.5s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.85;0.85;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="1.5s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="1.6" fill="#3b82f6" opacity="0.5">
+                                    <animateMotion path="M624,184 L624,98 L480,98 L480,70" dur="2.5s" begin="2.75s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.5;0.5;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="2.75s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="2.5" fill="#f59e0b" opacity="0.85">
+                                    <animateMotion path="M720,184 L720,98 L480,98 L480,70" dur="2.5s" begin="1.75s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.85;0.85;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="1.75s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="1.6" fill="#f59e0b" opacity="0.5">
+                                    <animateMotion path="M720,184 L720,98 L480,98 L480,70" dur="2.5s" begin="3.0s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.5;0.5;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="3.0s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="2.5" fill="#f59e0b" opacity="0.85">
+                                    <animateMotion path="M816,184 L816,98 L480,98 L480,70" dur="2.5s" begin="2.0s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.85;0.85;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="2.0s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="1.6" fill="#f59e0b" opacity="0.5">
+                                    <animateMotion path="M816,184 L816,98 L480,98 L480,70" dur="2.5s" begin="3.25s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.5;0.5;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="3.25s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="2.5" fill="#eab308" opacity="0.85">
+                                    <animateMotion path="M912,184 L912,98 L480,98 L480,70" dur="2.5s" begin="2.25s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.85;0.85;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="2.25s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle r="1.6" fill="#eab308" opacity="0.5">
+                                    <animateMotion path="M912,184 L912,98 L480,98 L480,70" dur="2.5s" begin="3.5s" repeatCount="indefinite" calcMode="linear"/>
+                                    <animate attributeName="opacity" values="0;0.5;0.5;0" keyTimes="0;0.04;0.92;1" dur="2.5s" begin="3.5s" repeatCount="indefinite"/>
+                                </circle>
+                                <!-- Sub-meter boxes -->
+                                <rect x="8" y="110" width="80" height="74" rx="5" fill="#111827" stroke="#3b82f6" stroke-width="0.8"/>
+                                <circle cx="15" cy="118" r="2.5" fill="#22c55e"/>
+                                <text x="48" y="130" text-anchor="middle" fill="#8896ab" font-family="Fira Sans" font-size="7.5" font-weight="600">CH-1</text>
+                                <text x="48" y="152" text-anchor="middle" fill="#3b82f6" font-family="Fira Code" font-size="14" font-weight="700">320 kW</text>
+                                <text x="48" y="166" text-anchor="middle" fill="#4a5a6e" font-family="Fira Code" font-size="7">490/480/475 A</text>
+                                <rect x="104" y="110" width="80" height="74" rx="5" fill="#111827" stroke="#3b82f6" stroke-width="0.8"/>
+                                <circle cx="111" cy="118" r="2.5" fill="#22c55e"/>
+                                <text x="144" y="130" text-anchor="middle" fill="#8896ab" font-family="Fira Sans" font-size="7.5" font-weight="600">CH-2</text>
+                                <text x="144" y="152" text-anchor="middle" fill="#3b82f6" font-family="Fira Code" font-size="14" font-weight="700">285 kW</text>
+                                <text x="144" y="166" text-anchor="middle" fill="#4a5a6e" font-family="Fira Code" font-size="7">438/428/432 A</text>
+                                <rect x="200" y="110" width="80" height="74" rx="5" fill="#111827" stroke="#06b6d4" stroke-width="0.8"/>
+                                <circle cx="207" cy="118" r="2.5" fill="#22c55e"/>
+                                <text x="240" y="130" text-anchor="middle" fill="#8896ab" font-family="Fira Sans" font-size="7.5" font-weight="600">CWP-1</text>
+                                <text x="240" y="152" text-anchor="middle" fill="#06b6d4" font-family="Fira Code" font-size="14" font-weight="700">45 kW</text>
+                                <text x="240" y="166" text-anchor="middle" fill="#4a5a6e" font-family="Fira Code" font-size="7">68/66/64 A</text>
+                                <rect x="296" y="110" width="80" height="74" rx="5" fill="#111827" stroke="#06b6d4" stroke-width="0.8"/>
+                                <circle cx="303" cy="118" r="2.5" fill="#22c55e"/>
+                                <text x="336" y="130" text-anchor="middle" fill="#8896ab" font-family="Fira Sans" font-size="7.5" font-weight="600">CWP-2</text>
+                                <text x="336" y="152" text-anchor="middle" fill="#06b6d4" font-family="Fira Code" font-size="14" font-weight="700">42 kW</text>
+                                <text x="336" y="166" text-anchor="middle" fill="#4a5a6e" font-family="Fira Code" font-size="7">64/62/63 A</text>
+                                <rect x="392" y="110" width="80" height="74" rx="5" fill="#111827" stroke="#06b6d4" stroke-width="0.8"/>
+                                <circle cx="399" cy="118" r="2.5" fill="#22c55e"/>
+                                <text x="432" y="130" text-anchor="middle" fill="#8896ab" font-family="Fira Sans" font-size="7.5" font-weight="600">CWP-3</text>
+                                <text x="432" y="152" text-anchor="middle" fill="#06b6d4" font-family="Fira Code" font-size="14" font-weight="700">40 kW</text>
+                                <text x="432" y="166" text-anchor="middle" fill="#4a5a6e" font-family="Fira Code" font-size="7">62/60/61 A</text>
+                                <rect x="488" y="110" width="80" height="74" rx="5" fill="#111827" stroke="#3b82f6" stroke-width="0.8"/>
+                                <circle cx="495" cy="118" r="2.5" fill="#22c55e"/>
+                                <text x="528" y="130" text-anchor="middle" fill="#8896ab" font-family="Fira Sans" font-size="7.5" font-weight="600">CHWP-1</text>
+                                <text x="528" y="152" text-anchor="middle" fill="#3b82f6" font-family="Fira Code" font-size="14" font-weight="700">37 kW</text>
+                                <text x="528" y="166" text-anchor="middle" fill="#4a5a6e" font-family="Fira Code" font-size="7">56/55/54 A</text>
+                                <rect x="584" y="110" width="80" height="74" rx="5" fill="#111827" stroke="#3b82f6" stroke-width="0.8"/>
+                                <circle cx="591" cy="118" r="2.5" fill="#22c55e"/>
+                                <text x="624" y="130" text-anchor="middle" fill="#8896ab" font-family="Fira Sans" font-size="7.5" font-weight="600">CHWP-2</text>
+                                <text x="624" y="152" text-anchor="middle" fill="#3b82f6" font-family="Fira Code" font-size="14" font-weight="700">35 kW</text>
+                                <text x="624" y="166" text-anchor="middle" fill="#4a5a6e" font-family="Fira Code" font-size="7">54/52/53 A</text>
+                                <rect x="680" y="110" width="80" height="74" rx="5" fill="#111827" stroke="#f59e0b" stroke-width="0.8"/>
+                                <circle cx="687" cy="118" r="2.5" fill="#f59e0b"/>
+                                <text x="720" y="130" text-anchor="middle" fill="#8896ab" font-family="Fira Sans" font-size="7.5" font-weight="600">CT-1</text>
+                                <text x="720" y="152" text-anchor="middle" fill="#f59e0b" font-family="Fira Code" font-size="14" font-weight="700">48 kW</text>
+                                <text x="720" y="166" text-anchor="middle" fill="#4a5a6e" font-family="Fira Code" font-size="7">72/70/71 A</text>
+                                <rect x="776" y="110" width="80" height="74" rx="5" fill="#111827" stroke="#f59e0b" stroke-width="0.8"/>
+                                <circle cx="783" cy="118" r="2.5" fill="#22c55e"/>
+                                <text x="816" y="130" text-anchor="middle" fill="#8896ab" font-family="Fira Sans" font-size="7.5" font-weight="600">CT-2</text>
+                                <text x="816" y="152" text-anchor="middle" fill="#f59e0b" font-family="Fira Code" font-size="14" font-weight="700">46 kW</text>
+                                <text x="816" y="166" text-anchor="middle" fill="#4a5a6e" font-family="Fira Code" font-size="7">70/68/69 A</text>
+                                <rect x="872" y="110" width="80" height="74" rx="5" fill="#111827" stroke="#eab308" stroke-width="0.8"/>
+                                <circle cx="879" cy="118" r="2.5" fill="#22c55e"/>
+                                <text x="912" y="130" text-anchor="middle" fill="#8896ab" font-family="Fira Sans" font-size="7.5" font-weight="600">GF Ltg</text>
+                                <text x="912" y="152" text-anchor="middle" fill="#eab308" font-family="Fira Code" font-size="14" font-weight="700">68 kW</text>
+                                <text x="912" y="166" text-anchor="middle" fill="#4a5a6e" font-family="Fira Code" font-size="7">103/100/99 A</text>
                             </svg>
                         </div>
                     </div>
@@ -13469,15 +13476,15 @@
                                     const statusText = meter.status === 'on' ? 'Online' : meter.status === 'warn' ? 'Alert' : 'Offline';
                                     const statusClass = meter.status === 'on' ? 'status-online' : meter.status === 'warn' ? 'status-alarm' : 'status-offline';
                                     return `
-                                        <tr>
-                                            <td><div class="meter-root-meter-name">${meter.name}</div><div class="meter-root-meter-location">${meter.loc}</div></td>
+                                        <tr${meter.virtual ? ' style="background:rgba(99,102,241,0.04);"' : ''}>
+                                            <td><div class="meter-root-meter-name">${meter.name}${meter.virtual ? '<span style="display:inline-block;margin-left:6px;padding:1px 5px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818cf8;border-radius:3px;font-size:9px;vertical-align:middle">Virtual</span>' : ''}</div><div class="meter-root-meter-location">${meter.loc}</div></td>
                                             <td class="mono">${meter.code}</td>
                                             <td class="mono" style="color:var(--text-primary);font-weight:600">${meter.p} kW</td>
-                                            <td class="mono">${meter.ia} / ${meter.ib} / ${meter.ic}</td>
-                                            <td class="mono">${meter.va} / ${meter.vb} / ${meter.vc}</td>
+                                            <td class="mono">${meter.virtual ? '<span style="color:var(--text-muted)">Aggregated</span>' : `${meter.ia} / ${meter.ib} / ${meter.ic}`}</td>
+                                            <td class="mono">${meter.virtual ? '<span style="color:var(--text-muted)">--</span>' : `${meter.va} / ${meter.vb} / ${meter.vc}`}</td>
                                             <td class="mono" style="${meter.pf > 0 && meter.pf < 0.9 ? 'color:var(--accent-amber);' : ''}">${meter.pf > 0 ? meter.pf.toFixed(2) : '--'}</td>
                                             <td class="mono">${meter.kwh > 0 ? meter.kwh.toLocaleString() : '--'} kWh</td>
-                                            <td class="mono"><span class="meter-root-load"><span>${loadPct}%</span><span class="meter-root-load-bar"><span class="meter-root-load-fill" style="width:${loadPct}%;background:${loadColor}"></span></span></span></td>
+                                            <td class="mono">${meter.virtual ? '<span style="color:var(--text-muted)">--</span>' : `<span class="meter-root-load"><span>${loadPct}%</span><span class="meter-root-load-bar"><span class="meter-root-load-fill" style="width:${loadPct}%;background:${loadColor}"></span></span></span>`}</td>
                                             <td><span class="status-dot ${statusClass}"></span>${statusText}</td>
                                         </tr>
                                     `;
@@ -13956,11 +13963,11 @@
         let devicePanelExpanded = false;
         let currentDeviceTrendMetric = 'power';
         let currentDeviceTrendRange = 'today';
-        let currentChillerTrendMetric = 'compressor_current';
+        let currentChillerTrendMetric = 'actual_load';
         let chillerAlarmExpanded = false;
-        let currentTowerTrendMetric = 'inlet_temp';
+        let currentTowerTrendMetric = 'power';
         let towerAlarmExpanded = false;
-        let currentPumpTrendMetric = 'flow';
+        let currentPumpTrendMetric = 'power';
         let pumpAlarmExpanded = false;
         let currentAirTrendMetric = 'supply_temp';
         let airAlarmExpanded = false;
@@ -13994,8 +14001,8 @@
             const known = {
                 'CH-1': { status: 'Normal', statusClass: 'status-online', power: 118, today: 1420, load: 85, alarms: 0, runtime: 11.8, metricLabel: 'COP', metricValue: '4.2', trend: [0,0,0,0,0,0,0,95,110,118,125,130,128,132,130,125,118,110,95,0,0,0,0,0] },
                 'CH-2': { status: 'Normal', statusClass: 'status-online', power: 125, today: 1502, load: 90, alarms: 0, runtime: 12.1, metricLabel: 'COP', metricValue: '3.8', trend: [0,0,0,0,0,0,0,98,114,122,128,134,136,138,135,132,126,119,101,0,0,0,0,0] },
-                'CHWP-1': { status: 'Normal', statusClass: 'status-online', power: 18, today: 216, load: 82, alarms: 0, runtime: 12.0, metricLabel: 'Speed', metricValue: '48 Hz', trend: [0,0,0,0,0,0,0,12,15,18,18,19,19,19,18,18,18,17,14,0,0,0,0,0] },
-                'CWP-1': { status: 'Alert', statusClass: 'status-alarm', power: 14, today: 168, load: 94, alarms: 1, runtime: 11.2, metricLabel: 'Speed', metricValue: '50 Hz', trend: [0,0,0,0,0,0,0,10,12,13,14,14,15,15,15,14,13,13,10,0,0,0,0,0] },
+                'CWP-1': { status: 'Normal', statusClass: 'status-online', power: 18, today: 216, load: 82, alarms: 0, runtime: 12.0, metricLabel: 'Speed', metricValue: '48 Hz', trend: [0,0,0,0,0,0,0,12,15,18,18,19,19,19,18,18,18,17,14,0,0,0,0,0] },
+                'CHWP-1': { status: 'Alert', statusClass: 'status-alarm', power: 14, today: 168, load: 94, alarms: 1, runtime: 11.2, metricLabel: 'Speed', metricValue: '50 Hz', trend: [0,0,0,0,0,0,0,10,12,13,14,14,15,15,15,14,13,13,10,0,0,0,0,0] },
                 'CT-1': { status: 'Normal', statusClass: 'status-online', power: 4.8, today: 57, load: 67, alarms: 0, runtime: 10.6, metricLabel: 'Fan', metricValue: 'ON', trend: [0,0,0,0,0,0,0,3,4,4.5,4.8,5.0,5.1,5.0,4.9,4.8,4.7,4.2,3.1,0,0,0,0,0] },
                 'GF1 FCU': { status: 'Offline', statusClass: 'status-offline', power: 0, today: 0, load: 0, alarms: 1, runtime: 0.0, metricLabel: 'Temp', metricValue: '—', trend: Array(24).fill(0) },
                 'GF1 AHU': { status: 'Alert', statusClass: 'status-alarm', power: 9.6, today: 132, load: 58, alarms: 1, runtime: 8.4, metricLabel: 'Airflow', metricValue: 'Low', trend: [0,0,0,0,0,0,0,5,7,9,9.6,10,10.2,10.1,10,9.7,9.2,8.5,6.2,0,0,0,0,0] }
@@ -17344,7 +17351,7 @@
             { key: 'd-001', id: 'D-001', name: 'CH-1 Chiller', type: 'Chiller', system: 'Central Cooling', location: 'Cooling Plant 1F', org: 'Facilities Management', status: 'Normal', meter: '2 meters', noMeter: false, power: '400 kW', capacity: '1,200 kW', brand: 'York', model: 'YCWL-0512', installDate: '2024-06-15', warranty: '2027-06-15' },
             { key: 'd-003', id: 'D-003', name: 'AHU-3', type: 'AHU', system: 'Central Cooling', location: 'FA 3F', org: 'Facilities Management', status: 'Alarm', meter: '1 meter', noMeter: false, power: '15 kW', airflow: '8,000 m³/h', brand: 'Daikin', model: 'AHU-8000', installDate: '2024-06-15' },
             { key: 'd-005', id: 'D-005', name: 'AHU-5', type: 'AHU', system: 'Central Cooling', location: 'FB 2F', org: 'Facilities Management', status: 'Offline', meter: '', noMeter: true, power: '15 kW', airflow: '8,000 m³/h', brand: 'Daikin', model: 'AHU-8000', installDate: '2024-06-15' },
-            { key: 'd-006', id: 'D-006', name: 'CWP-1 Pump', type: 'Pump', system: 'Central Cooling', location: 'Cooling Plant 1F', org: 'Facilities Management', status: 'Normal', meter: '1 meter', noMeter: false, power: '45 kW', brand: 'Grundfos', model: 'CWP-45', installDate: '2024-06-15' },
+            { key: 'd-006', id: 'D-006', name: 'CHWP-1 Pump', type: 'Pump', system: 'Central Cooling', location: 'Cooling Plant 1F', org: 'Facilities Management', status: 'Normal', meter: '1 meter', noMeter: false, power: '45 kW', brand: 'Grundfos', model: 'CWP-45', installDate: '2024-06-15' },
             { key: 'd-009', id: 'D-009', name: 'AHU-1 (Legacy)', type: 'AHU', system: 'Central Cooling', location: 'FA 1F', org: 'Facilities Management', status: 'Disabled', meter: '—', noMeter: false, disabled: true, power: '90 kW', airflow: '7,500 m³/h', brand: 'Daikin', model: 'AHU-7500', installDate: '2024-06-15' }
         ];
         const mdmMeters = [
@@ -17359,7 +17366,7 @@
         const statsScenarioLibrary = [
             { key: 'elec-space', title: 'Electricity by space', desc: 'Building and floor electricity, cost, carbon, and intensity.', unit: 'kWh', tree: 'space', badge: 'MOST USED', tags: [['Electricity', 'blue'], ['By space', 'teal']], color: 'linear-gradient(135deg, #4da3ff, #2563eb)', defaultPaths: [['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Ground Floor'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 1'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 2'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 3']] },
             { key: 'cost-org', title: 'Cost by organization', desc: 'Department cost, budget usage, and per-capita benchmark.', unit: 'MYR', tree: 'org', tags: [['Cost', 'amber'], ['By org', 'purple']], color: 'linear-gradient(135deg, #f59e0b, #d97706)', defaultPaths: [['TAR UMT', 'Administrative Departments', "Registrar's Office"], ['TAR UMT', 'Administrative Departments', 'Finance Department'], ['TAR UMT', 'Academic Departments', 'Faculty of Computing and Information Technology'], ['TAR UMT', 'Academic Departments', 'Faculty of New Energy']] },
-            { key: 'hvac-status', title: 'HVAC equipment status', desc: 'Runtime, load, COP, faults, and availability for HVAC devices.', unit: 'HVAC', tree: 'device', tags: [['HVAC', 'amber'], ['Status', 'purple']], color: 'linear-gradient(135deg, #fb923c, #f97316)', defaultPaths: [['TAR UMT', 'District Cooling System', 'Chiller', 'CH-1 (139kW)'], ['TAR UMT', 'District Cooling System', 'Chiller', 'CH-2 (139kW)'], ['TAR UMT', 'District Cooling System', 'Chilled Water Pump', 'CHWP-1 (22kW)'], ['TAR UMT', 'District Cooling System', 'Cooling Water Pump', 'CWP-1 (15kW)']] },
+            { key: 'hvac-status', title: 'HVAC equipment status', desc: 'Runtime, load, COP, faults, and availability for HVAC devices.', unit: 'HVAC', tree: 'device', tags: [['HVAC', 'amber'], ['Status', 'purple']], color: 'linear-gradient(135deg, #fb923c, #f97316)', defaultPaths: [['TAR UMT', 'District Cooling System', 'Chiller', 'CH-1 (139kW)'], ['TAR UMT', 'District Cooling System', 'Chiller', 'CH-2 (139kW)'], ['TAR UMT', 'District Cooling System', 'Chilled Water Pump', 'CWP-1 (22kW)'], ['TAR UMT', 'District Cooling System', 'Cooling Water Pump', 'CHWP-1 (15kW)']] },
             { key: 'water-space', title: 'Water by space', desc: 'Water use and intensity for buildings and floor scopes.', unit: 'm3', tree: 'space', tags: [['Water', 'teal']], color: 'linear-gradient(135deg, #2dd4bf, #0f766e)', defaultPaths: [['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Ground Floor'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 1'], ['TAR UMT', 'Academic Building'], ['TAR UMT', 'Student Residence']] },
             { key: 'cost-space', title: 'Electricity cost by space', desc: 'Tariff, cost, unit price, and allocation structure.', unit: 'MYR', tree: 'space', tags: [['Cost', 'amber']], color: 'linear-gradient(135deg, #f59e0b, #ea580c)', defaultPaths: [['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Ground Floor'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 1'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 2'], ['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Level 3']] },
             { key: 'carbon-space', title: 'Carbon by space', desc: 'Scope 2 emissions rolled up by building and floor.', unit: 'CO2', tree: 'space', tags: [['Carbon', 'green']], color: 'linear-gradient(135deg, #34d399, #059669)', defaultPaths: [['TAR UMT', 'Bangunan Tun Tan Siew Sin', 'Ground Floor'], ['TAR UMT', 'Academic Building'], ['TAR UMT', 'Student Residence']] },
@@ -20729,7 +20736,7 @@
                     </div>
                     <div class="mdm-section">
                         <div class="mdm-section-label">Upstream / Downstream</div>
-                        ${record.type === 'Chiller' ? `<div class="mdm-ref-list"><div class="mdm-ref-card"><div class="mdm-ref-card-title">D-006 CWP-1 Pump</div><div class="mdm-ref-card-sub">Downstream</div></div><div class="mdm-ref-card"><div class="mdm-ref-card-title">D-007 CT-1 Cooling Tower</div><div class="mdm-ref-card-sub">Downstream</div></div></div>` : '<div class="mdm-empty-note">No linked upstream or downstream equipment.</div>'}
+                        ${record.type === 'Chiller' ? `<div class="mdm-ref-list"><div class="mdm-ref-card"><div class="mdm-ref-card-title">D-006 CHWP-1 Pump</div><div class="mdm-ref-card-sub">Downstream</div></div><div class="mdm-ref-card"><div class="mdm-ref-card-title">D-007 CT-1 Cooling Tower</div><div class="mdm-ref-card-sub">Downstream</div></div></div>` : '<div class="mdm-empty-note">No linked upstream or downstream equipment.</div>'}
                     </div>
                 `;
             }

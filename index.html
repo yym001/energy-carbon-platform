@@ -240,6 +240,29 @@
             background: rgba(59, 130, 246, 0.14);
         }
 
+        .cockpit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 32px;
+            padding: 0 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(71, 85, 105, 0.72);
+            background: rgba(30, 41, 59, 0.9);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all .2s;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .cockpit-btn:hover {
+            border-color: rgba(34, 197, 94, 0.45);
+            background: rgba(34, 197, 94, 0.14);
+        }
+
         .right-nav {
             position: fixed;
             top: var(--topbar-h);
@@ -560,12 +583,16 @@
                 <i data-lucide="sparkles" style="width:13px;height:13px"></i>
                 <span>iRun</span>
             </div>
+            <a href="https://lukidesign.github.io/rundo-energy-carbon-center/index-standalone.html" target="_blank" class="cockpit-btn" id="cockpitBtn" title="Dashboard">
+                <i data-lucide="layout-dashboard" style="width:13px;height:13px"></i>
+                <span id="cockpitText"></span>
+            </a>
             <div class="user-block">
-                <div class="avatar">AD</div>
-                <div class="user-info">
+                <div class="user-info" style="text-align:right;">
                     <span class="user-name" id="userName">Admin</span>
                     <span class="user-role" id="userRole">Energy Manager</span>
                 </div>
+                <div class="avatar">AD</div>
             </div>
         </div>
     </header>
