@@ -1,0 +1,1066 @@
+{
+  "_comment": "Device parameters configuration with name-based matching",
+  "_usage": "Parameters are matched by device name first, then fall back to device type",
+  "devicesByName": {
+    "CH-1": {
+      "type": "chiller",
+      "params": [
+        [
+          "compressor_current",
+          "Compressor Current",
+          "152.3",
+          "A",
+          true
+        ],
+        [
+          "compressor_frequency",
+          "Compressor Frequency",
+          "85",
+          "%",
+          true
+        ],
+        [
+          "evaporator_pressure",
+          "Evaporator Pressure",
+          "4.2",
+          "bar",
+          true
+        ],
+        [
+          "condenser_pressure",
+          "Condenser Pressure",
+          "12.8",
+          "bar",
+          true
+        ],
+        [
+          "chw_outlet_temp",
+          "CHW Outlet Temp",
+          "14.2",
+          "°C",
+          false
+        ],
+        [
+          "chw_return_temp",
+          "CHW Return Temp",
+          "12.8",
+          "°C",
+          true
+        ],
+        [
+          "chw_flow",
+          "CHW Flow",
+          "{meta.flow}",
+          "m³/h",
+          true
+        ],
+        [
+          "chw_delta_t",
+          "CHW Delta T",
+          "1.4",
+          "°C",
+          false
+        ],
+        [
+          "cw_outlet_temp",
+          "CW Outlet Temp",
+          "35.2",
+          "°C",
+          true
+        ],
+        [
+          "cw_return_temp",
+          "CW Return Temp",
+          "30.1",
+          "°C",
+          true
+        ],
+        [
+          "cw_flow",
+          "CW Flow",
+          "145",
+          "m³/h",
+          true
+        ],
+        [
+          "cw_delta_t",
+          "CW Delta T",
+          "5.1",
+          "°C",
+          true
+        ],
+        [
+          "discharge_temp",
+          "Discharge Temp",
+          "78.5",
+          "°C",
+          true
+        ],
+        [
+          "suction_temp",
+          "Suction Temp",
+          "5.2",
+          "°C",
+          true
+        ],
+        [
+          "oil_pressure",
+          "Oil Pressure",
+          "6.8",
+          "bar",
+          true
+        ],
+        [
+          "oil_temp",
+          "Oil Temp",
+          "52",
+          "°C",
+          true
+        ],
+        [
+          "load_rate",
+          "Load Rate",
+          "{profile.load}",
+          "%",
+          true
+        ],
+        [
+          "runtime",
+          "Accumulated Runtime",
+          "12,840",
+          "h",
+          true
+        ]
+      ]
+    },
+    "CH-2": {
+      "type": "chiller",
+      "params": [
+        [
+          "compressor_current",
+          "Compressor Current",
+          "158.7",
+          "A",
+          true
+        ],
+        [
+          "compressor_frequency",
+          "Compressor Frequency",
+          "88",
+          "%",
+          true
+        ],
+        [
+          "evaporator_pressure",
+          "Evaporator Pressure",
+          "4.3",
+          "bar",
+          true
+        ],
+        [
+          "condenser_pressure",
+          "Condenser Pressure",
+          "13.1",
+          "bar",
+          true
+        ],
+        [
+          "chw_outlet_temp",
+          "CHW Outlet Temp",
+          "14.5",
+          "°C",
+          false
+        ],
+        [
+          "chw_return_temp",
+          "CHW Return Temp",
+          "13.0",
+          "°C",
+          true
+        ],
+        [
+          "chw_flow",
+          "CHW Flow",
+          "{meta.flow}",
+          "m³/h",
+          true
+        ],
+        [
+          "chw_delta_t",
+          "CHW Delta T",
+          "1.5",
+          "°C",
+          false
+        ],
+        [
+          "cw_outlet_temp",
+          "CW Outlet Temp",
+          "35.5",
+          "°C",
+          true
+        ],
+        [
+          "cw_return_temp",
+          "CW Return Temp",
+          "30.3",
+          "°C",
+          true
+        ],
+        [
+          "cw_flow",
+          "CW Flow",
+          "148",
+          "m³/h",
+          true
+        ],
+        [
+          "cw_delta_t",
+          "CW Delta T",
+          "5.2",
+          "°C",
+          true
+        ],
+        [
+          "discharge_temp",
+          "Discharge Temp",
+          "79.2",
+          "°C",
+          true
+        ],
+        [
+          "suction_temp",
+          "Suction Temp",
+          "5.4",
+          "°C",
+          true
+        ],
+        [
+          "oil_pressure",
+          "Oil Pressure",
+          "7.0",
+          "bar",
+          true
+        ],
+        [
+          "oil_temp",
+          "Oil Temp",
+          "53",
+          "°C",
+          true
+        ],
+        [
+          "load_rate",
+          "Load Rate",
+          "{profile.load}",
+          "%",
+          true
+        ],
+        [
+          "runtime",
+          "Accumulated Runtime",
+          "13,120",
+          "h",
+          true
+        ]
+      ]
+    },
+    "CT-1": {
+      "type": "tower",
+      "params": [
+        [
+          "inlet_temp",
+          "Inlet Water Temp",
+          "32.1",
+          "°C",
+          true
+        ],
+        [
+          "outlet_temp",
+          "Outlet Water Temp",
+          "28.4",
+          "°C",
+          true
+        ],
+        [
+          "delta_t",
+          "Delta T",
+          "3.7",
+          "°C",
+          true
+        ],
+        [
+          "wet_bulb_temp",
+          "Wet Bulb Temp",
+          "26.2",
+          "°C",
+          true
+        ],
+        [
+          "approach",
+          "Approach",
+          "2.2",
+          "°C",
+          true
+        ],
+        [
+          "cooling_efficiency",
+          "Cooling Efficiency",
+          "63",
+          "%",
+          true
+        ],
+        [
+          "circulation_flow",
+          "Circulation Flow",
+          "{meta.flow}",
+          "m³/h",
+          true
+        ],
+        [
+          "fan_power",
+          "Fan Power",
+          "{profile.power}",
+          "kW",
+          true
+        ],
+        [
+          "fan_frequency",
+          "Fan Frequency",
+          "45",
+          "Hz",
+          true
+        ],
+        [
+          "fan_current",
+          "Fan Current",
+          "82.5",
+          "A",
+          true
+        ],
+        [
+          "fan_vibration",
+          "Fan Vibration",
+          "2.3",
+          "mm/s",
+          true
+        ],
+        [
+          "makeup_water",
+          "Make-up Water Today",
+          "4.8",
+          "m³",
+          true
+        ],
+        [
+          "blowdown",
+          "Blowdown Today",
+          "1.2",
+          "m³",
+          true
+        ],
+        [
+          "concentration_ratio",
+          "Cycles of Concentration",
+          "3.8",
+          "",
+          true
+        ],
+        [
+          "conductivity",
+          "Conductivity",
+          "850",
+          "μS/cm",
+          true
+        ],
+        [
+          "today_energy",
+          "Today Energy",
+          "{profile.today}",
+          "kWh",
+          true
+        ],
+        [
+          "runtime",
+          "Accumulated Runtime",
+          "8,420",
+          "h",
+          true
+        ],
+        [
+          "last_cleaning",
+          "Last Cleaning",
+          "28",
+          "days",
+          true
+        ]
+      ]
+    },
+    "CWP-1": {
+      "type": "pump",
+      "params": [
+        [
+          "frequency",
+          "Operating Frequency",
+          "{context.frequency}",
+          "Hz",
+          true
+        ],
+        [
+          "power",
+          "Real-time Power",
+          "{context.power}",
+          "kW",
+          true
+        ],
+        [
+          "motor_current",
+          "Motor Current",
+          "68.2",
+          "A",
+          true
+        ],
+        [
+          "motor_voltage",
+          "Motor Voltage",
+          "380",
+          "V",
+          true
+        ],
+        [
+          "flow",
+          "Real-time Flow",
+          "{context.flow}",
+          "",
+          true
+        ],
+        [
+          "speed",
+          "Rotational Speed",
+          "1,350",
+          "rpm",
+          true
+        ],
+        [
+          "suction_pressure",
+          "Suction Pressure",
+          "{context.suctionPressure}",
+          "MPa",
+          true
+        ],
+        [
+          "discharge_pressure",
+          "Discharge Pressure",
+          "{context.dischargePressure}",
+          "MPa",
+          true
+        ],
+        [
+          "pressure_delta",
+          "Pressure Delta",
+          "{context.pressureDelta}",
+          "MPa",
+          true
+        ],
+        [
+          "efficiency",
+          "Pump Efficiency",
+          "78.5",
+          "%",
+          true
+        ],
+        [
+          "inlet_temp",
+          "Inlet Water Temp",
+          "{context.inletTemp}",
+          "°C",
+          true
+        ],
+        [
+          "outlet_temp",
+          "Outlet Water Temp",
+          "{context.outletTemp}",
+          "°C",
+          true
+        ],
+        [
+          "bearing_temp_de",
+          "Bearing Temp (DE)",
+          "52",
+          "°C",
+          true
+        ],
+        [
+          "bearing_temp_nde",
+          "Bearing Temp (NDE)",
+          "48",
+          "°C",
+          true
+        ],
+        [
+          "vibration_horizontal",
+          "Vibration (Horizontal)",
+          "1.8",
+          "mm/s",
+          true
+        ],
+        [
+          "vibration_vertical",
+          "Vibration (Vertical)",
+          "1.5",
+          "mm/s",
+          true
+        ],
+        [
+          "today_energy",
+          "Today Energy",
+          "{profile.today || 312}",
+          "kWh",
+          true
+        ],
+        [
+          "runtime",
+          "Accumulated Runtime",
+          "9,650",
+          "h",
+          true
+        ]
+      ]
+    }
+  },
+  "deviceTypes": {
+    "chiller": {
+      "params": [
+        [
+          "compressor_current",
+          "Compressor Current",
+          "152.3",
+          "A",
+          true
+        ],
+        [
+          "compressor_frequency",
+          "Compressor Frequency",
+          "85",
+          "%",
+          true
+        ],
+        [
+          "evaporator_pressure",
+          "Evaporator Pressure",
+          "4.2",
+          "bar",
+          true
+        ],
+        [
+          "condenser_pressure",
+          "Condenser Pressure",
+          "12.8",
+          "bar",
+          true
+        ],
+        [
+          "chw_outlet_temp",
+          "CHW Outlet Temp",
+          "14.2",
+          "°C",
+          false
+        ],
+        [
+          "chw_return_temp",
+          "CHW Return Temp",
+          "12.8",
+          "°C",
+          true
+        ],
+        [
+          "chw_flow",
+          "CHW Flow",
+          "{meta.flow}",
+          "m³/h",
+          true
+        ],
+        [
+          "chw_delta_t",
+          "CHW Delta T",
+          "1.4",
+          "°C",
+          false
+        ],
+        [
+          "cw_outlet_temp",
+          "CW Outlet Temp",
+          "35.2",
+          "°C",
+          true
+        ],
+        [
+          "cw_return_temp",
+          "CW Return Temp",
+          "30.1",
+          "°C",
+          true
+        ],
+        [
+          "cw_flow",
+          "CW Flow",
+          "145",
+          "m³/h",
+          true
+        ],
+        [
+          "cw_delta_t",
+          "CW Delta T",
+          "5.1",
+          "°C",
+          true
+        ],
+        [
+          "discharge_temp",
+          "Discharge Temp",
+          "78.5",
+          "°C",
+          true
+        ],
+        [
+          "suction_temp",
+          "Suction Temp",
+          "5.2",
+          "°C",
+          true
+        ],
+        [
+          "oil_pressure",
+          "Oil Pressure",
+          "6.8",
+          "bar",
+          true
+        ],
+        [
+          "oil_temp",
+          "Oil Temp",
+          "52",
+          "°C",
+          true
+        ],
+        [
+          "load_rate",
+          "Load Rate",
+          "{profile.load}",
+          "%",
+          true
+        ],
+        [
+          "runtime",
+          "Accumulated Runtime",
+          "12,840",
+          "h",
+          true
+        ]
+      ]
+    },
+    "tower": {
+      "params": [
+        [
+          "inlet_temp",
+          "Inlet Water Temp",
+          "32.1",
+          "°C",
+          true
+        ],
+        [
+          "outlet_temp",
+          "Outlet Water Temp",
+          "28.4",
+          "°C",
+          true
+        ],
+        [
+          "delta_t",
+          "Delta T",
+          "3.7",
+          "°C",
+          true
+        ],
+        [
+          "wet_bulb_temp",
+          "Wet Bulb Temp",
+          "26.2",
+          "°C",
+          true
+        ],
+        [
+          "approach",
+          "Approach",
+          "2.2",
+          "°C",
+          true
+        ],
+        [
+          "cooling_efficiency",
+          "Cooling Efficiency",
+          "63",
+          "%",
+          true
+        ],
+        [
+          "circulation_flow",
+          "Circulation Flow",
+          "{meta.flow}",
+          "m³/h",
+          true
+        ],
+        [
+          "fan_power",
+          "Fan Power",
+          "{profile.power}",
+          "kW",
+          true
+        ],
+        [
+          "fan_frequency",
+          "Fan Frequency",
+          "45",
+          "Hz",
+          true
+        ],
+        [
+          "fan_current",
+          "Fan Current",
+          "82.5",
+          "A",
+          true
+        ],
+        [
+          "fan_vibration",
+          "Fan Vibration",
+          "2.3",
+          "mm/s",
+          true
+        ],
+        [
+          "makeup_water",
+          "Make-up Water Today",
+          "4.8",
+          "m³",
+          true
+        ],
+        [
+          "blowdown",
+          "Blowdown Today",
+          "1.2",
+          "m³",
+          true
+        ],
+        [
+          "concentration_ratio",
+          "Cycles of Concentration",
+          "3.8",
+          "",
+          true
+        ],
+        [
+          "conductivity",
+          "Conductivity",
+          "850",
+          "μS/cm",
+          true
+        ],
+        [
+          "today_energy",
+          "Today Energy",
+          "{profile.today}",
+          "kWh",
+          true
+        ],
+        [
+          "runtime",
+          "Accumulated Runtime",
+          "8,420",
+          "h",
+          true
+        ],
+        [
+          "last_cleaning",
+          "Last Cleaning",
+          "28",
+          "days",
+          true
+        ]
+      ]
+    },
+    "pump": {
+      "params": [
+        [
+          "frequency",
+          "Operating Frequency",
+          "{context.frequency}",
+          "Hz",
+          true
+        ],
+        [
+          "power",
+          "Real-time Power",
+          "{context.power}",
+          "kW",
+          true
+        ],
+        [
+          "motor_current",
+          "Motor Current",
+          "{context.isChilled ? '68.2' : '82.6'}",
+          "A",
+          true
+        ],
+        [
+          "motor_voltage",
+          "Motor Voltage",
+          "380",
+          "V",
+          true
+        ],
+        [
+          "flow",
+          "Real-time Flow",
+          "{context.flow}",
+          "",
+          true
+        ],
+        [
+          "speed",
+          "Rotational Speed",
+          "{context.isChilled ? '1,350' : '1,260'}",
+          "rpm",
+          true
+        ],
+        [
+          "suction_pressure",
+          "Suction Pressure",
+          "{context.suctionPressure}",
+          "MPa",
+          true
+        ],
+        [
+          "discharge_pressure",
+          "Discharge Pressure",
+          "{context.dischargePressure}",
+          "MPa",
+          true
+        ],
+        [
+          "pressure_delta",
+          "Pressure Delta",
+          "{context.pressureDelta}",
+          "MPa",
+          true
+        ],
+        [
+          "efficiency",
+          "Pump Efficiency",
+          "{context.isChilled ? '78.5' : '75.2'}",
+          "%",
+          true
+        ],
+        [
+          "inlet_temp",
+          "{context.isChilled ? 'Inlet Water Temp' : 'Inlet Temp (From Tower)'}",
+          "{context.inletTemp}",
+          "°C",
+          true
+        ],
+        [
+          "outlet_temp",
+          "{context.isChilled ? 'Outlet Water Temp' : 'Outlet Temp (To Condenser)'}",
+          "{context.outletTemp}",
+          "°C",
+          true
+        ],
+        [
+          "bearing_temp_de",
+          "Bearing Temp (DE)",
+          "{context.isChilled ? '52' : '56'}",
+          "°C",
+          true
+        ],
+        [
+          "bearing_temp_nde",
+          "Bearing Temp (NDE)",
+          "{context.isChilled ? '48' : '51'}",
+          "°C",
+          true
+        ],
+        [
+          "vibration_horizontal",
+          "Vibration (Horizontal)",
+          "{context.isChilled ? '1.8' : '2.1'}",
+          "mm/s",
+          true
+        ],
+        [
+          "vibration_vertical",
+          "Vibration (Vertical)",
+          "{context.isChilled ? '1.5' : '1.8'}",
+          "mm/s",
+          true
+        ],
+        [
+          "today_energy",
+          "Today Energy",
+          "{profile.today || (context.isChilled ? 312 : 385)}",
+          "kWh",
+          true
+        ],
+        [
+          "runtime",
+          "Accumulated Runtime",
+          "{context.isChilled ? '9,650' : '8,920'}",
+          "h",
+          true
+        ]
+      ]
+    },
+    "ahu": {
+      "params": [
+        [
+          "supply_temp",
+          "Supply Air Temp",
+          "{context.supplyTemp}",
+          "°C",
+          true
+        ],
+        [
+          "return_temp",
+          "Return Air Temp",
+          "{context.returnTemp}",
+          "°C",
+          true
+        ],
+        [
+          "fresh_temp",
+          "Fresh Air Temp",
+          "{context.freshTemp}",
+          "°C",
+          true
+        ],
+        [
+          "mixed_temp",
+          "Mixed Air Temp",
+          "{context.mixedTemp}",
+          "°C",
+          true
+        ],
+        [
+          "supply_rh",
+          "Supply Air Humidity",
+          "{context.supplyRh}",
+          "%RH",
+          true
+        ],
+        [
+          "return_rh",
+          "Return Air Humidity",
+          "{context.returnRh}",
+          "%RH",
+          true
+        ],
+        [
+          "fan_frequency",
+          "Fan Frequency",
+          "{context.fanFrequency}",
+          "Hz",
+          true
+        ],
+        [
+          "fan_power",
+          "Fan Power",
+          "{context.fanPower}",
+          "kW",
+          true
+        ],
+        [
+          "fan_current",
+          "Fan Current",
+          "{context.fanCurrent}",
+          "A",
+          true
+        ],
+        [
+          "airflow",
+          "Real-time Airflow",
+          "{context.airflow}",
+          "m³/h",
+          true
+        ],
+        [
+          "static_pressure",
+          "Static Pressure",
+          "{context.staticPressure}",
+          "Pa",
+          true
+        ],
+        [
+          "filter_dp",
+          "Filter Differential Pressure",
+          "{context.filterDp}",
+          "Pa",
+          true
+        ],
+        [
+          "chw_inlet",
+          "CHW Inlet Temp",
+          "{context.chwInlet}",
+          "°C",
+          true
+        ],
+        [
+          "chw_return",
+          "CHW Return Temp",
+          "{context.chwReturn}",
+          "°C",
+          true
+        ],
+        [
+          "chw_delta",
+          "CHW Delta T",
+          "{context.chwDelta}",
+          "°C",
+          true
+        ],
+        [
+          "water_valve",
+          "Water Valve Position",
+          "{context.valveOpen}",
+          "%",
+          true
+        ],
+        [
+          "fresh_damper",
+          "Fresh Air Damper",
+          "{context.freshDamper}",
+          "%",
+          true
+        ],
+        [
+          "return_damper",
+          "Return Air Damper",
+          "{context.returnDamper}",
+          "%",
+          true
+        ],
+        [
+          "today_energy",
+          "Today Energy",
+          "{context.todayEnergy}",
+          "kWh",
+          true
+        ],
+        [
+          "runtime",
+          "Accumulated Runtime",
+          "{context.runtime}",
+          "h",
+          true
+        ]
+      ]
+    }
+  }
+}

@@ -12690,8 +12690,10 @@
             const transformer = document.getElementById('meterTransformerOverview');
             const root = document.getElementById('meterRootOverview');
             const fallback = document.getElementById('meterDefaultContent');
-            if (!transformer || !root || !fallback) return;
+            const branch = document.getElementById('meterBranchOverview');
+            if (!transformer || !root || !fallback || !branch) return;
             const metric = ['power', 'voltage', 'current', 'pf'].includes(meterRootChartMetric) ? meterRootChartMetric : 'power';
+            branch.style.display = 'none';
             transformer.style.display = 'block';
             root.style.display = 'none';
             fallback.style.display = 'none';
@@ -13300,8 +13302,13 @@
             const warnCount = meters.filter(m => m.status === 'warn').length;
             const totalPower = meters.reduce((sum, meter) => sum + meter.p, 0);
             const totalEnergy = meters.reduce((sum, meter) => sum + meter.kwh, 0);
-            const powerFactorValues = meters.filter(m => m.pf > 0).map(m => m.pf);
-            const avgPf = powerFactorValues.length ? (powerFactorValues.reduce((sum, val) => sum + val, 0) / powerFactorValues.length) : 0;
+            const daysElapsed = new Date().getDate();
+            const monthlyEnergy = (totalEnergy * daysElapsed / 1000).toFixed(1);
+            const lastMonthEnergy = (totalEnergy * 0.93 * daysElapsed / 1000).toFixed(1);
+            const momPct = lastMonthEnergy > 0 ? (((monthlyEnergy - lastMonthEnergy) / lastMonthEnergy) * 100).toFixed(1) : 0;
+            const momColor = momPct > 0 ? 'var(--accent-red)' : 'var(--accent-green)';
+            const momSign = momPct > 0 ? '+' : '';
+            const avgPf = meters.filter(m => m.pf > 0).length ? (meters.filter(m => m.pf > 0).reduce((s, m) => s + m.pf, 0) / meters.filter(m => m.pf > 0).length) : 0;
             const series = buildMeterRootSeries(metric);
 
             root.style.display = 'block';
@@ -13324,14 +13331,13 @@
                         <div class="device-kpi-meta"><span style="color:var(--accent-amber)">+2.1%</span><span class="kpi-meta-note">vs yesterday</span></div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label"><i data-lucide="activity" style="width:14px;height:14px;color:var(--accent-green)"></i>Overall Power Factor</div>
-                        <div class="kpi-value">${avgPf.toFixed(2)}</div>
-                        <div class="device-kpi-meta"><span class="kpi-meta-emphasis">Target ≥0.95</span><span class="kpi-meta-note">${avgPf < 0.95 ? 'Below Target' : 'Normal'}</span></div>
+                        <div class="kpi-label"><i data-lucide="calendar" style="width:14px;height:14px;color:var(--accent-green)"></i>Monthly Energy</div>
+                        <div class="kpi-value">${monthlyEnergy}<small style="font-size:12px;color:var(--text-muted)"> MWh</small></div>
+                        <div class="device-kpi-meta"><span style="color:${momColor}">${momSign}${momPct}%</span><span class="kpi-meta-note">MoM</span></div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label"><i data-lucide="triangle-alert" style="width:14px;height:14px;color:var(--accent-red)"></i>Active Alerts</div>
                         <div class="kpi-value">${warnCount + offlineCount}</div>
-                        <div class="device-kpi-meta">${warnCount + offlineCount ? `<span class="kpi-meta-flag-row"><span class="kpi-meta-flag warning"><span class="status-dot status-alarm"></span>Demand warning 1</span><span class="kpi-meta-flag major"><span class="status-dot status-offline"></span>Overload ${warnCount + 1}</span></span>` : 'No active alerts'}</div>
                     </div>
                 </div>
 
@@ -14660,11 +14666,11 @@
                 const vBudgetTag = document.getElementById('orgBudgetTag');
                 if (vBudgetBar) {
                     vBudgetBar.style.width = Math.min(100, budgetPct) + '%';
-                    vBudgetBar.style.background = budgetPct > 100 ? 'var(--accent-red)' : (budgetPct > 80 ? 'var(--accent-amber)' : 'var(--accent-green)');
+                    vBudgetBar.style.background = budgetPct > 100 ? 'var(--accent-red)' : 'var(--accent-green)';
                 }
                 if (vBudgetTag) {
-                    vBudgetTag.textContent = budgetPct > 100 ? 'Over Limit' : (budgetPct > 80 ? 'Near Limit' : 'Safe Range');
-                    vBudgetTag.className = 'kpi-tag ' + (budgetPct > 100 ? 'bad' : (budgetPct > 80 ? 'warning' : 'good'));
+                    vBudgetTag.textContent = budgetPct > 100 ? 'Alarm' : 'Normal';
+                    vBudgetTag.className = 'kpi-tag ' + (budgetPct > 100 ? 'bad' : 'good');
                 }
 
                 const vCarbon = document.querySelector('#orgCarbonQuotaCard .kpi-value');
@@ -14673,11 +14679,11 @@
                 const vCarbonTag = document.getElementById('orgCarbonTag');
                 if (vCarbonBar) {
                     vCarbonBar.style.width = Math.min(100, carbonPct) + '%';
-                    vCarbonBar.style.background = carbonPct > 100 ? 'var(--accent-red)' : (carbonPct > 80 ? 'var(--accent-amber)' : 'var(--accent-green)');
+                    vCarbonBar.style.background = carbonPct > 100 ? 'var(--accent-red)' : 'var(--accent-green)';
                 }
                 if (vCarbonTag) {
-                    vCarbonTag.textContent = carbonPct > 100 ? 'Exceeded' : (carbonPct > 80 ? 'Alert' : 'Normal');
-                    vCarbonTag.className = 'kpi-tag ' + (carbonPct > 100 ? 'bad' : (carbonPct > 80 ? 'warning' : 'good'));
+                    vCarbonTag.textContent = carbonPct > 100 ? 'Alarm' : 'Normal';
+                    vCarbonTag.className = 'kpi-tag ' + (carbonPct > 100 ? 'bad' : 'good');
                 }
 
                 const vIntensity = document.querySelector('#orgIntensityCard .kpi-value');
