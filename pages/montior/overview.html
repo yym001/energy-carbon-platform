@@ -8921,7 +8921,7 @@
                                     style="width:14px;height:14px;color:var(--accent-green)"></i>Device Online</div>
                             <div class="kpi-value">96% <small
                                     style="font-size:12px;color:var(--text-muted)">24/25</small></div>
-                            <div class="kpi-change down">▼ Stable</div>
+                            <div class="kpi-change down"><i data-lucide="alert-triangle" style="width:12px;height:12px"></i> 3 Alarms</div>
                         </div>
                     </div>
 
@@ -9054,7 +9054,7 @@
                             <div class="kpi-label"><i data-lucide="trending-down" style="width:14px;height:14px;color:var(--accent-green)"></i>Cost Savings vs Baseline (MYR)</div>
                             <div class="kpi-value">1,240 <small style="font-size:12px;color:var(--text-muted)">saved</small></div>
                             <div class="kpi-budget-info">
-                                <span>Compared with baseline month</span>
+                                <span>Compared with last month</span>
                             </div>
                         </div>
                     </div>
@@ -10621,6 +10621,7 @@
             
             updateBreadcrumb(path);
             updateNodeInfo(node);
+            syncEnergyTabsForTree();
             refreshDashboardData();
             if (isSettingsMode) populateSettingsForm();
             
@@ -12254,23 +12255,96 @@
         }
 
         function getMeterRootMeters() {
-            return [
-                { name: 'TTSS Main Electric Meter', loc: 'Main Switch Room', code: 'TTSS-M01', type: 'virtual', virtual: true, p: 1079, ia: 0, ib: 0, ic: 0, va: 229, vb: 230, vc: 229, pf: 0.93, kwh: 9492, cap: 0, status: 'on' },
-                { name: '1# Chiller', loc: 'Switch Room A · 1AT', code: '1AT-01', type: 'hvac', p: 320, ia: 168, ib: 162, ic: 160, va: 228, vb: 230, vc: 229, pf: 0.95, kwh: 2640, cap: 380, status: 'on' },
-                { name: '2# Chiller', loc: 'Switch Room A · 1AT', code: '1AT-02', type: 'hvac', p: 285, ia: 148, ib: 145, ic: 142, va: 229, vb: 230, vc: 228, pf: 0.96, kwh: 2520, cap: 380, status: 'on' },
-                { name: 'CWP-1', loc: 'Switch Room A · 1AT', code: '1AT-03', type: 'hvac', p: 37, ia: 19, ib: 18, ic: 19, va: 230, vb: 229, vc: 230, pf: 0.88, kwh: 312, cap: 55, status: 'on' },
-                { name: 'CHWP-1', loc: 'Switch Room A · 1AT', code: '1AT-05', type: 'hvac', p: 45, ia: 24, ib: 23, ic: 22, va: 229, vb: 230, vc: 229, pf: 0.90, kwh: 385, cap: 55, status: 'on' },
-                { name: 'Cooling Tower B', loc: 'Switch Room A · 1AT', code: '1AT-08', type: 'hvac', p: 48, ia: 25, ib: 24, ic: 24, va: 228, vb: 229, vc: 228, pf: 0.87, kwh: 405, cap: 55, status: 'warn' },
-                { name: 'Ground Floor Lighting', loc: 'Switch Room A · 1AL', code: '1AL-01', type: 'lighting', p: 22, ia: 12, ib: 11, ic: 11, va: 230, vb: 230, vc: 229, pf: 0.92, kwh: 176, cap: 40, status: 'on' },
-                { name: 'Level 2 Lighting', loc: 'Switch Room A · 1AL', code: '1AL-02', type: 'lighting', p: 28, ia: 15, ib: 14, ic: 14, va: 229, vb: 230, vc: 230, pf: 0.93, kwh: 224, cap: 45, status: 'on' },
-                { name: 'Elevator Group Control', loc: 'Switch Room A · 1AP', code: '1AP-01', type: 'power', p: 120, ia: 62, ib: 61, ic: 60, va: 230, vb: 229, vc: 230, pf: 0.85, kwh: 840, cap: 200, status: 'on' },
-                { name: 'AHU-1F-01', loc: 'Switch Room B · 2AT', code: '2AT-01', type: 'hvac', p: 15, ia: 8, ib: 8, ic: 7, va: 229, vb: 230, vc: 229, pf: 0.90, kwh: 128, cap: 30, status: 'on' },
-                { name: 'Data Room UPS', loc: 'Switch Room B · 2AP', code: '2AP-01', type: 'special', p: 85, ia: 44, ib: 43, ic: 43, va: 230, vb: 230, vc: 229, pf: 0.98, kwh: 1360, cap: 120, status: 'on' },
-                { name: 'Kitchen Equipment', loc: 'Switch Room B · 2AP', code: '2AP-02', type: 'special', p: 45, ia: 24, ib: 23, ic: 22, va: 229, vb: 229, vc: 230, pf: 0.82, kwh: 270, cap: 80, status: 'on' },
-                { name: 'EV Chargers', loc: 'Switch Room B · 2AP', code: '2AP-03', type: 'special', p: 0, ia: 0, ib: 0, ic: 0, va: 0, vb: 0, vc: 0, pf: 0, kwh: 0, cap: 60, status: 'off' },
-                { name: 'Level 4 Lighting', loc: 'Switch Room B · 2AL', code: '2AL-01', type: 'lighting', p: 29, ia: 15, ib: 15, ic: 14, va: 230, vb: 229, vc: 230, pf: 0.93, kwh: 232, cap: 45, status: 'on' },
-                { name: 'GF Water Meter', loc: 'Public Area Water Loop', code: 'WM-02', type: 'water', p: 0, ia: 0, ib: 0, ic: 0, va: 0, vb: 0, vc: 0, pf: 0, kwh: 0, cap: 100, status: 'off' }
-            ];
+            const meterRoot = TREES?.meter;
+            const electricNode = meterRoot?.children?.find(child => child?.name === 'Electric Meter');
+            const mainMeter = electricNode?.children?.find(child => child?.name === 'TTSS Main Electric Meter');
+            const branchMeters = Array.isArray(mainMeter?.children) ? mainMeter.children : [];
+
+            if (!branchMeters.length) {
+                return [];
+            }
+
+            const inferType = (name = '') => {
+                const upper = name.toUpperCase();
+                if (upper.includes('LIGHTING')) return 'lighting';
+                if (upper.includes('CH-') || upper.includes('CHWP') || upper.includes('CWP') || upper.includes('CT') || upper.includes('AHU')) return 'hvac';
+                if (upper.includes('UPS') || upper.includes('EV') || upper.includes('SPECIAL')) return 'special';
+                return 'power';
+            };
+
+            const buildMeterCode = (name, index) => {
+                const compact = String(name || '').replace(/\s+METER$/i, '').replace(/[^A-Z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toUpperCase();
+                return compact ? compact : `EM-${String(index + 1).padStart(2, '0')}`;
+            };
+
+            const meters = branchMeters.map((meterNode, index) => {
+                const type = inferType(meterNode?.name || '');
+                const typeBase = { hvac: 210, lighting: 38, power: 95, special: 120 };
+                const typeCap = { hvac: 360, lighting: 80, power: 180, special: 220 };
+                const typePf = { hvac: 0.93, lighting: 0.95, power: 0.9, special: 0.88 };
+
+                const base = typeBase[type] || 90;
+                const cap = typeCap[type] || 180;
+                const seed = (meterNode?.name || '').length + index * 7;
+                const p = Math.max(0, Math.round(base * (0.72 + (seed % 9) * 0.05)));
+                const ia = Math.max(0, Math.round(p * 0.52 + (seed % 5)));
+                const ib = Math.max(0, ia - (seed % 3));
+                const ic = Math.max(0, ia - 1 + (seed % 2));
+                const va = 228 + (seed % 3);
+                const vb = 229 + ((seed + 1) % 2);
+                const vc = 228 + ((seed + 2) % 3);
+                const pf = Math.max(0.82, Math.min(0.99, typePf[type] + ((seed % 5) - 2) * 0.01));
+                const kwh = Math.round(p * 8.1);
+                const isWarn = index % 11 === 7;
+                const isOff = index % 17 === 13;
+                const status = isOff ? 'off' : (isWarn ? 'warn' : 'on');
+
+                return {
+                    name: meterNode?.name || `Meter ${index + 1}`,
+                    loc: 'TTSS Main Electric Meter · Branch',
+                    code: buildMeterCode(meterNode?.name, index),
+                    type,
+                    virtual: false,
+                    p: status === 'off' ? 0 : p,
+                    ia: status === 'off' ? 0 : ia,
+                    ib: status === 'off' ? 0 : ib,
+                    ic: status === 'off' ? 0 : ic,
+                    va: status === 'off' ? 0 : va,
+                    vb: status === 'off' ? 0 : vb,
+                    vc: status === 'off' ? 0 : vc,
+                    pf: status === 'off' ? 0 : Number(pf.toFixed(2)),
+                    kwh: status === 'off' ? 0 : kwh,
+                    cap,
+                    status
+                };
+            });
+
+            const totalPower = meters.reduce((sum, m) => sum + m.p, 0);
+            const totalKwh = meters.reduce((sum, m) => sum + m.kwh, 0);
+            const pfWeight = meters.reduce((sum, m) => sum + (m.pf > 0 ? m.pf * Math.max(m.p, 1) : 0), 0);
+            const pfDenominator = meters.reduce((sum, m) => sum + (m.pf > 0 ? Math.max(m.p, 1) : 0), 0);
+            const avgPf = pfDenominator > 0 ? pfWeight / pfDenominator : 0.93;
+
+            const virtualRow = {
+                name: mainMeter?.name || 'TTSS Main Electric Meter',
+                loc: 'Main Switch Room',
+                code: 'TTSS-M01',
+                type: 'virtual',
+                virtual: true,
+                p: totalPower,
+                ia: 0,
+                ib: 0,
+                ic: 0,
+                va: 229,
+                vb: 230,
+                vc: 229,
+                pf: Number(avgPf.toFixed(2)),
+                kwh: totalKwh,
+                cap: 0,
+                status: 'on'
+            };
+
+            return [virtualRow, ...meters];
         }
 
         function getMeterBranchConfig(node) {
@@ -12384,8 +12458,9 @@
                 const pf = Math.max(0.8, Math.min(1, config.pf + (Math.random() - 0.5) * 0.02));
                 const energy = power / 12;
                 const loadPct = config.rated > 0 ? Math.round((power / config.rated) * 100) : 0;
+                const fullDateTime = `${time.getFullYear()}-${String(time.getMonth() + 1).padStart(2, '0')}-${String(time.getDate()).padStart(2, '0')} ${time.toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
                 rows.push({
-                    time: time.toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                    time: fullDateTime,
                     code: config.code,
                     power: power.toFixed(1),
                     ia: ia.toFixed(1),
@@ -12415,12 +12490,13 @@
             transformer.style.display = 'none';
             root.style.display = 'none';
             fallback.style.display = 'none';
+            const isLightingMeter = /lighting/i.test(node?.name || '');
             branch.innerHTML = `
                 <div class="kpi-grid device-kpi-grid">
                     <div class="kpi-card">
                         <div class="kpi-label"><i data-lucide="gauge" style="width:14px;height:14px;color:var(--accent-indigo)"></i>Real-time Power</div>
                         <div class="kpi-value">${cfg.power}<small style="font-size:12px;color:var(--text-muted)"> kW</small></div>
-                        <div class="device-kpi-meta"><span class="kpi-meta-emphasis">Current ${cfg.current} A</span><span class="kpi-meta-note">Voltage ${cfg.voltage} V</span></div>
+                        <div class="device-kpi-meta"><span class="kpi-meta-emphasis">Current ${isLightingMeter ? '-' : cfg.current + ' A'}</span><span class="kpi-meta-note">Voltage ${isLightingMeter ? '-' : cfg.voltage + ' V'}</span></div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label"><i data-lucide="zap" style="width:14px;height:14px;color:var(--accent-violet)"></i>Today Energy</div>
@@ -12432,11 +12508,6 @@
                         <div class="kpi-value">${cfg.month.toFixed(1)}<small style="font-size:12px;color:var(--text-muted)"> MWh</small></div>
                         <div class="device-kpi-meta"><span class="kpi-meta-emphasis">21 days</span><span class="kpi-meta-note">Est. ${(cfg.month * 1.42).toFixed(1)} MWh</span></div>
                     </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label"><i data-lucide="bar-chart-2" style="width:14px;height:14px;color:var(--accent-green)"></i>Load Rate</div>
-                        <div class="kpi-value">${cfg.loadPct}<small style="font-size:12px;color:var(--text-muted)"> %</small></div>
-                        <div class="device-kpi-meta"><span class="kpi-meta-emphasis">Rated ${cfg.rated} kW</span><span class="kpi-meta-note">Reactive ${cfg.reactive} kvar</span></div>
-                    </div>
                 </div>
 
                 <div class="chart-card">
@@ -12444,8 +12515,8 @@
                         <span class="chart-title">Load Trend</span>
                         <div class="meter-root-filter-group">
                             <button class="meter-root-filter-btn ${meterBranchChartMetric === 'power' ? 'active' : ''}" data-meter-branch-chart="power">Power</button>
-                            <button class="meter-root-filter-btn ${meterBranchChartMetric === 'voltage' ? 'active' : ''}" data-meter-branch-chart="voltage">Voltage</button>
-                            <button class="meter-root-filter-btn ${meterBranchChartMetric === 'current' ? 'active' : ''}" data-meter-branch-chart="current">Current</button>
+                            ${isLightingMeter ? '' : `<button class="meter-root-filter-btn ${meterBranchChartMetric === 'voltage' ? 'active' : ''}" data-meter-branch-chart="voltage">Voltage</button>
+                            <button class="meter-root-filter-btn ${meterBranchChartMetric === 'current' ? 'active' : ''}" data-meter-branch-chart="current">Current</button>`}
                         </div>
                     </div>
                     <div style="padding:16px 20px">
@@ -12468,21 +12539,18 @@
                                     <th>Current A/B/C</th>
                                     <th>Voltage A/B/C</th>
                                     <th>Interval Energy</th>
-                                    <th>Load Rate</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${detailRows.map(row => {
-                                    const loadColor = row.loadPct > 85 ? 'var(--accent-red)' : (row.loadPct > 70 ? 'var(--accent-amber)' : 'var(--accent-green)');
                                     return `
                                         <tr>
                                             <td class="mono">${row.time}</td>
                                             <td class="mono">${row.code}</td>
                                             <td class="mono" style="color:var(--text-primary);font-weight:600">${row.power} kW</td>
-                                            <td class="mono">${row.ia} / ${row.ib} / ${row.ic}</td>
-                                            <td class="mono">${row.va} / ${row.vb} / ${row.vc}</td>
+                                            <td class="mono">${isLightingMeter ? '<span style="color:var(--text-muted)">-</span>' : `${row.ia} / ${row.ib} / ${row.ic}`}</td>
+                                            <td class="mono">${isLightingMeter ? '<span style="color:var(--text-muted)">-</span>' : `${row.va} / ${row.vb} / ${row.vc}`}</td>
                                             <td class="mono">${row.energy} kWh</td>
-                                            <td class="mono"><span class="meter-root-load"><span>${row.loadPct}%</span><span class="meter-root-load-bar"><span class="meter-root-load-fill" style="width:${row.loadPct}%;background:${loadColor}"></span></span></span></td>
                                         </tr>
                                     `;
                                 }).join('')}
@@ -12608,25 +12676,14 @@
             });
             const datasets = {
                 power: [
-                    { label: 'Total Active Power', data: gen(860, 50), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', fill: true },
-                    { label: 'Demand Limit', data: Array(24).fill(1200), borderColor: 'rgba(239,68,68,0.4)', borderDash: [6, 4], fill: false, pointRadius: 0 }
+                    { label: 'Total Active Power', data: gen(860, 50), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', fill: true }
                 ],
-                voltage: [
-                    { label: 'Phase A Voltage', data: gen(228.5, 2, 'flat'), borderColor: '#ef4444', fill: false },
-                    { label: 'Phase B Voltage', data: gen(230.1, 2, 'flat'), borderColor: '#22c55e', fill: false },
-                    { label: 'Phase C Voltage', data: gen(229.3, 2, 'flat'), borderColor: '#3b82f6', fill: false }
-                ],
-                current: [
-                    { label: 'Phase A Current', data: gen(442, 30), borderColor: '#ef4444', fill: false },
-                    { label: 'Phase B Current', data: gen(435, 28), borderColor: '#22c55e', fill: false },
-                    { label: 'Phase C Current', data: gen(435, 28), borderColor: '#3b82f6', fill: false }
-                ],
-                pf: [
-                    { label: 'Power Factor', data: gen(0.947, 0.02, 'flat'), borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', fill: true },
-                    { label: 'Target', data: Array(24).fill(0.95), borderColor: 'rgba(34,197,94,0.4)', borderDash: [6, 4], fill: false, pointRadius: 0 }
-                ]
+                voltage: [],
+                current: [],
+                pf: []
             };
-            return { labels, datasets: datasets[metric] || datasets.power };
+            const noData = metric !== 'power';
+            return { labels, datasets: datasets[metric] || datasets.power, noData };
         }
 
         function renderMainTransformerMeter(node) {
@@ -12639,18 +12696,18 @@
             root.style.display = 'none';
             fallback.style.display = 'none';
             const quality = [
-                ['Voltage Unbalance', '1.2', '%', 'ok', '≤2%'],
-                ['Current Unbalance', '1.8', '%', 'ok', '≤15%'],
-                ['Frequency', '50.02', 'Hz', 'ok', '50±0.2'],
-                ['THDu', '3.8', '%', 'ok', '≤5%'],
-                ['Phase A THDi', '8.2', '%', 'warn', '≤8%'],
-                ['Phase B THDi', '6.5', '%', 'ok', '≤8%'],
-                ['Phase C THDi', '7.1', '%', 'ok', '≤8%'],
-                ['Power Factor', '0.947', '', 'warn', '≥0.95'],
-                ['Phase A Voltage Deviation', '+0.7', '%', 'ok', '±7%'],
-                ['Phase B Voltage Deviation', '-0.4', '%', 'ok', '±7%'],
-                ['Max Phase Current Delta', '7', 'A', 'ok', '--'],
-                ['Zero Sequence Current', '2.8', 'A', 'ok', '≤10A']
+                ['Voltage Unbalance', '-', '', 'na', '≤2%'],
+                ['Current Unbalance', '-', '', 'na', '≤15%'],
+                ['Frequency', '-', '', 'na', '50±0.2'],
+                ['THDu', '-', '', 'na', '≤5%'],
+                ['Phase A THDi', '-', '', 'na', '≤8%'],
+                ['Phase B THDi', '-', '', 'na', '≤8%'],
+                ['Phase C THDi', '-', '', 'na', '≤8%'],
+                ['Power Factor', '-', '', 'na', '≥0.95'],
+                ['Phase A Voltage Deviation', '-', '', 'na', '±7%'],
+                ['Phase B Voltage Deviation', '-', '', 'na', '±7%'],
+                ['Max Phase Current Delta', '-', '', 'na', '--'],
+                ['Zero Sequence Current', '-', '', 'na', '≤10A']
             ];
             transformer.innerHTML = `
                 <div class="meter-demand-energy-row">
@@ -12753,18 +12810,40 @@
             `;
             const series = buildMainTransformerTrend(metric);
             destroyChart('meterTransformerTrendChart');
-            createChart('meterTransformerTrendChart', {
-                type: 'line',
-                data: {
-                    labels: series.labels,
-                    datasets: series.datasets.map(item => ({ ...item, tension: 0.4, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4 }))
-                },
-                options: {
-                    ...CHART_DEFAULTS,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: { ...CHART_DEFAULTS.plugins, legend: { ...CHART_DEFAULTS.plugins.legend, display: true } }
+            if (series.noData) {
+                const trendCanvas = document.getElementById('meterTransformerTrendChart');
+                if (trendCanvas) {
+                    trendCanvas.style.display = 'none';
+                    let placeholder = trendCanvas.parentElement.querySelector('.no-data-placeholder');
+                    if (!placeholder) {
+                        placeholder = document.createElement('div');
+                        placeholder.className = 'no-data-placeholder';
+                        placeholder.style.cssText = 'display:flex;align-items:center;justify-content:center;height:220px;color:var(--text-muted);font-size:14px;';
+                        trendCanvas.parentElement.appendChild(placeholder);
+                    }
+                    placeholder.style.display = 'flex';
+                    placeholder.textContent = 'Virtual meter — No data available for this metric';
                 }
-            });
+            } else {
+                const trendCanvas = document.getElementById('meterTransformerTrendChart');
+                if (trendCanvas) {
+                    trendCanvas.style.display = '';
+                    const placeholder = trendCanvas.parentElement.querySelector('.no-data-placeholder');
+                    if (placeholder) placeholder.style.display = 'none';
+                }
+                createChart('meterTransformerTrendChart', {
+                    type: 'line',
+                    data: {
+                        labels: series.labels,
+                        datasets: series.datasets.map(item => ({ ...item, tension: 0.4, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4 }))
+                    },
+                    options: {
+                        ...CHART_DEFAULTS,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: { ...CHART_DEFAULTS.plugins, legend: { ...CHART_DEFAULTS.plugins.legend, display: true } }
+                    }
+                });
+            }
             drawMeterDemandGauge('meterTransformerGauge', 860, 1200);
             const barsWrap = document.getElementById('meterTransformerDailyBars');
             if (barsWrap) {
@@ -12909,8 +12988,9 @@
                 const intervalUsage = Math.max(0.8, flow / 12 + (Math.random() - 0.5) * 0.2);
                 total += intervalUsage;
                 todayUsage = Math.max(0, todayUsage - intervalUsage * 0.35 + (Math.random() - 0.5) * 0.1);
+                const fullDateTime = `${time.getFullYear()}-${String(time.getMonth() + 1).padStart(2, '0')}-${String(time.getDate()).padStart(2, '0')} ${time.toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
                 rows.push({
-                    time: time.toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                    time: fullDateTime,
                     code: config.code,
                     flow: flow.toFixed(1),
                     pressure: pressure.toFixed(2),
@@ -13060,6 +13140,7 @@
             const metric = ['flow', 'pressure', 'usage'].includes(meterRootChartMetric) ? meterRootChartMetric : 'flow';
             const config = getWaterMeterConfig(node);
             const detailRows = buildWaterMainDetailRows(config);
+            const hideDetailPressureColumn = node?.name === 'Cooling Energy Meter 1';
             const series = buildWaterMainTrend(config, metric);
             branch.style.display = 'none';
             transformer.style.display = 'block';
@@ -13139,7 +13220,7 @@
                                     <th>Time</th>
                                     <th>Meter ID</th>
                                     <th>Real-time Flow</th>
-                                    <th>Pressure</th>
+                                    ${hideDetailPressureColumn ? '' : '<th>Pressure</th>'}
                                     <th>Interval Usage</th>
                                     <th>Total Reading</th>
                                     <th>Status</th>
@@ -13151,7 +13232,7 @@
                                         <td class="mono">${row.time}</td>
                                         <td class="mono">${row.code}</td>
                                         <td class="mono" style="color:var(--text-primary);font-weight:600">${row.flow} m³/h</td>
-                                        <td class="mono">${row.pressure} bar</td>
+                                        ${hideDetailPressureColumn ? '' : `<td class="mono">${row.pressure} bar</td>`}
                                         <td class="mono">${row.intervalUsage} m³</td>
                                         <td class="mono">${row.total} m³</td>
                                         <td><span class="status-dot ${row.status === 'Watch' ? 'status-alarm' : row.status === 'Offline' ? 'status-offline' : 'status-online'}"></span>${row.status}</td>
@@ -13463,9 +13544,7 @@
                                     <th>Real-time Power</th>
                                     <th>Current A/B/C</th>
                                     <th>Voltage A/B/C</th>
-                                    <th>Power Factor</th>
                                     <th>Today Energy</th>
-                                    <th>Load Rate</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -13480,11 +13559,9 @@
                                             <td><div class="meter-root-meter-name">${meter.name}${meter.virtual ? '<span style="display:inline-block;margin-left:6px;padding:1px 5px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818cf8;border-radius:3px;font-size:9px;vertical-align:middle">Virtual</span>' : ''}</div><div class="meter-root-meter-location">${meter.loc}</div></td>
                                             <td class="mono">${meter.code}</td>
                                             <td class="mono" style="color:var(--text-primary);font-weight:600">${meter.p} kW</td>
-                                            <td class="mono">${meter.virtual ? '<span style="color:var(--text-muted)">Aggregated</span>' : `${meter.ia} / ${meter.ib} / ${meter.ic}`}</td>
-                                            <td class="mono">${meter.virtual ? '<span style="color:var(--text-muted)">--</span>' : `${meter.va} / ${meter.vb} / ${meter.vc}`}</td>
-                                            <td class="mono" style="${meter.pf > 0 && meter.pf < 0.9 ? 'color:var(--accent-amber);' : ''}">${meter.pf > 0 ? meter.pf.toFixed(2) : '--'}</td>
+                                            <td class="mono">${meter.type === 'lighting' ? '<span style="color:var(--text-muted)">-</span>' : (meter.virtual ? '<span style="color:var(--text-muted)">Aggregated</span>' : `${meter.ia} / ${meter.ib} / ${meter.ic}`)}</td>
+                                            <td class="mono">${meter.type === 'lighting' ? '<span style="color:var(--text-muted)">-</span>' : (meter.virtual ? '<span style="color:var(--text-muted)">--</span>' : `${meter.va} / ${meter.vb} / ${meter.vc}`)}</td>
                                             <td class="mono">${meter.kwh > 0 ? meter.kwh.toLocaleString() : '--'} kWh</td>
-                                            <td class="mono">${meter.virtual ? '<span style="color:var(--text-muted)">--</span>' : `<span class="meter-root-load"><span>${loadPct}%</span><span class="meter-root-load-bar"><span class="meter-root-load-fill" style="width:${loadPct}%;background:${loadColor}"></span></span></span>`}</td>
                                             <td><span class="status-dot ${statusClass}"></span>${statusText}</td>
                                         </tr>
                                     `;
@@ -13574,8 +13651,9 @@
                     illuminance,
                     scene,
                     rated,
-                    zones,
-                    lightbar
+                    zones: zones.map(z => [z[0], 'na', null]),
+                    lightbar,
+                    noFieldData: true
                 };
             });
 
@@ -13586,10 +13664,10 @@
             return {
                 kpis: [
                     ['Lighting Units', totalFixtures.toLocaleString(), '', `Covered across ${floorNodes.length} floors`, '#eab308'],
-                    ['Lights On', lightingOn.toLocaleString(), '', `Lighting rate ${((lightingOn / Math.max(totalFixtures, 1)) * 100).toFixed(1)}%`, 'var(--accent-green)'],
+                    ['Lights On', '-', '', 'No field data', 'var(--text-muted)'],
                     ['Today Energy', totalEnergy.toFixed(1), 'kWh', '-4.6% vs yesterday', 'var(--accent-amber)'],
-                    ['Average Illuminance', String(avgLux), 'lux', 'Compliance 94.2%', 'var(--accent-blue)'],
-                    ['Active Strategies', String(Math.min(6, floorNodes.length + 1)), '', 'Timer 4 · Scene 2', 'var(--accent-cyan)']
+                    ['Average Illuminance', '-', '', 'No field data', 'var(--text-muted)'],
+                    ['Active Strategies', '-', '', 'No field data', 'var(--text-muted)']
                 ],
                 schedules: buildLightingSchedules(configuredScenes),
                 sceneOptions: sceneDefinitions,
@@ -13668,8 +13746,8 @@
                     <div class="lighting-floor-zones">
                         ${floor.zones.map(zone => `
                             <div class="lighting-zone-item">
-                                <span class="lighting-zone-label"><span class="lighting-zone-dot ${zone[1]}"></span>${zone[0]}</span>
-                                <span class="lighting-zone-value">${zone[1] === 'on' ? 'On' : zone[1] === 'dim' ? 'Dim' : 'Off'}${zone[2] !== null ? ` · ${zone[2]} lx` : ''}</span>
+                                <span class="lighting-zone-label"><span class="lighting-zone-dot ${zone[1] === 'na' ? 'off' : zone[1]}"></span>${zone[0]}</span>
+                                <span class="lighting-zone-value">${zone[1] === 'na' ? '-' : (zone[1] === 'on' ? 'On' : zone[1] === 'dim' ? 'Dim' : 'Off')}${zone[1] === 'na' ? '' : (zone[2] !== null ? ` · ${zone[2]} lx` : '')}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -13693,19 +13771,15 @@
             `).join('');
             const circuitCardsHtml = isSingleFloorScope && data.floors[0]
                 ? data.floors[0].zones.map((zone, index) => {
-                    const circuitRate = zone[1] === 'on' ? 100 : zone[1] === 'dim' ? 55 : 0;
-                    const circuitBar = Array.from({ length: 16 }, (_, segIndex) => {
-                        const onSegments = Math.round(16 * (circuitRate / 100));
-                        if (segIndex < onSegments) return 'on';
-                        if (segIndex === onSegments && circuitRate > 0 && circuitRate < 100) return 'dim';
-                        return 'off';
-                    });
+                    const isNa = zone[1] === 'na';
+                    const circuitRate = isNa ? 0 : (zone[1] === 'on' ? 100 : zone[1] === 'dim' ? 55 : 0);
+                    const circuitBar = Array(16).fill('off');
                     const circuitEnergy = Math.max(0.4, Number((data.floors[0].energy / Math.max(data.floors[0].zones.length, 1) * (circuitRate === 0 ? 0.35 : circuitRate === 55 ? 0.72 : 1)).toFixed(1)));
                     return `
                         <div class="lighting-floor-card">
                             <div class="lighting-floor-top">
                                 <div class="lighting-floor-name">${zone[0]} Circuit</div>
-                                <div class="lighting-floor-rate" style="color:${circuitRate >= 75 ? '#f5c542' : (circuitRate >= 40 ? 'var(--accent-amber)' : 'var(--text-muted)')}">${circuitRate}%</div>
+                                <div class="lighting-floor-rate" style="color:var(--text-muted)">${isNa ? '-' : circuitRate + '%'}</div>
                             </div>
                             <div class="lighting-ratio-wrap">
                                 <div class="lighting-lightbar">
@@ -13714,15 +13788,15 @@
                             </div>
                             <div class="lighting-floor-zones">
                                 <div class="lighting-zone-item">
-                                    <span class="lighting-zone-label"><span class="lighting-zone-dot ${zone[1]}"></span>Current Status</span>
-                                    <span class="lighting-zone-value">${zone[1] === 'on' ? 'On' : zone[1] === 'dim' ? 'Dim' : 'Off'}</span>
+                                    <span class="lighting-zone-label"><span class="lighting-zone-dot off"></span>Current Status</span>
+                                    <span class="lighting-zone-value">${isNa ? '-' : (zone[1] === 'on' ? 'On' : zone[1] === 'dim' ? 'Dim' : 'Off')}</span>
                                 </div>
                                 <div class="lighting-zone-item">
-                                    <span class="lighting-zone-label"><span class="lighting-zone-dot ${zone[1]}"></span>Measured Illuminance</span>
-                                    <span class="lighting-zone-value">${zone[2] !== null ? `${zone[2]} lx` : '--'}</span>
+                                    <span class="lighting-zone-label"><span class="lighting-zone-dot off"></span>Measured Illuminance</span>
+                                    <span class="lighting-zone-value">${isNa ? '-' : (zone[2] !== null ? `${zone[2]} lx` : '-')}</span>
                                 </div>
                                 <div class="lighting-zone-item">
-                                    <span class="lighting-zone-label"><span class="lighting-zone-dot ${zone[1]}"></span>Control Scope</span>
+                                    <span class="lighting-zone-label"><span class="lighting-zone-dot off"></span>Control Scope</span>
                                     <span class="lighting-zone-value">${index + 1}/${data.floors[0].zones.length} Circuits</span>
                                 </div>
                             </div>
@@ -14776,12 +14850,56 @@
             }
 
             const getTimeLabel = () => {
-                const now = new Date();
-                if (currentTime === 'today') return now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-                if (currentTime === 'month') return now.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
-                if (currentTime === 'year') return now.getFullYear().toString();
-                if (currentTime === 'week') return 'This Week';
-                return 'Custom';
+                const pad2 = (n) => String(n).padStart(2, '0');
+                const formatDate = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+                const formatDateTime = (d) => `${formatDate(d)} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+
+                if (currentTime === 'today') {
+                    const now = new Date();
+                    const isTodaySelected = baseDate.toDateString() === now.toDateString();
+                    if (isTodaySelected) {
+                        // Show latest available timestamp up to now for today.
+                        return formatDateTime(now);
+                    }
+                    const endOfSelectedDay = new Date(baseDate);
+                    endOfSelectedDay.setHours(23, 59, 0, 0);
+                    return formatDateTime(endOfSelectedDay);
+                }
+
+                if (currentTime === 'week') {
+                    const start = new Date(baseDate);
+                    start.setDate(baseDate.getDate() - baseDate.getDay());
+                    const end = new Date(start);
+                    end.setDate(start.getDate() + 6);
+                    return `${formatDate(start)} - ${formatDate(end)}`;
+                }
+
+                if (currentTime === 'month') {
+                    return `${baseDate.getFullYear()}-${pad2(baseDate.getMonth() + 1)}`;
+                }
+
+                if (currentTime === 'year') {
+                    return String(baseDate.getFullYear());
+                }
+
+                if (currentTime === 'custom') {
+                    // Always prefer the custom range selected by user.
+                    if (startDateInput?.value && endDateInput?.value) {
+                        const start = new Date(startDateInput.value);
+                        const end = new Date(endDateInput.value);
+                        if (!Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime()) && start <= end) {
+                            return `${formatDate(start)} - ${formatDate(end)}`;
+                        }
+                    }
+                    if (customDateRange) {
+                        return `${formatDate(customDateRange.start)} - ${formatDate(customDateRange.end)}`;
+                    }
+                    if (customRangeLabel) {
+                        return customRangeLabel;
+                    }
+                }
+
+                return formatDateTime(new Date());
             };
             const timeLabel = getTimeLabel();
             const isElec = currentEnergy === 'elec';
@@ -15455,18 +15573,24 @@
             const tabs = document.querySelectorAll('.energy-tab');
             const tabsWrap = document.getElementById('energyTabs');
             const tabsDivider = document.getElementById('energyTabsDivider');
-            const hideForMeter = currentTree === 'meter';
-            if (tabsWrap) tabsWrap.style.display = hideForMeter ? 'none' : 'flex';
-            if (tabsDivider) tabsDivider.style.display = hideForMeter ? 'none' : 'block';
+            const hideForMeterOrOrg = currentTree === 'meter' || currentTree === 'org';
+            if (tabsWrap) tabsWrap.style.display = hideForMeterOrOrg ? 'none' : 'flex';
+            if (tabsDivider) tabsDivider.style.display = hideForMeterOrOrg ? 'none' : 'block';
+            // Space sub-nodes: only one water meter in project, hide water tab for non-root
+            const spaceSubNode = currentTree === 'space' && selectedDepth > 0;
             tabs.forEach(tab => {
                 const isWater = tab.dataset.energy === 'water';
-                const disabled = currentTree === 'org' && isWater;
+                const disabled = (currentTree === 'org' && isWater) || (spaceSubNode && isWater);
                 tab.classList.toggle('disabled', disabled);
                 tab.setAttribute('aria-disabled', disabled ? 'true' : 'false');
-                tab.title = disabled ? 'Water view is not available for organization tree in this phase' : (isWater ? 'Water' : 'Electricity');
+                if (disabled && isWater) {
+                    tab.title = spaceSubNode ? 'Only one water meter — water view available at campus level only' : 'Water view is not available for organization tree in this phase';
+                } else {
+                    tab.title = isWater ? 'Water' : 'Electricity';
+                }
             });
 
-            if (currentTree === 'org' && currentEnergy === 'water') {
+            if ((currentTree === 'org' || spaceSubNode) && currentEnergy === 'water') {
                 currentEnergy = 'elec';
                 tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.energy === 'elec'));
             }
@@ -16467,7 +16591,7 @@
             }
 
             const isWater = currentEnergy === 'water';
-            const dataFactor = isWater ? 0.04 : 1; 
+            const dataFactor = isWater ? 0.35 : 1; 
             const scaledElec = elec.map(v => (v * dataFactor).toFixed(isWater ? 1 : 0));
             const scaledBaseline = baseline.map(v => (v * dataFactor).toFixed(isWater ? 1 : 0));
 
@@ -16481,9 +16605,9 @@
                 }
             ];
 
-            if (showBaseline) {
+            if (showBaseline && !isWater) {
                 datasets.push({
-                    label: isWater ? 'Target / Norm' : 'Non-saving Baseline', 
+                    label: 'Non-saving Baseline', 
                     data: scaledBaseline,
                     borderColor: CHART_COLORS.red, borderDash: [6, 3],
                     backgroundColor: 'transparent', fill: false,
