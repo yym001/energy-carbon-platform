@@ -1642,7 +1642,7 @@
         </div>
         <div class="drawer-foot">
             <button class="btn" onclick="closeDrawer('virtualMeterDrawer')">Cancel</button>
-            <button class="btn btn-primary" onclick="saveVirtualMeter()">Create Virtual Meter</button>
+            <button class="btn btn-primary" id="virtualMeterSaveBtn" onclick="saveVirtualMeter()">Create Virtual Meter</button>
         </div>
     </aside>
 
@@ -2081,6 +2081,10 @@
         function openEditMeter(id) {
             var m = meters.find(function(x){ return x.id === id; });
             if (!m) return;
+            if (m.type === 'Virtual') {
+                openEditVirtualMeter(id);
+                return;
+            }
             editingMeterId = id;
             document.getElementById('meterDrawerTitle').textContent = t('editMeter');
             
@@ -2346,8 +2350,119 @@
         function openVirtualMeterDrawer() {
             editingVirtualMeterId = null;
             document.getElementById('virtualMeterDrawerTitle').textContent = 'New Virtual Meter';
+            document.getElementById('virtualMeterSaveBtn').textContent = 'Create Virtual Meter';
             clearVirtualMeterForm();
             populateMeterSelectors();
+            openDrawer('virtualMeterDrawer');
+        }
+
+        function inferVirtualFormulaType(meter) {
+            if (meter && ['diff', 'sum', 'ratio', 'custom'].includes(meter.formulaType)) {
+                return meter.formulaType;
+            }
+            const formula = (meter && meter.formula) ? meter.formula : '';
+            const plain = formula.replace(/^V\s*=\s*/i, '').trim();
+            const hasPlus = plain.includes('+');
+            const hasMinus = plain.includes('−') || plain.includes(' - ');
+            const hasMultiply = plain.includes('×');
+            if (hasMultiply && (hasPlus || hasMinus)) return 'custom';
+            if (hasMultiply) return 'ratio';
+            if (hasMinus) return 'diff';
+            if (hasPlus) return 'sum';
+            return 'custom';
+        }
+
+        function parseCustomFormulaItems(formula) {
+            const source = (formula || '').replace(/^V\s*=\s*/i, '').trim();
+            if (!source) return [];
+
+            const rows = [];
+            const pattern = /([+-]?)\s*([A-Za-z0-9-]+)\s*(?:×\s*(\d+(?:\.\d+)?)%)?/g;
+            let matched;
+            while ((matched = pattern.exec(source)) !== null) {
+                const operator = matched[1] === '-' ? '-' : '+';
+                const meterId = matched[2] || '';
+                const ratio = matched[3] ? parseFloat(matched[3]) : 100;
+                rows.push({ operator: operator, meterId: meterId, ratio: ratio });
+            }
+            return rows;
+        }
+
+        function openEditVirtualMeter(id) {
+            const meter = meters.find(x => x.id === id);
+            if (!meter) return;
+
+            editingVirtualMeterId = id;
+            document.getElementById('virtualMeterDrawerTitle').textContent = 'Edit Virtual Meter';
+            document.getElementById('virtualMeterSaveBtn').textContent = 'Update Virtual Meter';
+
+            clearVirtualMeterForm();
+            populateMeterSelectors();
+
+            document.getElementById('f_virtualName').value = meter.name || '';
+            document.getElementById('f_virtualMedium').value = meter.meterMedium || '';
+            document.getElementById('f_virtualLocation').value = meter.location || '';
+
+            const method = inferVirtualFormulaType(meter);
+
+            if (method === 'diff') {
+                const plain = (meter.formula || '').replace(/^V\s*=\s*/i, '').trim();
+                const parts = plain.split(/\s*[−-]\s*/).map(x => x.trim()).filter(Boolean);
+                document.getElementById('f_totalMeter').value = parts[0] || '';
+                subMeters = parts.slice(1);
+            } else if (method === 'sum') {
+                const plain = (meter.formula || '').replace(/^V\s*=\s*/i, '').trim();
+                combineMeters = plain.split(/\s*\+\s*/).map(x => x.trim()).filter(Boolean);
+            } else if (method === 'ratio') {
+                const plain = (meter.formula || '').replace(/^V\s*=\s*/i, '').trim();
+                const ratioMatch = plain.match(/^([A-Za-z0-9-]+)\s*×\s*(.+)$/);
+                if (ratioMatch) {
+                    document.getElementById('f_sourceMeterForRatio').value = ratioMatch[1];
+                }
+
+                selectedAllocationMode = meter.allocationMode || 'custom';
+                document.querySelectorAll('.allocation-mode-card').forEach(card => card.classList.remove('selected'));
+                document.getElementById('allocModeAreaConfig').style.display = 'none';
+                document.getElementById('allocModeHeadcountConfig').style.display = 'none';
+                document.getElementById('allocModeCustomConfig').style.display = 'none';
+
+                if (selectedAllocationMode === 'area') {
+                    document.getElementById('allocMode_area').classList.add('selected');
+                    document.getElementById('allocModeAreaConfig').style.display = 'block';
+                    if (meter.targetArea !== undefined) document.getElementById('f_targetArea').value = meter.targetArea;
+                    if (meter.totalArea !== undefined) document.getElementById('f_totalArea').value = meter.totalArea;
+                } else if (selectedAllocationMode === 'headcount') {
+                    document.getElementById('allocMode_headcount').classList.add('selected');
+                    document.getElementById('allocModeHeadcountConfig').style.display = 'block';
+                    if (meter.targetHeadcount !== undefined) document.getElementById('f_targetHeadcount').value = meter.targetHeadcount;
+                    if (meter.totalHeadcount !== undefined) document.getElementById('f_totalHeadcount').value = meter.totalHeadcount;
+                } else {
+                    document.getElementById('allocMode_custom').classList.add('selected');
+                    document.getElementById('allocModeCustomConfig').style.display = 'block';
+                    const percentMatch = plain.match(/(\d+(?:\.\d+)?)%/);
+                    if (percentMatch) {
+                        document.getElementById('f_allocationPercent').value = percentMatch[1];
+                    }
+                }
+            } else {
+                customFormulaItems = Array.isArray(meter.formulaItems) && meter.formulaItems.length
+                    ? meter.formulaItems.map(item => ({
+                        operator: item.operator === '-' ? '-' : '+',
+                        meterId: item.meterId || '',
+                        ratio: item.ratio === undefined ? 100 : item.ratio
+                    }))
+                    : parseCustomFormulaItems(meter.formula);
+
+                if (!customFormulaItems.length) {
+                    customFormulaItems = [{ operator: '+', meterId: '', ratio: 100 }];
+                }
+            }
+
+            selectMethod(method);
+            updateMeterTreeCount('sub');
+            updateMeterTreeCount('combine');
+            renderCustomFormulaRows();
+            updateFormulaPreview();
             openDrawer('virtualMeterDrawer');
         }
 
@@ -2751,6 +2866,7 @@
 
             let formula = '';
             let isValid = false;
+            const virtualExtra = {};
 
             if (selectedMethod === 'diff') {
                 const totalId = document.getElementById('f_totalMeter').value;
@@ -2777,6 +2893,9 @@
                     if (parseFloat(totalArea) <= 0) { showToast('Total area must be greater than 0', 'error'); return; }
                     const ratio = ((parseFloat(targetArea) / parseFloat(totalArea)) * 100).toFixed(1);
                     formula = `${sourceId} × (${targetArea}/${totalArea}) = ${ratio}%`;
+                    virtualExtra.allocationMode = 'area';
+                    virtualExtra.targetArea = parseFloat(targetArea);
+                    virtualExtra.totalArea = parseFloat(totalArea);
                     isValid = true;
                 } else if (selectedAllocationMode === 'headcount') {
                     const targetHC = document.getElementById('f_targetHeadcount').value;
@@ -2785,11 +2904,15 @@
                     if (parseInt(totalHC) <= 0) { showToast('Total headcount must be greater than 0', 'error'); return; }
                     const ratio = ((parseFloat(targetHC) / parseFloat(totalHC)) * 100).toFixed(1);
                     formula = `${sourceId} × (${targetHC}/${totalHC}) = ${ratio}%`;
+                    virtualExtra.allocationMode = 'headcount';
+                    virtualExtra.targetHeadcount = parseInt(targetHC, 10);
+                    virtualExtra.totalHeadcount = parseInt(totalHC, 10);
                     isValid = true;
                 } else if (selectedAllocationMode === 'custom') {
                     const percent = document.getElementById('f_allocationPercent').value;
                     if (!percent || percent <= 0 || percent > 100) { showToast('Please enter a valid percentage (0-100)', 'error'); return; }
                     formula = `${sourceId} × ${percent}%`;
+                    virtualExtra.allocationMode = 'custom';
                     isValid = true;
                 }
             } else if (selectedMethod === 'custom') {
@@ -2799,6 +2922,11 @@
                     return;
                 }
                 formula = customResult.formula;
+                virtualExtra.formulaItems = customFormulaItems.map(item => ({
+                    operator: item.operator === '-' ? '-' : '+',
+                    meterId: item.meterId,
+                    ratio: parseFloat(item.ratio)
+                }));
                 isValid = true;
             }
 
@@ -2807,16 +2935,7 @@
                 return;
             }
 
-            // Generate new ID
-            const prefix = 'V';
-            const maxNum = meters.filter(m => m.id.startsWith(prefix)).reduce((max, m) => {
-                const num = parseInt(m.id.substring(2));
-                return num > max ? num : max;
-            }, 0);
-            const newId = prefix + '-' + String(maxNum + 1).padStart(3, '0');
-
-            const newMeter = {
-                id: newId,
+            const meterPayload = {
                 name: name,
                 type: 'Virtual',
                 meterMedium: medium,
@@ -2842,11 +2961,34 @@
                 description: '',
                 formula: formula,
                 virtual: true,
-                formulaType: selectedMethod
+                formulaType: selectedMethod,
+                allocationMode: virtualExtra.allocationMode || '',
+                targetArea: virtualExtra.targetArea,
+                totalArea: virtualExtra.totalArea,
+                targetHeadcount: virtualExtra.targetHeadcount,
+                totalHeadcount: virtualExtra.totalHeadcount,
+                formulaItems: virtualExtra.formulaItems || []
             };
 
-            meters.push(newMeter);
-            showToast('Virtual meter "' + name + '" created successfully!', 'success');
+            if (editingVirtualMeterId) {
+                const existingMeter = meters.find(m => m.id === editingVirtualMeterId);
+                if (!existingMeter) {
+                    showToast('Virtual meter not found for update', 'error');
+                    return;
+                }
+                Object.assign(existingMeter, meterPayload);
+                showToast('Virtual meter "' + name + '" updated successfully!', 'success');
+            } else {
+                const prefix = 'V';
+                const maxNum = meters.filter(m => m.id.startsWith(prefix)).reduce((max, m) => {
+                    const num = parseInt(m.id.substring(2));
+                    return num > max ? num : max;
+                }, 0);
+                const newId = prefix + '-' + String(maxNum + 1).padStart(3, '0');
+                meters.push(Object.assign({ id: newId }, meterPayload));
+                showToast('Virtual meter "' + name + '" created successfully!', 'success');
+            }
+
             closeDrawer('virtualMeterDrawer');
             saveToLocalStorage();
             applyFilters();
