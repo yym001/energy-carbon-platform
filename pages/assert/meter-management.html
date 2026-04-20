@@ -1470,7 +1470,7 @@
                 <div class="section-divider"><span>Calculation Method</span></div>
                 
                 <!-- Method Selection Cards -->
-                <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:12px;margin-bottom:16px;">
+                <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:12px;margin-bottom:16px;">
                     <div class="method-card" id="card_diff" onclick="selectMethod('diff')" style="cursor:pointer;padding:16px;border-radius:10px;border:2px solid var(--border);background:rgba(15,23,42,0.4);transition:all .2s;">
                         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-blue)"><path d="M12 2v20"/><path d="m17 5-5 5-5-5"/></svg>
@@ -1496,6 +1496,15 @@
                         </div>
                         <div style="font-size:11px;color:var(--text-secondary);line-height:1.5">Allocate a percentage of a source meter's reading</div>
                         <div style="margin-top:8px;font-size:10px;color:var(--text-muted);font-family:var(--font-data)">Example: Source × 24%</div>
+                    </div>
+
+                    <div class="method-card" id="card_custom" onclick="selectMethod('custom')" style="cursor:pointer;padding:16px;border-radius:10px;border:2px solid var(--border);background:rgba(15,23,42,0.4);transition:all .2s;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-cyan)"><path d="M12 3v18"/><path d="M3 12h18"/></svg>
+                            <div style="font-size:14px;font-weight:600;color:var(--text-primary)">Custom Combo</div>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-secondary);line-height:1.5">Freely combine meters with add/subtract and percentage weighting</div>
+                        <div style="margin-top:8px;font-size:10px;color:var(--text-muted);font-family:var(--font-data)">Example: +M-001 − M-012×30%</div>
                     </div>
                 </div>
 
@@ -1607,6 +1616,18 @@
                             <input id="f_allocationPercent" type="number" placeholder="e.g. 24" min="0" max="100" step="0.1" oninput="updateFormulaPreview()">
                             <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Directly enter the percentage to allocate (0-100%)</div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Custom Combination Method Configuration -->
+                <div id="customConfigSection" style="display:none;">
+                    <div class="drawer-form">
+                        <label>Formula Rows<span class="req">*</span></label>
+                        <div style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:11px;color:var(--text-muted)">Configure operator, meter, and ratio per row (0-100%)</span>
+                            <button type="button" class="btn btn-sm" onclick="addCustomFormulaRow()">+ Add Row</button>
+                        </div>
+                        <div id="customFormulaRowsContainer" style="display:flex;flex-direction:column;gap:10px;"></div>
                     </div>
                 </div>
 
@@ -2318,6 +2339,8 @@
         var selectedAllocationMode = null;
         var subMeters = [];
         var combineMeters = [];
+        var customFormulaItems = [];
+        var selectablePhysicalMeters = [];
         var editingVirtualMeterId = null;
 
         function openVirtualMeterDrawer() {
@@ -2339,6 +2362,7 @@
             document.getElementById('diffConfigSection').style.display = 'none';
             document.getElementById('sumConfigSection').style.display = 'none';
             document.getElementById('ratioConfigSection').style.display = 'none';
+            document.getElementById('customConfigSection').style.display = 'none';
             
             // Reset allocation mode
             selectedAllocationMode = null;
@@ -2350,6 +2374,7 @@
             // Clear all meter selections
             subMeters = [];
             combineMeters = [];
+            customFormulaItems = [];
             
             document.getElementById('f_totalMeter').selectedIndex = 0;
             document.getElementById('f_sourceMeterForRatio').selectedIndex = 0;
@@ -2358,6 +2383,8 @@
             document.getElementById('f_totalArea').value = '';
             document.getElementById('f_targetHeadcount').value = '';
             document.getElementById('f_totalHeadcount').value = '';
+
+            renderCustomFormulaRows();
             
             updateFormulaPreview();
         }
@@ -2373,6 +2400,7 @@
             document.getElementById('diffConfigSection').style.display = method === 'diff' ? 'block' : 'none';
             document.getElementById('sumConfigSection').style.display = method === 'sum' ? 'block' : 'none';
             document.getElementById('ratioConfigSection').style.display = method === 'ratio' ? 'block' : 'none';
+            document.getElementById('customConfigSection').style.display = method === 'custom' ? 'block' : 'none';
             
             // Reset allocation mode when switching to ratio
             if (method === 'ratio') {
@@ -2381,6 +2409,11 @@
                 document.getElementById('allocModeAreaConfig').style.display = 'none';
                 document.getElementById('allocModeHeadcountConfig').style.display = 'none';
                 document.getElementById('allocModeCustomConfig').style.display = 'none';
+            }
+
+            if (method === 'custom' && customFormulaItems.length === 0) {
+                customFormulaItems.push({ operator: '+', meterId: '', ratio: 100 });
+                renderCustomFormulaRows();
             }
             
             updateFormulaPreview();
@@ -2403,6 +2436,7 @@
 
         function populateMeterSelectors() {
             const physicalMeters = meters.filter(m => m.type === 'Physical' && m.status === 'Enabled');
+            selectablePhysicalMeters = physicalMeters.map(m => ({ id: m.id, name: m.name }));
             
             // Populate total meter selector (for difference method)
             const totalSelect = document.getElementById('f_totalMeter');
@@ -2430,6 +2464,9 @@
             // Render tree-based selection
             renderMeterTree('sub', physicalMeters);
             renderMeterTree('combine', physicalMeters);
+
+            // Refresh custom combination row selectors
+            renderCustomFormulaRows();
         }
 
         function renderMeterTree(type, meterList) {
@@ -2510,6 +2547,108 @@
             
             const count = type === 'sub' ? subMeters.length : combineMeters.length;
             countElement.textContent = `${count} selected`;
+        }
+
+        function addCustomFormulaRow() {
+            customFormulaItems.push({ operator: '+', meterId: '', ratio: 100 });
+            renderCustomFormulaRows();
+            updateFormulaPreview();
+        }
+
+        function removeCustomFormulaRow(index) {
+            if (customFormulaItems.length <= 1) {
+                showToast('At least one row is required for custom combination', 'error');
+                return;
+            }
+            customFormulaItems.splice(index, 1);
+            renderCustomFormulaRows();
+            updateFormulaPreview();
+        }
+
+        function updateCustomFormulaRowField(index, field, value) {
+            if (!customFormulaItems[index]) return;
+            if (field === 'ratio') {
+                const parsed = parseFloat(value);
+                customFormulaItems[index][field] = isNaN(parsed) ? '' : parsed;
+            } else {
+                customFormulaItems[index][field] = value;
+            }
+            updateFormulaPreview();
+        }
+
+        function renderCustomFormulaRows() {
+            const container = document.getElementById('customFormulaRowsContainer');
+            if (!container) return;
+
+            if (customFormulaItems.length === 0) {
+                container.innerHTML = '<div style="padding:12px;border:1px dashed rgba(120, 142, 180, 0.24);border-radius:10px;background:rgba(15,23,42,0.3);font-size:12px;color:var(--text-muted)">No formula rows yet. Click <strong style="color:var(--text-secondary)">+ Add Row</strong> to start.</div>';
+                return;
+            }
+
+            const meterOptions = selectablePhysicalMeters.length
+                ? selectablePhysicalMeters.map(m => `<option value="${m.id}">${m.id} - ${m.name}</option>`).join('')
+                : '<option value="">No enabled physical meters</option>';
+
+            container.innerHTML = customFormulaItems.map((item, idx) => {
+                const ratioValue = item.ratio === '' || item.ratio === null || item.ratio === undefined ? '' : item.ratio;
+                return `
+                    <div style="display:grid;grid-template-columns:90px 1fr 120px 74px;gap:8px;align-items:center;padding:10px;border:1px solid rgba(120, 142, 180, 0.14);border-radius:10px;background:rgba(15,23,42,0.42);">
+                        <select onchange="updateCustomFormulaRowField(${idx}, 'operator', this.value)" style="padding:8px;border-radius:8px;border:1px solid rgba(120, 142, 180, 0.14);background:rgba(16, 22, 34, 0.96);color:var(--text-primary);font-size:12px;font-family:var(--font-ui);">
+                            <option value="+" ${item.operator === '+' ? 'selected' : ''}>Add (+)</option>
+                            <option value="-" ${item.operator === '-' ? 'selected' : ''}>Minus (-)</option>
+                        </select>
+                        <select onchange="updateCustomFormulaRowField(${idx}, 'meterId', this.value)" style="padding:8px;border-radius:8px;border:1px solid rgba(120, 142, 180, 0.14);background:rgba(16, 22, 34, 0.96);color:var(--text-primary);font-size:12px;font-family:var(--font-ui);">
+                            <option value="">Select meter...</option>
+                            ${meterOptions}
+                        </select>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <input type="number" min="0" max="100" step="0.1" value="${ratioValue}" oninput="updateCustomFormulaRowField(${idx}, 'ratio', this.value)" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(120, 142, 180, 0.14);background:rgba(16, 22, 34, 0.96);color:var(--text-primary);font-size:12px;font-family:var(--font-ui);" />
+                            <span style="font-size:12px;color:var(--text-muted)">%</span>
+                        </div>
+                        <button type="button" class="btn btn-sm" onclick="removeCustomFormulaRow(${idx})" ${customFormulaItems.length === 1 ? 'disabled' : ''}>Delete</button>
+                    </div>`;
+            }).join('');
+
+            customFormulaItems.forEach((item, idx) => {
+                const row = container.children[idx];
+                if (!row) return;
+                const meterSelect = row.querySelectorAll('select')[1];
+                if (meterSelect) meterSelect.value = item.meterId || '';
+            });
+        }
+
+        function buildCustomFormulaResult() {
+            if (customFormulaItems.length === 0) {
+                return { valid: false, formula: 'Waiting for formula rows...', explanation: 'Add at least one row to build a custom formula' };
+            }
+
+            const invalidRatio = customFormulaItems.some(item => item.ratio === '' || isNaN(parseFloat(item.ratio)) || parseFloat(item.ratio) < 0 || parseFloat(item.ratio) > 100);
+            if (invalidRatio) {
+                return { valid: false, formula: 'Invalid ratio', explanation: 'Each row ratio must be between 0% and 100%' };
+            }
+
+            const missingMeter = customFormulaItems.some(item => !item.meterId);
+            if (missingMeter) {
+                return { valid: false, formula: 'Waiting for meter selection...', explanation: 'Select a meter for every formula row' };
+            }
+
+            const ids = customFormulaItems.map(item => item.meterId);
+            if (new Set(ids).size !== ids.length) {
+                return { valid: false, formula: 'Duplicate meter detected', explanation: 'Each meter can only appear once in custom combination' };
+            }
+
+            const expression = customFormulaItems.map((item, index) => {
+                const op = index === 0 ? '' : (item.operator === '-' ? ' - ' : ' + ');
+                const firstPrefix = index === 0 ? (item.operator === '-' ? '-' : '') : '';
+                const ratioText = parseFloat(item.ratio) === 100 ? '' : ` × ${parseFloat(item.ratio).toFixed(1).replace(/\.0$/, '')}%`;
+                return `${op}${firstPrefix}${item.meterId}${ratioText}`;
+            }).join('');
+
+            return {
+                valid: true,
+                formula: expression,
+                explanation: 'Custom combination with per-row operator and ratio (0-100%)'
+            };
         }
 
         function updateFormulaPreview() {
@@ -2593,6 +2732,10 @@
                         explanation = 'Enter the allocation percentage (0-100%)';
                     }
                 }
+            } else if (selectedMethod === 'custom') {
+                const customResult = buildCustomFormulaResult();
+                formula = customResult.formula;
+                explanation = customResult.explanation;
             }
             
             preview.innerHTML = `<div style="width:100%"><div style="font-family:var(--font-data);font-size:15px;margin-bottom:6px;color:var(--accent-cyan)">${formula}</div><div style="font-size:11px;color:var(--text-secondary)">${explanation}</div></div>`;
@@ -2649,6 +2792,14 @@
                     formula = `${sourceId} × ${percent}%`;
                     isValid = true;
                 }
+            } else if (selectedMethod === 'custom') {
+                const customResult = buildCustomFormulaResult();
+                if (!customResult.valid) {
+                    showToast(customResult.explanation, 'error');
+                    return;
+                }
+                formula = customResult.formula;
+                isValid = true;
             }
 
             if (!isValid) {
