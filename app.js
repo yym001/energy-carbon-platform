@@ -137,9 +137,22 @@ function selectSubMenu(moduleId, subMenuName) {
     loadSubMenuPage(moduleId, subMenuName);
 }
 
+// Pages that have been completed and are ready to display.
+// All other sub-pages will show the "under optimization" placeholder instead.
+const COMPLETED_PAGES = new Set([
+    'montior/overview',
+    'montior/settings',
+    'assert/device-management',
+    'assert/meter-management',
+    'system/space-management',
+    'system/organization-management'
+]);
+
 function loadSubMenuPage(moduleId, subMenuName) {
-    // Construct the URL based on module and submenu
-    const url = `./pages/${moduleId}/${subMenuName}.html`;
+    const pageKey = `${moduleId}/${subMenuName}`;
+    const url = COMPLETED_PAGES.has(pageKey)
+        ? `./pages/${moduleId}/${subMenuName}.html`
+        : `./pages/wip.html`;
     const iframe = document.getElementById('contentFrame');
     iframe.src = url;
     console.log(`Loading page: ${url}`);

@@ -11,6 +11,9 @@
         href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+    <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+    <script src="https://unpkg.com/file-saver/dist/FileSaver.min.js"></script>
     <style>
         :root {
             --bg-base: #0b1220;
@@ -1273,6 +1276,82 @@
         }
         .personnel-tag .remove-tag:hover { opacity: 1; }
 
+        /* ===== SECTION PICKER ===== */
+        .section-picker-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .section-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1.5px solid rgba(120, 142, 180, 0.14);
+            background: rgba(16, 22, 34, 0.6);
+            cursor: pointer;
+            transition: all .18s;
+            user-select: none;
+        }
+        .section-card:hover {
+            border-color: rgba(96, 165, 250, 0.28);
+            background: rgba(30, 41, 59, 0.5);
+        }
+        .section-card.selected {
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(59, 130, 246, 0.09);
+        }
+        .section-card-check {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1.5px solid rgba(120, 142, 180, 0.35);
+            flex-shrink: 0;
+            margin-top: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s;
+        }
+        .section-card.selected .section-card-check {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+        .section-card-check svg {
+            width: 10px;
+            height: 10px;
+            color: #fff;
+            display: none;
+        }
+        .section-card.selected .section-card-check svg { display: block; }
+        .section-card-body { flex: 1; min-width: 0; }
+        .section-card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+        .section-card-desc {
+            font-size: 10px;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+        .section-card-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+            line-height: 1;
+            margin-top: 1px;
+        }
+        .section-counter {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+        .section-counter strong {
+            color: var(--accent-blue);
+        }
+
         /* Periodic report indicator */
         .periodic-indicator {
             display: inline-flex;
@@ -1292,7 +1371,73 @@
             background: rgba(100, 116, 139, 0.12);
             color: var(--text-muted);
         }
-    </style>
+    
+        /* ===== TREE SELECTOR STYLES ===== */
+        .selector-box { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 10px; min-height: 38px; background: rgba(16, 22, 34, 0.6); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: all 0.2s; position: relative; align-items: center; }
+        .selector-box:hover { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.05); }
+        .selector-box:empty::before { content: attr(data-placeholder); color: var(--text-muted); font-size: 13px; line-height: 24px; }
+        .sel-tag { background: rgba(59, 130, 246, 0.15); color: #93c5fd; padding: 3px 8px; border-radius: 4px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; }
+        .sel-tag-close { cursor: pointer; opacity: 0.6; }
+        .sel-tag-close:hover { opacity: 1; color: var(--accent-red); }
+
+        .tree-dropdown-popup {
+            display: none;
+            position: absolute;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            z-index: 1050;
+            width: 320px;
+            max-height: 360px;
+            overflow-y: auto;
+            padding: 12px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .tree-dropdown-popup.open {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .tree-dropdown-header {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .tree-dropdown-close {
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        .tree-dropdown-close:hover {
+            color: var(--text-primary);
+        }
+
+        .tree-node { margin-top: 4px; font-size: 13px; }
+        .tree-node-content { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+        .tree-node-content:hover { background: rgba(59, 130, 246, 0.1); }
+        .tree-toggle { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; color: var(--text-muted); }
+        .tree-toggle.expanded { transform: rotate(90deg); color: var(--accent-blue); }
+        .tree-children { margin-left: 20px; border-left: 1px dashed rgba(255, 255, 255, 0.1); padding-left: 6px; display: none; }
+        .tree-children.expanded { display: block; }
+        
+        .tree-checkbox {
+            appearance: none;width: 14px;height: 14px;border: 1px solid var(--border);border-radius: 3px;position: relative;cursor: pointer;background: transparent;
+        }
+        .tree-checkbox:checked { background: var(--accent-blue); border-color: var(--accent-blue); }
+        .tree-checkbox:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+        .tree-search-wrap { position: relative; margin-bottom: 8px; }
+        .tree-search-input { width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 5px; padding: 6px 8px 6px 30px; font-size: 12px; color: var(--text-primary); outline: none; }
+        .tree-search-input:focus { border-color: var(--accent-blue); }
+        .tree-search-input::placeholder { color: var(--text-muted); }
+        /* ===== /TREE SELECTOR STYLES ===== */
+</style>
+</style>
 </head>
 
 <body>
@@ -1473,76 +1618,33 @@
                     </div>
                 </div>
 
-                <div class="export-scope-section">
-                    <div class="export-scope-title">Export Scope (select one dimension)</div>
-                    <div class="export-scope-options">
-                        <div class="export-scope-option active" data-scope="space" onclick="setExportScope('space')">By Space</div>
-                        <div class="export-scope-option" data-scope="org" onclick="setExportScope('org')">By Organization</div>
-                        <div class="export-scope-option" data-scope="device" onclick="setExportScope('device')">By Device</div>
-                    </div>
-                    <div class="export-scope-detail visible" id="scopeSpace">
-                        <div class="checkbox-group">
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Block FA</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Block FB</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Library</span><input type="checkbox"></div>
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Dormitory</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Cooling Plant</span><input type="checkbox"></div>
-                        </div>
-                    </div>
-                    <div class="export-scope-detail" id="scopeOrg">
-                        <div class="checkbox-group">
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Faculty of Computing</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Faculty of Engineering</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Library</span><input type="checkbox"></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Student Affairs</span><input type="checkbox"></div>
-                        </div>
-                    </div>
-                    <div class="export-scope-detail" id="scopeDevice">
-                        <div class="checkbox-group">
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CH-1 Chiller</span><input type="checkbox"></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CH-2 Chiller</span><input type="checkbox"></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>AHU-3</span><input type="checkbox"></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CWP-1 Pump</span><input type="checkbox"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-row full">
-                    <div class="form-group">
-                        <label>Additional Metrics</label>
-                        <div class="checkbox-group">
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Equipment Efficiency</span><input type="checkbox"></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Weather Correlation</span><input type="checkbox"></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Carbon Detail</span><input type="checkbox"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            </div>
-
+            </div><!-- /genParamsSection -->
+            <!-- Output Format (shown after template selected for table types) -->
             <div class="form-section" id="genOutputSection" style="display:none">
-                <div class="form-section-title">Step 3: Output & Notify</div>
+                <div class="form-section-title">Output Format</div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Output Format</label>
+                        <label>Format</label>
                         <div class="checkbox-group">
                             <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>PDF</span><input type="checkbox" checked></div>
                             <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Excel</span><input type="checkbox" checked></div>
                             <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CSV</span><input type="checkbox"></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>PNG Charts</span><input type="checkbox"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Language</label>
                         <select class="form-select" id="gen_language">
-                            <option value="en">English (Default)</option>
+                            <option value="en">English</option>
                             <option value="zh">Chinese</option>
                             <option value="bilingual">Bilingual</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-row full">
+            </div>
+            <!-- Push Notification (shown after template selected) -->
+            <div class="form-section" id="genPushSection" style="display:none">
+                <div class="form-section-title">Notification</div>
+                <div class="form-row">
                     <div class="form-group">
                         <label>Notify on Completion</label>
                         <div class="radio-group" id="genNotifyRadios">
@@ -1550,97 +1652,23 @@
                             <div class="radio-item" onclick="setGenNotify('no')"><span class="radio-dot"></span><span>No</span></div>
                         </div>
                     </div>
-                </div>
-                <div class="form-row full">
                     <div class="form-group">
-                        <label>Recipients</label>
-                        <input class="form-input" id="gen_recipients" placeholder="admin@utar.edu.my, weiming@utar.edu.my">
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-section" id="genPushSection" style="display:none">
-                <div class="form-section-title">Step 4: Personnel Push</div>
-                <div class="form-row full">
-                    <div class="form-group">
-                        <label>Push Targets (Multi-select)</label>
-                        <div style="position:relative">
-                            <input class="form-input" id="gen_pushTargets_search" placeholder="Search personnel..." oninput="filterPushTargets('gen')" style="margin-bottom:8px">
-                            <div class="personnel-dropdown" id="gen_pushTargets_dropdown">
-                                <div class="personnel-item selected" data-id="p1" onclick="togglePersonnel('gen', 'p1')">
-                                    <span class="personnel-check">✓</span>
-                                    <span class="personnel-name">Ahmad Razak</span>
-                                    <span class="personnel-role">Admin</span>
-                                </div>
-                                <div class="personnel-item selected" data-id="p2" onclick="togglePersonnel('gen', 'p2')">
-                                    <span class="personnel-check">✓</span>
-                                    <span class="personnel-name">Lee Wei Ming</span>
-                                    <span class="personnel-role">Energy Manager</span>
-                                </div>
-                                <div class="personnel-item" data-id="p3" onclick="togglePersonnel('gen', 'p3')">
-                                    <span class="personnel-check">✓</span>
-                                    <span class="personnel-name">Raj Kumar</span>
-                                    <span class="personnel-role">O&M Staff</span>
-                                </div>
-                                <div class="personnel-item" data-id="p4" onclick="togglePersonnel('gen', 'p4')">
-                                    <span class="personnel-check">✓</span>
-                                    <span class="personnel-name">Dr. Lim Siew Hua</span>
-                                    <span class="personnel-role">Department Head</span>
-                                </div>
-                                <div class="personnel-item" data-id="p5" onclick="togglePersonnel('gen', 'p5')">
-                                    <span class="personnel-check">✓</span>
-                                    <span class="personnel-name">Ng Ai Ling</span>
-                                    <span class="personnel-role">Finance Officer</span>
-                                </div>
-                                <div class="personnel-item" data-id="p6" onclick="togglePersonnel('gen', 'p6')">
-                                    <span class="personnel-check">✓</span>
-                                    <span class="personnel-name">Tan Mei Lin</span>
-                                    <span class="personnel-role">Facility Manager</span>
-                                </div>
-                                <div class="personnel-item" data-id="p7" onclick="togglePersonnel('gen', 'p7')">
-                                    <span class="personnel-check">✓</span>
-                                    <span class="personnel-name">Wong Kar Wai</span>
-                                    <span class="personnel-role">Sustainability Lead</span>
-                                </div>
-                                <div class="personnel-item" data-id="p8" onclick="togglePersonnel('gen', 'p8')">
-                                    <span class="personnel-check">✓</span>
-                                    <span class="personnel-name">Sarah Abdullah</span>
-                                    <span class="personnel-role">Campus Director</span>
-                                </div>
-                            </div>
-                            <div class="selected-personnel-tags" id="gen_selectedTags"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Push Channel</label>
-                        <div class="checkbox-group" id="genPushChannels">
+                        <label>Channels</label>
+                        <div class="checkbox-group">
                             <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Email</span><input type="checkbox" checked></div>
                             <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>In-App</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>SMS</span><input type="checkbox"></div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Push Timing</label>
-                        <select class="form-select" id="gen_pushTiming">
-                            <option value="immediate">Immediate</option>
-                            <option value="scheduled">Scheduled</option>
-                        </select>
                     </div>
                 </div>
             </div>
-        </div>
+        </div><!-- /drawer-body generateDrawer -->
         <div class="drawer-footer">
             <button class="btn" onclick="closeGenerateDrawer()">Cancel</button>
-            <button class="btn btn-success" onclick="confirmGenerate()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Generate Report
-            </button>
+            <button class="btn btn-primary" onclick="submitGenerateReport()">Generate</button>
         </div>
-    </aside>
+    </aside><!-- /generateDrawer -->
 
-    <!-- ===== DRAWER: New/Edit Template ===== -->
+    <!-- ===== DRAWER: Template Editor ===== -->
     <div class="drawer-overlay" id="templateDrawerOverlay" onclick="closeTemplateDrawer()"></div>
     <aside class="drawer-panel" id="templateDrawer">
         <div class="drawer-header">
@@ -1650,113 +1678,140 @@
             </button>
         </div>
         <div class="drawer-body">
+            <!-- Basic Info -->
             <div class="form-section">
-                <div class="form-section-title">Basic Information</div>
+                <div class="form-section-title">Basic Info</div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Template Name<span class="req">*</span></label>
-                        <input class="form-input" id="tpl_name" placeholder="e.g. Daily Energy Summary">
+                        <input class="form-input" id="tpl_name" placeholder="e.g. Monthly Energy Summary">
                     </div>
                     <div class="form-group">
-                        <label>Category<span class="req">*</span></label>
-                        <select class="form-select" id="tpl_category" onchange="onCategoryChange()">
+                        <label>Category</label>
+                        <select class="form-select" id="tpl_category" onchange="onCategoryChange()" style="pointer-events:none;opacity:0.7;">
                             <option value="report">📊 Report</option>
-                            <option value="table">📋 Table/Statement</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Report Type<span class="req">*</span></label>
-                        <select class="form-select" id="tpl_type" onchange="onTypeChange()">
-                            <option value="daily">Daily Report</option>
-                            <option value="weekly">Weekly Report</option>
-                            <option value="monthly">Monthly Report</option>
-                            <option value="custom">Custom Report</option>
+                        <label>Type<span class="req">*</span></label>
+                        <select class="form-select" id="tpl_type" onchange="onTypeChange()"></select>
+                    </div>
+                </div>
+            </div>
+            <!-- Schedule -->
+            <div class="form-section">
+                <div class="form-section-title">Schedule</div>
+                <!-- Recurrence mode row (hidden for Custom type) -->
+                <div class="form-row" id="periodicRow">
+                    <div class="form-group" style="flex:1">
+                        <label>Recurrence Mode</label>
+                        <div class="radio-group" id="periodicRadios">
+                            <div class="radio-item selected" onclick="setPeriodic('no')"><span class="radio-dot"></span><span>One-time</span></div>
+                            <div class="radio-item" onclick="setPeriodic('yes')"><span class="radio-dot"></span><span>Periodic</span></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Periodic detail: weekly day selector + time range -->
+                <div class="form-row" id="weekdayRow" style="display:none">
+                    <div class="form-group">
+                        <label>每周执行日</label>
+                        <select class="form-select" id="tpl_weekday">
+                            <option value="1">周一</option>
+                            <option value="2">周二</option>
+                            <option value="3">周三</option>
+                            <option value="4">周四</option>
+                            <option value="5">周五</option>
+                            <option value="6">周六</option>
+                            <option value="0">周日</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-row" id="periodicRow">
+                <div class="form-row" id="weekdayRangeRow" style="display:none">
                     <div class="form-group">
-                        <label>Is Periodic Report</label>
-                        <div style="display:flex;gap:8px;margin-top:4px">
-                            <button type="button" class="btn" id="periodicYesBtn" onclick="setPeriodic('yes')" style="flex:1">Yes, Recurring</button>
-                            <button type="button" class="btn" id="periodicNoBtn" onclick="setPeriodic('no')" style="flex:1">No, One-time</button>
+                        <label>统计开始时间</label>
+                        <input class="form-input" type="datetime-local" id="tpl_weekly_from">
+                    </div>
+                    <div class="form-group">
+                        <label>统计结束时间</label>
+                        <input class="form-input" type="datetime-local" id="tpl_weekly_to">
+                    </div>
+                </div>
+                <!-- Periodic detail: monthly day selector + time range -->
+                <div class="form-row" id="monthdayRow" style="display:none">
+                    <div class="form-group">
+                        <label>每月执行日</label>
+                        <input class="form-input" type="number" id="tpl_monthday" min="1" max="28" value="1" placeholder="1–28">
+                    </div>
+                </div>
+                <div class="form-row" id="monthdayRangeRow" style="display:none">
+                    <div class="form-group">
+                        <label>统计开始时间</label>
+                        <input class="form-input" type="datetime-local" id="tpl_monthly_from">
+                    </div>
+                    <div class="form-group">
+                        <label>统计结束时间</label>
+                        <input class="form-input" type="datetime-local" id="tpl_monthly_to">
+                    </div>
+                </div>
+                <!-- Periodic detail: daily time range -->
+                <div class="form-row" id="dailyTimeRow" style="display:none">
+                    <div class="form-group">
+                        <label>统计开始时间</label>
+                        <input class="form-input" type="datetime-local" id="tpl_daily_from">
+                    </div>
+                    <div class="form-group">
+                        <label>统计结束时间</label>
+                        <input class="form-input" type="datetime-local" id="tpl_daily_to">
+                    </div>
+                </div>
+                <!-- Custom type: date-time range -->
+                <div id="timeRangeRow" style="display:none">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Start Date &amp; Time</label>
+                            <input class="form-input" type="datetime-local" id="tpl_from">
+                        </div>
+                        <div class="form-group">
+                            <label>End Date &amp; Time</label>
+                            <input class="form-input" type="datetime-local" id="tpl_to">
                         </div>
                     </div>
                 </div>
-                <div class="form-row" id="timeRangeRow" style="display:none">
-                    <div class="form-group">
-                        <label>Start Date & Time</label>
-                        <input class="form-input" type="text" id="tpl_startDateTime" placeholder="YYYY-MM-DD HH:mm" onfocus="this.type='datetime-local'" onblur="if(!this.value)this.type='text'">
-                    </div>
-                    <div class="form-group">
-                        <label>End Date & Time</label>
-                        <input class="form-input" type="text" id="tpl_endDateTime" placeholder="YYYY-MM-DD HH:mm" onfocus="this.type='datetime-local'" onblur="if(!this.value)this.type='text'">
-                    </div>
-                </div>
             </div>
-
+            <!-- Data Scope -->
             <div class="form-section">
                 <div class="form-section-title">Data Scope</div>
-                <div class="export-scope-section">
-                    <div class="export-scope-title">Export Scope (select one dimension)</div>
-                    <div class="export-scope-options" id="tplExportScope">
-                        <div class="export-scope-option active" data-scope="space" onclick="setTplExportScope('space')">By Space</div>
-                        <div class="export-scope-option" data-scope="org" onclick="setTplExportScope('org')">By Organization</div>
-                        <div class="export-scope-option" data-scope="device" onclick="setTplExportScope('device')">By Device</div>
-                    </div>
-                    <div class="export-scope-detail visible" id="tplScopeSpace">
-                        <div class="checkbox-group">
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Block FA</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Block FB</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Library</span><input type="checkbox"></div>
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Dormitory</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Cooling Plant</span><input type="checkbox"></div>
+                <div class="export-scope-section" style="padding:0;">
+                    <div class="form-row full" style="display:flex;flex-direction:column;gap:12px;">
+                        <div class="form-group" style="margin-top:10px;">
+                            <label style="font-size:11px;margin-bottom:6px;">By Space</label>
+                            <div class="selector-box" id="selBox-space" data-placeholder="Click to select Spaces..." onclick="openTreeSelector('space')"></div>
                         </div>
-                    </div>
-                    <div class="export-scope-detail" id="tplScopeOrg">
-                        <div class="checkbox-group">
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Faculty of Computing</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Faculty of Engineering</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Library</span><input type="checkbox"></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Student Affairs</span><input type="checkbox"></div>
+                        <div class="form-group" style="margin-top:10px;">
+                            <label style="font-size:11px;margin-bottom:6px;">By Organization</label>
+                            <div class="selector-box" id="selBox-org" data-placeholder="Click to select Organizations..." onclick="openTreeSelector('org')"></div>
                         </div>
-                    </div>
-                    <div class="export-scope-detail" id="tplScopeDevice">
-                        <div class="checkbox-group">
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CH-1 Chiller</span><input type="checkbox"></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CH-2 Chiller</span><input type="checkbox"></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>AHU-3</span><input type="checkbox"></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>CWP-1 Pump</span><input type="checkbox"></div>
+                        <div class="form-group" style="margin-top:10px;">
+                            <label style="font-size:11px;margin-bottom:6px;">By Equipment/Device</label>
+                            <div class="selector-box" id="selBox-device" data-placeholder="Click to select Equipment..." onclick="openTreeSelector('device')"></div>
+                        </div>
+                        <div class="form-group" style="margin-top:10px;">
+                            <label style="font-size:11px;margin-bottom:6px;">By Meter/System</label>
+                            <div class="selector-box" id="selBox-meter" data-placeholder="Click to select Meters..." onclick="openTreeSelector('meter')"></div>
                         </div>
                     </div>
                 </div>
             </div>
-
             <div class="form-section">
-                <div class="form-section-title">Report Content</div>
+                <div class="form-section-title">Report Sections</div>
                 <div class="form-row full">
                     <div class="form-group">
-                        <label>Include Metrics<span class="req">*</span></label>
-                        <div class="checkbox-group" id="metricCheckboxes">
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Energy Consumption</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Water Consumption</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Carbon Emissions</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Cost Analysis</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Equipment Efficiency</span><input type="checkbox"></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Weather Correlation</span><input type="checkbox"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-row full">
-                    <div class="form-group">
-                        <label>Comparison Dimensions</label>
-                        <div class="checkbox-group" id="compareCheckboxes">
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>MoM (vs Previous)</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>YoY (vs Last Year)</span><input type="checkbox" checked></div>
-                            <div class="checkbox-item" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Budget Comparison</span><input type="checkbox"></div>
-                            <div class="checkbox-item checked" onclick="toggleCb(this)"><span class="cb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Department Ranking</span><input type="checkbox" checked></div>
+                        <label>Select Sections to Include<span class="req">*</span></label>
+                        <div class="section-picker-grid" id="sectionPickerGrid"></div>
+                        <div class="section-counter">
+                            <strong id="sectionSelectedCount">0</strong> sections selected
                         </div>
                     </div>
                 </div>
@@ -1918,18 +1973,353 @@
     </div>
 
     <script>
+        /* ===== REPORT MARKDOWN TEMPLATE (10 sections, demo) ===== */
+        var REPORT_MD_TEMPLATE = [
+            '#拉曼大学 (TAR UMT) 校园能耗与碳排放报告',
+            '> **周期：** 2026年4月 | **生成时间：** {DATE} | **语言：** 中文  ',
+            '> **校区：** Universiti Tunku Abdul Rahman (TAR UMT) 吉隆坡主校区',
+            '',
+            '---',
+            '',
+            '## 1. 核心指标总览 (Executive Summary)',
+            '',
+            '本周期内核心能效 KPI 与既定目标的对比情况以及历史趋势。整体能耗情况偏高，需要引起重视。',
+            '',
+            '| 指标 Metric | 本期实际 | 基准目标 | 占目标比 | 环比 MoM | 同比 YoY |',
+            '|---|---|---|---|---|---|',
+            '| 总电量 (kWh) | 45,210 | 42,000 | ▲ 7.6% | ▲ 3.2% | ▼ 1.5% |',
+            '| 总水量 (m³) | 1,250 | 1,300 | ▼ 3.8% | ▼ 2.1% | ▼ 4.3% |',
+            '| 碳排 (tCO₂e) | 24.82 | 23.05 | ▲ 7.6% | ▲ 3.2% | ▼ 1.5% |',
+            '| 费用 (RM) | 16,561 | 15,385 | ▲ 7.6% | ▲ 3.2% | ▼ 1.5% |',
+            '',
+            '**执行总结：** 本周期总电量较基准目标超出 7.6%，主要受近期连续异常高温影响，导致空调系统（特别是冷却塔与冷机）长时间满载运行。水资源管理表现优异，连续三个月保持下降趋势。',
+            '',
+            '---',
+            '',
+            '## 2. 空间能耗明细 (Energy by Space)',
+            '',
+            '依据校园主要建筑及楼层划分的用电拆解与对比。主要聚焦重点大楼 Bangunan Tun Tan Siew Sin。',
+            '',
+            '| 建筑/楼层 | 面积 | 用电量 (kWh) | 占比 (%) | 环比变化 | 预估费用 (RM) |',
+            '|---|---|---|---|---|---|',
+            '| Bangunan Tun Tan Siew Sin | 8,204 m² | 32,500 | 71.9% | ▲ 4.5% | 11,906 |',
+            '| ├── Ground Floor | 1,320 m² | 5,200 | 11.5% | ▲ 2.1% | 1,904 |',
+            '| ├── Level 1 & 2 | 2,380 m² | 9,800 | 21.7% | ▲ 6.2% | 3,590 |',
+            '| ├── Level 3 & 4 | 2,070 m² | 7,600 | 16.8% | ▲ 3.8% | 2,784 |',
+            '| ├── Level 5 | 980 m² | 2,400 | 5.3% | ▼ 1.2% | 879 |',
+            '| └── DCS Room (冷站) | 1,454 m²| 7,500 | 16.6% | ▲ 8.5% | 2,749 |',
+            '| 其他附属设施 | 8,920 m² | 12,710 | 28.1% | ▼ 0.5% | 4,655 |',
+            '| **总计** | **17,124 m²**| **45,210** | **100%** | **▲ 3.2%** | **16,561** |',
+            '',
+            '> ⚠️ **重点关注：** 冷站 (DCS Room) 及低楼层区域 (Level 1&2) 涨幅最明显。建议排查教学时段的空调温控设定。',
+            '',
+            '---',
+            '',
+            '## 3. 组织机构能耗分摊 (Energy by Organisation)',
+            '',
+            '将整体能耗按照院系与行政部门进行分摊，并结合人事数据(Headcount)计算人均能耗。',
+            '',
+            '| 部门组织 | 人数 | 分摊电量 (kWh) | 人均能耗 | 预算执行率 | 预算结余 |',
+            '|---|---|---|---|---|---|',
+            '| **Academic Departments** | **60** | **18,500** | **308.3** | **105%** | **🔴 超支** |',
+            '| ├── Faculty of IT | 35 | 11,200 | 320.0 | 108% | 🔴 -8% |',
+            '| └── Faculty of New Energy | 25 | 7,300 | 292.0 | 100% | 🟡 持平 |',
+            '| **Administrative Depts** | **50** | **12,800** | **256.0** | **92%** | **🟢 结余** |',
+            '| ├── Registrar / Finance | 20 | 5,100 | 255.0 | 90% | 🟢 +10% |',
+            '| └── HR / Audit Dept | 30 | 7,700 | 256.6 | 93% | 🟢 +7% |',
+            '| **Research Management Dept** | **15** | **6,400** | **426.6** | **110%** | **🔴 超支** |',
+            '| **Logistics Department** | **15** | **7,510** | **500.6** | **95%** | **🟢 结余** |',
+            '',
+            '> 注：IT 学院及研究管理部的机房密集，人均能耗显著高于全校平均水平。',
+            '',
+            '---',
+            '',
+            '## 4. 需量峰值与设备运行 (Equipment Status & Demand)',
+            '',
+            'Overview of facility demand peaks, device online rates, and major HVAC equipment running status.',
+            '',
+            '> **最大有功峰值 (Peak Active Power)：** 12,450 kW (发生于 2026-04-15 14:30)  ',
+            '> **全网平均功率因数 (Avg. PF)：** 0.94 (合格范围)  ',
+            '> **设备在线率 (Device Online Rate)：** 99.1% (▲ 0.5% MoM)',
+            '',
+            '| 设备名称 | 类型 | 运行状态 | 本月运行时长 | 告警/故障数 | 计划可用率 |',
+            '|---|---|---|---|---|---|',
+            '| CH-1 Chiller | 离心冷水机组 | 🟢 Running | 520 h (17h/d) | 0 | 100% |',
+            '| CH-2 Chiller | 螺杆冷水机组 | 🟡 Standby | 120 h (智能轮换) | 1 (轻微震动) | 98.5% |',
+            '| CWP-1 Cooling Pump | 冷却水泵 | 🟢 Running | 640 h | 0 | 100% |',
+            '| CT-1 Cooling Tower | 冷却塔 | 🟢 Running | 520 h | 0 | 100% |',
+            '| GF AHU | 新风机组 | 🟢 Running | 480 h | 0 | 100% |',
+            '| Level 1 AHU | 新风机组 | 🔴 Offline | - | 1 (过滤网堵塞) | - |',
+            '',
+            '---',
+            '',
+            '## 5. 效能综合趋势 (Trend Comparison)',
+            '',
+            '按月度横向比较水电消耗与碳足迹变动。',
+            '',
+            '| 分析指标 | 2026年3月 (上期) | 2026年4月 (本期) | 环比 (MoM) | 预算限值 | 偏差比例 |',
+            '|---|---|---|---|---|---|',
+            '| 电耗 (kWh) | 43,800 | 45,210 | ▲ 3.2% | 42,000 | ▲ 7.6% |',
+            '| 水耗 (m³) | 1,276 | 1,250 | ▼ 2.1% | 1,300 | ▼ 3.8% |',
+            '| 碳排 (tCO₂e) | 24.04 | 24.82 | ▲ 3.2% | 23.05 | ▲ 7.6% |',
+            '| 费用 (RM) | 16,045 | 16,561 | ▲ 3.2% | 15,385 | ▲ 7.6% |',
+            '',
+            '---',
+            '',
+            '## 6. 冷站能效与工况 (HVAC Efficiency)',
+            '',
+            '冷水机房 (DCS Room) 核心制冷效率评估。设定目标：全局 COP > 4.5。',
+            '',
+            '| 设备/系统 | 平均 COP | 负载率 (Load%) | 供水温度 (°C) | 回水温度 (°C) | 评级 |',
+            '|---|---|---|---|---|---|',
+            '| CH-1 Chiller | 4.85 | 82% | 7.2 | 12.8 | ✅ 优良 |',
+            '| CH-2 Chiller | 4.10 | 45% (部分负载) | 7.5 | 12.1 | 🟡 偏低 |',
+            '| **冷站总体 (System)**| **4.52** | **70%** | **7.3** | **12.5** | **✅ 达标** |',
+            '',
+            '> 分析：CH-1 承担基载运行，效率维持在 4.85。冷却塔 CT-1 及 CT-2 风机频率变频跟踪效果良好。',
+            '',
+            '---',
+            '',
+            '## 7. 碳排足迹拆解 (Carbon Detail)',
+            '',
+            '计算基于 Scope 2 间接温室气体排放，大马电网系数：0.549 kgCO₂/kWh。',
+            '',
+            '| 部门/区域 | 电耗 (kWh) | 电力碳排因子 | 温室气体排放量 (tCO₂e) |',
+            '|---|---|---|---|',
+            '| Faculty of IT | 11,200 | 0.549 | 6.148 |',
+            '| Faculty of New Energy | 7,300 | 0.549 | 4.007 |',
+            '| Bangunan 公共区域 | 13,900 | 0.549 | 7.631 |',
+            '| 其他后勤设施 | 12,810 | 0.549 | 7.032 |',
+            '| **总计** | **45,210** | | **24.82** |',
+            '',
+            '---',
+            '',
+            '## 8. 能耗成本与账单 (Cost Allocation)',
+            '',
+            '参考 TNB (Tenaga Nasional Berhad) 的商业关税费率 (商业综合费率均值预估为 0.366 RM/kWh)。',
+            '',
+            '| 账单归属主体 | 实际用电 (kWh) | 分摊综合电价 | 费用总计 (RM) |',
+            '|---|---|---|---|',
+            '| Academic Departments | 18,500 | 0.366 | 6,771 |',
+            '| Administrative Depts | 12,800 | 0.366 | 4,684 |',
+            '| Research Management | 6,400 | 0.366 | 2,342 |',
+            '| Logistics Department | 7,510 | 0.366 | 2,748 |',
+            '| **合计结算** | **45,210** | | **16,561** |',
+            '',
+            '---',
+            '',
+            '## 9. 异常与告警汇总 (Alarm Summary)',
+            '',
+            '本月期间物联网系统捕获的硬件连接、参数越限的事件汇总。',
+            '',
+            '| 告警时间 | 设备/区域 | 告警详情描述 | 持续时长 | 状态 |',
+            '|---|---|---|---|---|',
+            '| 04-12 14:15 | Level 1 AHU | 回风滤网压差报警 (需清洁) | - | 待处理 (Open)|',
+            '| 04-15 14:30 | 全局仪表盘 | 峰值突破设定阈值 (12,450 kW) | 30 min | 已恢复 (Resolved) |',
+            '| 04-18 08:00 | CT-2 冷却塔 | 变频器通讯中断掉线 | 2 h | 已修复 (Resolved) |',
+            '',
+            '> **指标总结：** 平台工单平均修复时间 (MTTR) 为 4.5 小时，仍有 1 项未完成闭环。',
+            '',
+            '---',
+            '',
+            '## 10. AI 智能推荐 (Recommendations)',
+            '',
+            '基于历史数据与本周期运行状况的智能优化策略。',
+            '',
+            '| 执行优先级 | 智能策略说明 | 预期节能效益 |',
+            '|---|---|---|',
+            '| 🔴 High | **下层AHU清洗：** Level 1 AHU 滤网堵塞导致风机耗电增加，请安排工单跟进。 | ~400 kWh/月 |',
+            '| 🟡 Med | **冷水机组排程：** 下午(14:00-16:00)峰值期间，建议适当放宽 0.5°C 的冷冻水出水设定点。 | 降低峰值电费 |',
+            '| 🟡 Med | **IT学院机房审查：** Faculty of IT 人均能耗最高，建议检查服务器机房的精密空调是否冷热通道混风。 | ~800 kWh/月 |',
+            '| 🟢 Low | **光感照明：** Bangunan 外围走廊可在白天根据光照度自动调暗或关闭。 | ~150 kWh/月 |',
+            '',
+            '---',
+            '*本报告由 RunDo Energy Carbon Platform 自动生成 · {DATE}*'
+        ].join('\n');
+
+        /* ===== DOCX DOWNLOAD ===== */
+        function downloadReportDocx(taskName, period) {
+            var date = new Date().toLocaleString();
+            var md = REPORT_MD_TEMPLATE.replace(/{DATE}/g, date);
+
+            if (typeof marked === 'undefined') {
+                showToast('marked.js not loaded, please check CDN connection', 'error');
+                return;
+            }
+            if (typeof htmlDocx === 'undefined' || typeof saveAs === 'undefined') {
+                showToast('html-docx-js or FileSaver not loaded, please check CDN connection', 'error');
+                return;
+            }
+
+            var htmlBody = marked.parse(md);
+            var fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+                '<style>' +
+                'body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#1a202c;margin:40px;}' +
+                'h1{font-size:20pt;color:#1a365d;border-bottom:2px solid #2b6cb0;padding-bottom:6px;margin-top:24px;}' +
+                'h2{font-size:14pt;color:#2b6cb0;margin-top:20px;}' +
+                'table{border-collapse:collapse;width:100%;margin:10px 0;font-size:10pt;}' +
+                'th{background:#2b6cb0;color:#fff;padding:6px 10px;text-align:left;}' +
+                'td{padding:5px 10px;border:1px solid #cbd5e0;}' +
+                'tr:nth-child(even) td{background:#ebf8ff;}' +
+                'blockquote{border-left:4px solid #4299e1;padding:6px 12px;margin:8px 0;background:#ebf8ff;color:#2c5282;}' +
+                'hr{border:none;border-top:1px solid #cbd5e0;margin:16px 0;}' +
+                'p{margin:6px 0;line-height:1.6;}' +
+                'em{color:#718096;}' +
+                '</style></head><body>' + htmlBody + '</body></html>';
+
+            try {
+                var docxBlob = htmlDocx.asBlob(fullHtml, { orientation: 'portrait', margins: { top: 720, right: 720, bottom: 720, left: 720 } });
+                var filename = (taskName || 'Energy-Report').replace(/\s+/g, '-') + '_' + (period || 'Apr-2026').replace(/\s+/g, '-') + '.docx';
+                saveAs(docxBlob, filename);
+                showToast('DOCX exported: ' + filename, 'success');
+            } catch(e) {
+                showToast('Export failed: ' + e.message, 'error');
+            }
+        }
+
+        /* ===== SECTION DEFINITIONS ===== */
+        var REPORT_SECTIONS = [
+            {
+                key: 'executive-summary',
+                title: 'Executive Summary',
+                icon: '📊',
+                desc: 'Total KPI: energy, water, carbon, cost vs targets',
+                defaultOn: true
+            },
+            {
+                key: 'energy-by-space',
+                title: 'Energy by Space',
+                icon: '🏢',
+                desc: 'Breakdown by building / floor (Block FA, FB, Library…)',
+                defaultOn: true
+            },
+            {
+                key: 'energy-by-org',
+                title: 'Energy by Org',
+                icon: '🏛️',
+                desc: 'Consumption by faculty / department with per-capita',
+                defaultOn: true
+            },
+            {
+                key: 'equipment-status',
+                title: 'Equipment & Demand',
+                icon: '⚙️',
+                desc: 'Peak active power, online rate, running hours & faults',
+                defaultOn: true
+            },
+            {
+                key: 'trend-comparison',
+                title: 'Trend Comparison',
+                icon: '📈',
+                desc: 'MoM / YoY comparison with budget benchmark',
+                defaultOn: true
+            },
+            {
+                key: 'hvac-efficiency',
+                title: 'HVAC Efficiency',
+                icon: '❄️',
+                desc: 'COP, load rate, supply/return temp for each unit',
+                defaultOn: false
+            },
+            {
+                key: 'carbon-detail',
+                title: 'Carbon Detail',
+                icon: '🌿',
+                desc: 'Scope 2 tCO₂e breakdown by space and emission factor',
+                defaultOn: false
+            },
+            {
+                key: 'cost-allocation',
+                title: 'Cost Allocation',
+                icon: '💰',
+                desc: 'Energy cost split by org / space, budget usage %',
+                defaultOn: false
+            },
+            {
+                key: 'alarm-summary',
+                title: 'Alarm Summary',
+                icon: '🚨',
+                desc: 'Fault events, anomaly spikes, MTTR, open items',
+                defaultOn: false
+            },
+            {
+                key: 'recommendations',
+                title: 'Recommendations',
+                icon: '💡',
+                desc: 'AI-generated insights and energy-saving suggestions',
+                defaultOn: false
+            }
+        ];
+
+        /* Track which sections are checked per template (key = tplId or 'new') */
+        var templateSectionsState = {};
+
+        function getSectionState(tplId) {
+            if (!templateSectionsState[tplId]) {
+                templateSectionsState[tplId] = {};
+                REPORT_SECTIONS.forEach(function(s) {
+                    templateSectionsState[tplId][s.key] = s.defaultOn;
+                });
+            }
+            return templateSectionsState[tplId];
+        }
+
+        function renderSectionPicker(tplId) {
+            var state = getSectionState(tplId);
+            var grid = document.getElementById('sectionPickerGrid');
+            if (!grid) return;
+            var html = '';
+            REPORT_SECTIONS.forEach(function(s) {
+                var selected = state[s.key];
+                html += '<div class="section-card' + (selected ? ' selected' : '') + '" ' +
+                    'onclick="toggleSection(\'' + tplId + '\',\'' + s.key + '\')" ' +
+                    'data-section-key="' + s.key + '">' +
+                    '<div class="section-card-icon">' + s.icon + '</div>' +
+                    '<div class="section-card-body">' +
+                        '<div class="section-card-title">' + s.title + '</div>' +
+                        '<div class="section-card-desc">' + s.desc + '</div>' +
+                    '</div>' +
+                    '<div class="section-card-check">' +
+                        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+                    '</div>' +
+                '</div>';
+            });
+            grid.innerHTML = html;
+            updateSectionCounter(tplId);
+        }
+
+        function toggleSection(tplId, key) {
+            var state = getSectionState(tplId);
+            state[key] = !state[key];
+            var card = document.querySelector('#sectionPickerGrid [data-section-key="' + key + '"]');
+            if (card) card.classList.toggle('selected', state[key]);
+            updateSectionCounter(tplId);
+        }
+
+        function updateSectionCounter(tplId) {
+            var state = getSectionState(tplId);
+            var count = Object.values(state).filter(Boolean).length;
+            var el = document.getElementById('sectionSelectedCount');
+            if (el) el.textContent = count;
+        }
+
+        function getSelectedSections(tplId) {
+            var state = getSectionState(tplId);
+            return REPORT_SECTIONS.filter(function(s) { return state[s.key]; });
+        }
+
         /* ===== MOCK DATA ===== */
         var templates = [
-            { id: 'tpl-001', name: 'Daily Energy Summary', category: 'report', type: 'daily', schedule: 'auto', time: '08:00', lastGen: '2026-04-06 08:00', status: 'green', active: true },
-            { id: 'tpl-002', name: 'Weekly Energy & Carbon', category: 'report', type: 'weekly', schedule: 'manual', time: '', lastGen: '2026-03-31 17:30', status: 'green', active: true },
-            { id: 'tpl-003', name: 'Monthly Billing Statement', category: 'report', type: 'monthly', schedule: 'scheduled', time: '00:00', lastGen: '2026-04-01 00:00', status: 'amber', active: true },
-            { id: 'tpl-004', name: 'HVAC Efficiency Analysis', category: 'report', type: 'thematic', schedule: 'manual', time: '', lastGen: '2026-03-15 14:20', status: 'green', active: true },
-            { id: 'tpl-005', name: 'Custom Report', category: 'report', type: 'custom', schedule: 'manual', time: '', lastGen: 'Never', status: 'gray', active: false },
-            { id: 'tpl-006', name: 'Energy Summary Table', category: 'table', type: 'summary', schedule: 'manual', time: '', lastGen: '2026-04-01 10:00', status: 'green', active: true },
-            { id: 'tpl-007', name: 'Cost Allocation Table', category: 'table', type: 'allocation', schedule: 'scheduled', time: '00:00', lastGen: '2026-04-03 00:00', status: 'amber', active: true },
-            { id: 'tpl-008', name: 'Equipment Operation Table', category: 'table', type: 'statistics', schedule: 'manual', time: '', lastGen: '2026-03-28 16:00', status: 'green', active: true },
-            { id: 'tpl-009', name: 'Carbon Accounting Table', category: 'table', type: 'carbon', schedule: 'scheduled', time: '00:00', lastGen: '2026-04-01 00:00', status: 'amber', active: true },
-            { id: 'tpl-010', name: 'Custom Pivot Table', category: 'table', type: 'pivot', schedule: 'manual', time: '', lastGen: '2026-03-20 11:30', status: 'green', active: true }
+            { id: 'tpl-001', name: 'Daily Energy Summary', category: 'report', type: 'daily', schedule: 'auto', time: '08:00', lastGen: '2026-04-06 08:00', status: 'green', active: true, sections: ['executive-summary','energy-by-space','trend-comparison','alarm-summary','recommendations'] },
+            { id: 'tpl-002', name: 'Weekly Energy & Carbon', category: 'report', type: 'weekly', schedule: 'manual', time: '', lastGen: '2026-03-31 17:30', status: 'green', active: true, sections: ['executive-summary','energy-by-space','energy-by-org','carbon-detail','trend-comparison'] },
+            { id: 'tpl-003', name: 'Monthly Billing Statement', category: 'report', type: 'monthly', schedule: 'scheduled', time: '00:00', lastGen: '2026-04-01 00:00', status: 'amber', active: true, sections: ['executive-summary','energy-by-org','cost-allocation','carbon-detail','trend-comparison','recommendations'] },
+            { id: 'tpl-004', name: 'HVAC Efficiency Analysis', category: 'report', type: 'thematic', schedule: 'manual', time: '', lastGen: '2026-03-15 14:20', status: 'green', active: true, sections: ['equipment-status','hvac-efficiency','trend-comparison','alarm-summary','recommendations'] },
+            { id: 'tpl-005', name: 'Custom Report', category: 'report', type: 'custom', schedule: 'manual', time: '', lastGen: 'Never', status: 'gray', active: false, sections: [] },
+            { id: 'tpl-006', name: 'Energy Summary Table', category: 'table', type: 'summary', schedule: 'manual', time: '', lastGen: '2026-04-01 10:00', status: 'green', active: true, sections: [] },
+            { id: 'tpl-007', name: 'Cost Allocation Table', category: 'table', type: 'allocation', schedule: 'scheduled', time: '00:00', lastGen: '2026-04-03 00:00', status: 'amber', active: true, sections: [] },
+            { id: 'tpl-008', name: 'Equipment Operation Table', category: 'table', type: 'statistics', schedule: 'manual', time: '', lastGen: '2026-03-28 16:00', status: 'green', active: true, sections: [] },
+            { id: 'tpl-009', name: 'Carbon Accounting Table', category: 'table', type: 'carbon', schedule: 'scheduled', time: '00:00', lastGen: '2026-04-01 00:00', status: 'amber', active: true, sections: [] },
+            { id: 'tpl-010', name: 'Custom Pivot Table', category: 'table', type: 'pivot', schedule: 'manual', time: '', lastGen: '2026-03-20 11:30', status: 'green', active: true, sections: [] }
         ];
 
         var tasks = [
@@ -1972,7 +2362,7 @@
             var list = document.getElementById('templateList');
             var filtered = templates.filter(function(t) {
                 if (currentFilter !== 'all' && t.category !== currentFilter) return false;
-                if (searchQuery && t.name.toLowerCase().indexOf(searchQuery.toLowerCase()) === -1) return false;
+                if (searchQuery && ((t.name || '').toLowerCase()).indexOf(searchQuery.toLowerCase()) === -1) return false;
                 return true;
             });
 
@@ -2126,52 +2516,103 @@
 
             // Report preview area (for completed tasks)
             if (task.status === 'completed') {
+                // Find the matching template to get its sections
+                var tpl = templates.find(function(t) { return t.name === task.template; });
+                var sections = (tpl && tpl.sections && tpl.sections.length > 0)
+                    ? REPORT_SECTIONS.filter(function(s) { return tpl.sections.includes(s.key); })
+                    : REPORT_SECTIONS.filter(function(s) { return s.defaultOn; });
+
+                var sectionContent = {
+                    'executive-summary': '<div style="margin-top:12px"><div class="report-mock-kpi-row">' +
+                        '<div class="report-mock-kpi"><div class="report-mock-kpi-value">12,450</div><div class="report-mock-kpi-label">kWh</div><div class="report-mock-kpi-change up">↑ 3.2%</div></div>' +
+                        '<div class="report-mock-kpi"><div class="report-mock-kpi-value">856</div><div class="report-mock-kpi-label">m³ Water</div><div class="report-mock-kpi-change down">↓ 1.5%</div></div>' +
+                        '<div class="report-mock-kpi"><div class="report-mock-kpi-value">6.82</div><div class="report-mock-kpi-label">tCO₂</div><div class="report-mock-kpi-change up">↑ 2.8%</div></div>' +
+                        '<div class="report-mock-kpi"><div class="report-mock-kpi-value">4,230</div><div class="report-mock-kpi-label">RM Cost</div><div class="report-mock-kpi-change up">↑ 4.1%</div></div>' +
+                        '</div></div>',
+                    'energy-by-space': '<table class="report-mock-table" style="margin-top:10px"><thead><tr><th>Space</th><th>Energy (kWh)</th><th>Change</th><th>Cost (RM)</th></tr></thead><tbody>' +
+                        '<tr><td>Block FA</td><td>4,200</td><td style="color:#f87171">↑ 5%</td><td>1,450</td></tr>' +
+                        '<tr><td>Block FB</td><td>3,800</td><td style="color:#4ade80">↓ 2%</td><td>1,310</td></tr>' +
+                        '<tr><td>Library</td><td>2,100</td><td style="color:#f87171">↑ 1%</td><td>725</td></tr>' +
+                        '<tr><td>Dormitory</td><td>2,350</td><td style="color:#f87171">↑ 8%</td><td>810</td></tr>' +
+                        '</tbody></table>',
+                    'energy-by-org': '<table class="report-mock-table" style="margin-top:10px"><thead><tr><th>Department</th><th>Energy (kWh)</th><th>Per Capita</th><th>vs Budget</th></tr></thead><tbody>' +
+                        '<tr><td>Faculty of Engineering</td><td>3,100</td><td>48.4</td><td style="color:#f87171">+12%</td></tr>' +
+                        '<tr><td>Faculty of IT</td><td>2,650</td><td>39.2</td><td style="color:#4ade80">-3%</td></tr>' +
+                        '<tr><td>Administration</td><td>1,800</td><td>72.0</td><td style="color:#f87171">+7%</td></tr>' +
+                        '<tr><td>Library</td><td>900</td><td>N/A</td><td style="color:#4ade80">-5%</td></tr>' +
+                        '</tbody></table>',
+                    'equipment-status': '<div style="display:flex;gap:12px;margin-bottom:8px;padding:8px;background:var(--bg-surface);border-radius:4px;border:1px solid rgba(120,142,180,0.08);margin-top:10px">' +
+                            '<div style="flex:1"><div style="color:var(--text-muted);font-size:10px;margin-bottom:2px">Peak Active Power</div><div style="font-size:12px;color:var(--text-primary);font-weight:600">3,450 kW <span style="font-size:9px;color:var(--accent-amber);font-weight:400">(04-15 14:00)</span></div></div>' +
+                            '<div style="flex:1"><div style="color:var(--text-muted);font-size:10px;margin-bottom:2px">Online Rate</div><div style="font-size:12px;color:var(--text-primary);font-weight:600">98.5% <span style="font-size:9px;color:var(--accent-green);font-weight:400">↑ 1.2%</span></div></div>' +
+                            '<div style="flex:1"><div style="color:var(--text-muted);font-size:10px;margin-bottom:2px">Avg. PF</div><div style="font-size:12px;color:var(--text-primary);font-weight:600">0.96</div></div>' +
+                        '</div>' +
+                        '<div style="font-size:10px;color:var(--text-muted);line-height:2">' +
+                        '<div>🟢 CH-1 Chiller — Running 18.5h | COP 4.2 | Faults: 0</div>' +
+                        '<div>🟡 CH-2 Chiller — Standby | Last fault: 2026-04-03 bearing noise</div>' +
+                        '<div>🟢 P-1 Primary Pump — Running | Flow 120 m³/h</div>' +
+                        '<div>🟢 AHU-B1-01 — Running | Supply 13.5°C / Return 18.2°C</div>' +
+                        '<div>🔴 AHU-FA-03 — Offline (maintenance)</div>' +
+                        '</div>',
+                    'trend-comparison': '<table class="report-mock-table" style="margin-top:10px"><thead><tr><th>Metric</th><th>This Period</th><th>MoM</th><th>YoY</th></tr></thead><tbody>' +
+                        '<tr><td>Energy (kWh)</td><td>12,450</td><td style="color:#f87171">↑ 3.2%</td><td style="color:#4ade80">↓ 5.1%</td></tr>' +
+                        '<tr><td>Water (m³)</td><td>856</td><td style="color:#4ade80">↓ 1.5%</td><td style="color:#4ade80">↓ 2.3%</td></tr>' +
+                        '<tr><td>Carbon (tCO₂)</td><td>6.82</td><td style="color:#f87171">↑ 2.8%</td><td style="color:#4ade80">↓ 4.8%</td></tr>' +
+                        '<tr><td>Cost (RM)</td><td>4,230</td><td style="color:#f87171">↑ 4.1%</td><td style="color:#4ade80">↓ 3.5%</td></tr>' +
+                        '</tbody></table>',
+                    'hvac-efficiency': '<table class="report-mock-table" style="margin-top:10px"><thead><tr><th>Unit</th><th>COP</th><th>Load%</th><th>Supply°C</th><th>Return°C</th></tr></thead><tbody>' +
+                        '<tr><td>CH-1</td><td>4.20</td><td>72%</td><td>7.0</td><td>12.5</td></tr>' +
+                        '<tr><td>AHU-B1-01</td><td>—</td><td>65%</td><td>13.5</td><td>18.2</td></tr>' +
+                        '<tr><td>AHU-FA-01</td><td>—</td><td>80%</td><td>14.0</td><td>18.8</td></tr>' +
+                        '</tbody></table>',
+                    'carbon-detail': '<table class="report-mock-table" style="margin-top:10px"><thead><tr><th>Space</th><th>kWh</th><th>EF (kgCO₂/kWh)</th><th>tCO₂e</th></tr></thead><tbody>' +
+                        '<tr><td>Block FA</td><td>4,200</td><td>0.549</td><td>2.306</td></tr>' +
+                        '<tr><td>Block FB</td><td>3,800</td><td>0.549</td><td>2.086</td></tr>' +
+                        '<tr><td>Library</td><td>2,100</td><td>0.549</td><td>1.153</td></tr>' +
+                        '<tr><td>Dormitory</td><td>2,350</td><td>0.549</td><td>1.290</td></tr>' +
+                        '</tbody></table>',
+                    'cost-allocation': '<table class="report-mock-table" style="margin-top:10px"><thead><tr><th>Department</th><th>kWh</th><th>Cost (RM)</th><th>Budget Used</th></tr></thead><tbody>' +
+                        '<tr><td>Faculty of Engineering</td><td>3,100</td><td>1,073</td><td>68%</td></tr>' +
+                        '<tr><td>Faculty of IT</td><td>2,650</td><td>917</td><td>52%</td></tr>' +
+                        '<tr><td>Administration</td><td>1,800</td><td>623</td><td>71%</td></tr>' +
+                        '<tr><td>Library</td><td>900</td><td>312</td><td>43%</td></tr>' +
+                        '</tbody></table>',
+                    'alarm-summary': '<div style="margin-top:10px;font-size:10px;color:var(--text-muted);line-height:2">' +
+                        '<div>⚠️ 02:15 Block FB 3F — Energy spike +45% (duration 2h)</div>' +
+                        '<div>⚠️ 14:30 CH-1 — COP dropped to 3.2 (normal ≥4.0)</div>' +
+                        '<div>⚠️ 09:00 AHU-FA-03 — Offline alert (unplanned maintenance)</div>' +
+                        '<div>✅ Night shutdown compliance: 98% (target met)</div>' +
+                        '</div>',
+                    'recommendations': '<div style="margin-top:10px;font-size:10px;color:var(--text-muted);line-height:2">' +
+                        '<div>💡 Dormitory night lighting off-rate 15% — increase patrol frequency</div>' +
+                        '<div>💡 Block FA weekend overtime areas suggest sub-metering</div>' +
+                        '<div>💡 CH-1 COP degradation detected — schedule deep cleaning</div>' +
+                        '<div>💡 Energy intensity above benchmark for 3 consecutive weeks — review HVAC setpoints</div>' +
+                        '</div>'
+                };
+
+                var sectionsHtml = '';
+                sections.forEach(function(s) {
+                    var content = sectionContent[s.key] || '<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">No data available for this section.</div>';
+                    sectionsHtml += '<div style="margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(120,142,180,0.1)">' +
+                        '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">' + s.icon + ' ' + s.title + '</div>' +
+                        content +
+                        '</div>';
+                });
+
                 html += '<div class="preview-section">' +
                     '<div class="report-preview-area">' +
                         '<div class="report-preview-header">' +
                             '<span class="report-preview-title">📄 Report Preview</span>' +
                             '<div class="report-preview-actions">' +
-                                '<button class="report-preview-btn" onclick="showToast(\'Exporting PDF...\', \'info\')"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> PDF</button>' +
-                                '<button class="report-preview-btn" onclick="showToast(\'Exporting Excel...\', \'info\')"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>' +
-                                '<button class="report-preview-btn" onclick="showToast(\'Exporting CSV...\', \'info\')"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> CSV</button>' +
-                                '<button class="report-preview-btn" onclick="showToast(\'Printing...\', \'info\')"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>' +
+                                '<button class="report-preview-btn" onclick="downloadReportDocx(' + JSON.stringify(task.name) + ',' + JSON.stringify(task.period) + ')" style="background:rgba(59,130,246,0.18);border-color:rgba(59,130,246,0.45);color:#93c5fd;font-weight:600">' +
+                                    '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+                                    ' Download DOCX</button>' +
                             '</div>' +
                         '</div>' +
                         '<div class="report-content-mock">' +
-                            '<div class="report-mock-title">UTAR Campus Energy Daily Report</div>' +
+                            '<div class="report-mock-title">UTAR Campus Energy Report</div>' +
                             '<div class="report-mock-date">Period: ' + esc(task.period) + ' | Generated: ' + new Date().toLocaleString() + ' | Language: English</div>' +
-                            '<div class="report-mock-kpi-row">' +
-                                '<div class="report-mock-kpi"><div class="report-mock-kpi-value">12,450</div><div class="report-mock-kpi-label">kWh</div><div class="report-mock-kpi-change up">↑ 3.2%</div></div>' +
-                                '<div class="report-mock-kpi"><div class="report-mock-kpi-value">856</div><div class="report-mock-kpi-label">m³ Water</div><div class="report-mock-kpi-change down">↓ 1.5%</div></div>' +
-                                '<div class="report-mock-kpi"><div class="report-mock-kpi-value">6.82</div><div class="report-mock-kpi-label">tCO₂</div><div class="report-mock-kpi-change up">↑ 2.8%</div></div>' +
-                                '<div class="report-mock-kpi"><div class="report-mock-kpi-value">4,230</div><div class="report-mock-kpi-label">RM Cost</div><div class="report-mock-kpi-change up">↑ 4.1%</div></div>' +
-                            '</div>' +
-                            '<div style="margin-top:14px;margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;">Energy Breakdown by Space</div>' +
-                            '<table class="report-mock-table">' +
-                                '<thead><tr><th>Space</th><th>Energy (kWh)</th><th>Change</th><th>Cost (RM)</th><th>Carbon (tCO₂)</th></tr></thead>' +
-                                '<tbody>' +
-                                '<tr><td>Block FA</td><td>4,200</td><td style="color:#f87171">↑ 5%</td><td>1,450</td><td>2.30</td></tr>' +
-                                '<tr><td>Block FB</td><td>3,800</td><td style="color:#4ade80">↓ 2%</td><td>1,310</td><td>2.08</td></tr>' +
-                                '<tr><td>Library</td><td>2,100</td><td style="color:#f87171">↑ 1%</td><td>725</td><td>1.15</td></tr>' +
-                                '<tr><td>Dormitory</td><td>2,350</td><td style="color:#f87171">↑ 8%</td><td>810</td><td>1.29</td></tr>' +
-                                '</tbody>' +
-                            '</table>' +
-                            '<div style="margin-top:14px;margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;">Anomaly Events</div>' +
-                            '<div style="font-size:10px;color:var(--text-muted);line-height:1.6;">' +
-                                '<div style="padding:4px 0;border-bottom:1px solid rgba(120,142,180,0.06);">⚠️ 02:15 Block FB 3F — Energy spike +45% (duration 2h)</div>' +
-                                '<div style="padding:4px 0;border-bottom:1px solid rgba(120,142,180,0.06);">⚠️ 14:30 CH-1 Chiller — COP dropped to 3.2 (normal ≥4.0)</div>' +
-                                '<div style="padding:4px 0;">✅ Night shutdown compliance: 98% (target met)</div>' +
-                            '</div>' +
-                            '<div style="margin-top:14px;margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;">Weather Correlation</div>' +
-                            '<div style="font-size:10px;color:var(--text-muted);line-height:1.6;">' +
-                                '<div>Max Temp: 34°C | Avg Humidity: 78% | Condition: Partly Cloudy</div>' +
-                                '<div>Est. impact: +3.5% cooling load per 1°C above baseline (30°C)</div>' +
-                            '</div>' +
-                            '<div style="margin-top:14px;margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;">Recommendations</div>' +
-                            '<div style="font-size:10px;color:var(--text-muted);line-height:1.6;">' +
-                                '<div>💡 Dormitory night lighting off-rate 15% — increase patrol frequency</div>' +
-                                '<div>💡 Block FA weekend overtime areas suggest sub-metering</div>' +
-                            '</div>' +
+                            sectionsHtml +
                         '</div>' +
                     '</div>' +
                 '</div>';
@@ -2298,6 +2739,13 @@
             }
         }
 
+        function submitGenerateReport() {
+            var tplId = document.getElementById('gen_template').value;
+            if (!tplId) { showToast('Please select a template first', 'error'); return; }
+            closeGenerateDrawer();
+            generateFromTemplate(tplId);
+        }
+
         function closeGenerateDrawer() {
             document.getElementById('generateDrawer').classList.remove('open');
             document.getElementById('generateDrawerOverlay').classList.remove('open');
@@ -2379,17 +2827,20 @@
             document.getElementById('tpl_category').value = 'report';
             
             // Initialize type options based on category
-            onCategoryChange();
+            onCategoryChange(); // builds options and calls onTypeChange()
             document.getElementById('tpl_type').value = 'daily';
             
             document.getElementById('tpl_recipients').value = '';
             
-            // Show periodic buttons for daily/weekly/monthly, default to non-periodic (show time picker)
-            document.getElementById('periodicRow').style.display = 'grid';
-            setPeriodic('no'); // Default to showing time picker
+            // Show schedule for daily type, default one-time (no time picker)
+            onTypeChange();
+            setPeriodic('no');
             
             // Initialize personnel selection
             initPersonnelData('tpl');
+
+            // Initialize section picker for new template
+            renderSectionPicker('new');
             
             document.getElementById('templateDrawer').classList.add('open');
             document.getElementById('templateDrawerOverlay').classList.add('open');
@@ -2408,20 +2859,27 @@
             document.getElementById('tpl_type').value = tpl.type;
             
             document.getElementById('tpl_recipients').value = '';
+window.scopeSelections = { space: tpl.selectedSpaces || [], org: tpl.selectedOrgs || [], device: tpl.selectedDevices || [], meter: tpl.selectedMeters || [] };
+renderTreeSelections('space'); renderTreeSelections('org'); renderTreeSelections('device'); renderTreeSelections('meter');
             
             // Set periodic based on type
             if (['daily', 'weekly', 'monthly'].includes(tpl.type)) {
-                // For daily/weekly/monthly, show periodic button
-                document.getElementById('periodicRow').style.display = 'grid';
-                setPeriodic('no'); // Default to showing time picker
+                // For daily/weekly/monthly, show periodic button, default one-time
+                onTypeChange(); // updates UI based on current tpl_type value
+                setPeriodic('no');
             } else if (tpl.type === 'custom') {
-                // For custom, hide periodic and show time range
-                document.getElementById('periodicRow').style.display = 'none';
-                document.getElementById('timeRangeRow').style.display = 'grid';
+                onTypeChange(); // shows date-time range
             }
             
             // Initialize personnel selection
             initPersonnelData('tpl');
+
+            // Initialize section picker from saved sections
+            templateSectionsState[id] = {};
+            REPORT_SECTIONS.forEach(function(s) {
+                templateSectionsState[id][s.key] = tpl.sections ? tpl.sections.includes(s.key) : s.defaultOn;
+            });
+            renderSectionPicker(id);
             
             document.getElementById('templateDrawer').classList.add('open');
             document.getElementById('templateDrawerOverlay').classList.add('open');
@@ -2436,6 +2894,9 @@
             var name = document.getElementById('tpl_name').value.trim();
             if (!name) { showToast('Please enter a template name', 'error'); return; }
 
+            var tplId = editingTemplateId || 'new';
+            var selectedSections = getSelectedSections(tplId).map(function(s) { return s.key; });
+
             if (editingTemplateId) {
                 var tpl = templates.find(function(t) { return t.id === editingTemplateId; });
                 if (tpl) {
@@ -2443,6 +2904,9 @@
                         tpl.name = name;
                         tpl.category = document.getElementById('tpl_category').value;
                         tpl.type = document.getElementById('tpl_type').value;
+                        tpl.sections = selectedSections;
+                        // Sync section state under new id
+                        templateSectionsState[tpl.id] = templateSectionsState[tplId];
                         closeTemplateDrawer();
                         renderTemplates();
                         showToast('Template "' + name + '" updated', 'success');
@@ -2451,17 +2915,22 @@
                 }
             } else {
                 pendingAction = function() {
+                    var newId = 'tpl-' + (templates.length + 1).toString().padStart(3, '0');
                     templates.push({
-                        id: 'tpl-' + (templates.length + 1).toString().padStart(3, '0'),
+                        id: newId,
                         name: name,
                         category: document.getElementById('tpl_category').value,
                         type: document.getElementById('tpl_type').value,
-                        schedule: 'manual', // Default to manual
+                        schedule: 'manual',
                         time: '',
                         lastGen: 'Never',
                         status: 'green',
-                        active: true
+                        active: true,
+                        sections: selectedSections
                     });
+                    // Move section state to new template id
+                    templateSectionsState[newId] = templateSectionsState['new'];
+                    delete templateSectionsState['new'];
                     closeTemplateDrawer();
                     renderTemplates();
                     showToast('Template "' + name + '" created', 'success');
@@ -2584,57 +3053,75 @@
 
         /* ===== PERIODIC REPORT HANDLING ===== */
         function setPeriodic(val) {
-            var yesBtn = document.getElementById('periodicYesBtn');
-            var noBtn = document.getElementById('periodicNoBtn');
-            
+            // Update radio selection (index: 0=One-time, 1=Periodic)
+            var items = document.querySelectorAll('#periodicRadios .radio-item');
+            items.forEach(function(item, i) {
+                item.classList.toggle('selected', (i === 0 && val === 'no') || (i === 1 && val === 'yes'));
+            });
+
+            var type = document.getElementById('tpl_type') ? document.getElementById('tpl_type').value : '';
+            var weekdayRow = document.getElementById('weekdayRow');
+            var weekdayRangeRow = document.getElementById('weekdayRangeRow');
+            var monthdayRow = document.getElementById('monthdayRow');
+            var monthdayRangeRow = document.getElementById('monthdayRangeRow');
+            var dailyTimeRow = document.getElementById('dailyTimeRow');
+
             if (val === 'yes') {
-                // Periodic task: show time range for recurring schedule
-                yesBtn.classList.add('btn-primary');
-                noBtn.classList.remove('btn-primary');
-                document.getElementById('timeRangeRow').style.display = 'grid';
+                // Show type-specific periodic fields
+                var isWeekly = type === 'weekly';
+                var isMonthly = type === 'monthly';
+                var isDaily = type === 'daily';
+                if (weekdayRow) weekdayRow.style.display = isWeekly ? 'grid' : 'none';
+                if (weekdayRangeRow) weekdayRangeRow.style.display = isWeekly ? 'grid' : 'none';
+                if (monthdayRow) monthdayRow.style.display = isMonthly ? 'grid' : 'none';
+                if (monthdayRangeRow) monthdayRangeRow.style.display = isMonthly ? 'grid' : 'none';
+                if (dailyTimeRow) dailyTimeRow.style.display = isDaily ? 'grid' : 'none';
             } else {
-                // One-time task: hide time range
-                noBtn.classList.add('btn-primary');
-                yesBtn.classList.remove('btn-primary');
-                document.getElementById('timeRangeRow').style.display = 'none';
+                // One-time: hide all detail rows
+                if (weekdayRow) weekdayRow.style.display = 'none';
+                if (weekdayRangeRow) weekdayRangeRow.style.display = 'none';
+                if (monthdayRow) monthdayRow.style.display = 'none';
+                if (monthdayRangeRow) monthdayRangeRow.style.display = 'none';
+                if (dailyTimeRow) dailyTimeRow.style.display = 'none';
             }
         }
 
         function onCategoryChange() {
-            var category = document.getElementById('tpl_category').value;
             var typeSelect = document.getElementById('tpl_type');
-            
-            // Clear existing options
-            typeSelect.innerHTML = '';
-            
-            if (category === 'report') {
-                // Report types - only daily, weekly, monthly, custom
-                typeSelect.innerHTML = '<option value="daily">Daily Report</option>' +
-                    '<option value="weekly">Weekly Report</option>' +
-                    '<option value="monthly">Monthly Report</option>' +
-                    '<option value="custom">Custom Report</option>';
-            } else {
-                // Table types
-                typeSelect.innerHTML = '<option value="summary">Summary Table</option>' +
-                    '<option value="allocation">Allocation Table</option>' +
-                    '<option value="statistics">Statistics Table</option>' +
-                    '<option value="carbon">Carbon Table</option>' +
-                    '<option value="pivot">Pivot Table</option>';
-            }
+            if (!typeSelect) return;
+            typeSelect.innerHTML = '<option value="daily">Daily Report</option>' +
+                '<option value="weekly">Weekly Report</option>' +
+                '<option value="monthly">Monthly Report</option>' +
+                '<option value="custom">Custom Report</option>';
+            onTypeChange();
         }
 
         function onTypeChange() {
-            var type = document.getElementById('tpl_type').value;
-            
-            // For Daily/Weekly/Monthly: show periodic button option
-            if (['daily', 'weekly', 'monthly'].includes(type)) {
-                document.getElementById('periodicRow').style.display = 'grid';
-                // Default to non-periodic (one-time), hide time picker
-                setPeriodic('no');
-            } else if (type === 'custom') {
-                // Custom report: always show time range, hide periodic option
-                document.getElementById('periodicRow').style.display = 'none';
-                document.getElementById('timeRangeRow').style.display = 'grid';
+            var type = document.getElementById('tpl_type') ? document.getElementById('tpl_type').value : '';
+            var periodicRow = document.getElementById('periodicRow');
+            var timeRangeRow = document.getElementById('timeRangeRow');
+            var weekdayRow = document.getElementById('weekdayRow');
+            var weekdayRangeRow = document.getElementById('weekdayRangeRow');
+            var monthdayRow = document.getElementById('monthdayRow');
+            var monthdayRangeRow = document.getElementById('monthdayRangeRow');
+            var dailyTimeRow = document.getElementById('dailyTimeRow');
+
+            // Hide all detail rows first
+            [weekdayRow, weekdayRangeRow, monthdayRow, monthdayRangeRow, dailyTimeRow].forEach(function(el) {
+                if (el) el.style.display = 'none';
+            });
+
+            if (type === 'custom') {
+                // Custom: hide recurrence, show date-time range
+                if (periodicRow) periodicRow.style.display = 'none';
+                if (timeRangeRow) timeRangeRow.style.display = 'block';
+            } else {
+                // Daily/Weekly/Monthly: show recurrence choice, default One-time
+                if (periodicRow) periodicRow.style.display = 'grid';
+                if (timeRangeRow) timeRangeRow.style.display = 'none';
+                // Re-apply current periodic mode
+                var currentMode = document.querySelector('#periodicRadios .radio-item:nth-child(2).selected') ? 'yes' : 'no';
+                setPeriodic(currentMode);
             }
         }
 
@@ -2724,11 +3211,227 @@
             });
         }
 
-        function capitalize(str) {
+        function capitalize(str) { if(typeof str !== 'string') return ''; if(typeof str !== 'string') return '';
             return str.charAt(0).toUpperCase() + str.slice(1);
         }
 
+        
+        var currentTreeType = null;
+        window.scopeSelections = { space: [], org: [], device: [], meter: [] };
+        var treeDataCache = null;
+
+        async function fetchTreeData() {
+            if (treeDataCache) return treeDataCache;
+            try {
+                let res = await fetch('../../data/tree-data.json');
+                if(res.ok) {
+                    treeDataCache = await res.json();
+                } else {
+                    console.warn('Fallback data');
+                    treeDataCache = {
+                        space: { name: 'Campus', children: [{name: 'Building A'}] },
+                        org: { name: 'HQ' }, device: { name: 'Equip' }, meter: { name: 'Main' }
+                    };
+                }
+            } catch(e) {
+                console.error(e);
+            }
+            return treeDataCache;
+        }
+
+        async function openTreeSelector(type) {
+            currentTreeType = type;
+            let titleMap = { space: 'Spaces', org: 'Organizations', device: 'Equipment', meter: 'Meters' };
+            document.getElementById('globalTreePopupTitle').textContent = 'Select ' + titleMap[type];
+            
+            let selBox = document.getElementById('selBox-' + type);
+            let rect = selBox.getBoundingClientRect();
+            let popup = document.getElementById('globalTreePopup');
+            
+            popup.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+            popup.style.left = (rect.left + window.scrollX) + 'px';
+            popup.classList.add('open');
+
+            // Reset search on open
+            let searchInput = document.getElementById('treeSearchInput');
+            if (searchInput) { searchInput.value = ''; filterTreeSearch(''); }
+
+            document.getElementById('globalTreeContainer').innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px;">Loading Data...</div>';
+            lucide.createIcons();
+
+            let data = await fetchTreeData();
+            if (data && data[type]) {
+                let rootData = Array.isArray(data[type]) ? data[type] : [data[type]];
+                document.getElementById('globalTreeContainer').innerHTML = buildTreeHtml(rootData, window.scopeSelections[type]);
+            } else {
+                document.getElementById('globalTreeContainer').innerHTML = '<div style="color:var(--accent-red);font-size:12px;text-align:center;padding:20px;">No Data</div>';
+            }
+        }
+
+        function closeTreePopup() {
+            let popup = document.getElementById('globalTreePopup');
+            if(popup) popup.classList.remove('open');
+        }
+
+        document.addEventListener('mousedown', function(e) {
+            let popup = document.getElementById('globalTreePopup');
+            if (popup && popup.classList.contains('open')) {
+                if (!popup.contains(e.target) && !e.target.closest('.selector-box')) {
+                    closeTreePopup();
+                }
+            }
+        });
+
+        function buildTreeHtml(nodes, selectedArray, level = 0) {
+            let htmlStr = '';
+            nodes.forEach(n => {
+                let id = n.id || n.name;
+                let hasChildren = n.children && n.children.length > 0;
+                let isChecked = selectedArray.includes(id) ? 'checked' : '';
+
+                htmlStr += `<div class="tree-node" data-name="${n.name.toLowerCase()}">`;
+                htmlStr += `<div class="tree-node-content" style="padding-left:${level * 16}px">`;
+                if (hasChildren) {
+                    htmlStr += `<div class="tree-toggle expanded" onclick="toggleTreeNode(this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>`;
+                } else {
+                    htmlStr += `<div style="width: 14px; display:inline-block"></div>`;
+                }
+                htmlStr += `<input type="checkbox" class="tree-checkbox" value="${id}" data-name="${n.name}" ${isChecked} onchange="selectTreeItem(this)">`;
+                htmlStr += `<span onclick="this.previousElementSibling.click()">${n.name}</span>`;
+                htmlStr += `</div>`;
+                
+                if (hasChildren) {
+                    htmlStr += `<div class="tree-children expanded">`;
+                    htmlStr += buildTreeHtml(n.children, selectedArray, level + 1);
+                    htmlStr += `</div>`;
+                }
+                htmlStr += `</div>`;
+            });
+            return htmlStr;
+        }
+
+        function toggleTreeNode(iconEl) {
+            iconEl.classList.toggle('expanded');
+            let childrenContainer = iconEl.closest('.tree-node').querySelector(':scope > .tree-children');
+            if (childrenContainer) {
+                childrenContainer.classList.toggle('expanded');
+            }
+        }
+
+        function selectTreeItem(checkbox) {
+            let val = checkbox.value;
+            let treeNode = checkbox.closest('.tree-node');
+            let childCbs = treeNode ? Array.from(treeNode.querySelectorAll(':scope .tree-children .tree-checkbox')) : [];
+            let selected = window.scopeSelections[currentTreeType];
+
+            if (checkbox.checked) {
+                if (!selected.includes(val)) selected.push(val);
+                // Cascade: check all children
+                childCbs.forEach(cb => {
+                    cb.checked = true;
+                    if (!selected.includes(cb.value)) selected.push(cb.value);
+                });
+            } else {
+                selected = selected.filter(v => v !== val);
+                // Cascade: uncheck all children
+                childCbs.forEach(cb => {
+                    cb.checked = false;
+                    selected = selected.filter(v => v !== cb.value);
+                });
+            }
+            window.scopeSelections[currentTreeType] = selected;
+
+            // Update ancestor checkboxes
+            let ancestor = treeNode ? treeNode.parentElement.closest('.tree-node') : null;
+            while (ancestor) {
+                let ancestorCb = ancestor.querySelector(':scope > .tree-node-content .tree-checkbox');
+                let directChildCbs = Array.from(ancestor.querySelectorAll(':scope > .tree-children > .tree-node > .tree-node-content .tree-checkbox'));
+                if (ancestorCb && directChildCbs.length > 0) {
+                    let allChecked = directChildCbs.every(cb => cb.checked);
+                    ancestorCb.checked = allChecked;
+                    let pid = ancestorCb.value;
+                    if (allChecked) {
+                        if (!window.scopeSelections[currentTreeType].includes(pid)) window.scopeSelections[currentTreeType].push(pid);
+                    } else {
+                        window.scopeSelections[currentTreeType] = window.scopeSelections[currentTreeType].filter(v => v !== pid);
+                    }
+                }
+                ancestor = ancestor.parentElement.closest('.tree-node');
+            }
+            renderTreeSelections(currentTreeType);
+        }
+
+        function filterTreeSearch(query) {
+            let q = (query || '').toLowerCase().trim();
+            let container = document.getElementById('globalTreeContainer');
+            if (!container) return;
+            let allNodes = Array.from(container.querySelectorAll('.tree-node'));
+            if (!q) {
+                allNodes.forEach(n => { n.style.display = ''; });
+                return;
+            }
+            // First hide all
+            allNodes.forEach(n => { n.style.display = 'none'; });
+            // Show matching nodes and all their ancestors
+            allNodes.forEach(n => {
+                let name = (n.dataset.name || '').toLowerCase();
+                if (name.includes(q)) {
+                    n.style.display = '';
+                    let parent = n.parentElement;
+                    while (parent && parent !== container) {
+                        if (parent.classList.contains('tree-node')) parent.style.display = '';
+                        if (parent.classList.contains('tree-children')) parent.classList.add('expanded');
+                        parent = parent.parentElement;
+                    }
+                }
+            });
+        }
+
+        function getTreeItemName(nodes, id) {
+            if (!nodes) return id;
+            let nodeArray = Array.isArray(nodes) ? nodes : [nodes];
+            for (let n of nodeArray) {
+                let nid = n.id || n.name;
+                if (nid === id) return n.name;
+                if (n.children) {
+                    let found = getTreeItemName(n.children, id);
+                    if (found !== id) return found;
+                }
+            }
+            return id;
+        }
+
+        async function renderTreeSelections(type) {
+            let selBox = document.getElementById('selBox-' + type);
+            if (!selBox) return;
+            selBox.innerHTML = '';
+            let selectedIds = window.scopeSelections[type] || [];
+            if (selectedIds.length === 0) return;
+            
+            let data = await fetchTreeData();
+            let nodes = data[type] ? (Array.isArray(data[type]) ? data[type] : [data[type]]) : [];
+
+            selectedIds.forEach(id => {
+                let name = getTreeItemName(nodes, id);
+                let tag = document.createElement('span');
+                tag.className = 'sel-tag';
+                tag.innerHTML = `${name} <svg onclick="removeSelection(event, '${type}', '${id}')" style="cursor:pointer; width:12px;height:12px;opacity:0.7;margin-left:4px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                selBox.appendChild(tag);
+            });
+        }
+
+        function removeSelection(e, type, id) {
+            if (e) e.stopPropagation();
+            if (window.scopeSelections[type]) {
+                window.scopeSelections[type] = window.scopeSelections[type].filter(v => v !== id);
+            }
+            renderTreeSelections(type);
+            let cb = document.querySelector(`.tree-checkbox[value="${id}"]`);
+            if (cb) cb.checked = false;
+        }
+
         function esc(s) {
+ if(s == null) return '';
             var d = document.createElement('div');
             d.textContent = s;
             return d.innerHTML;
@@ -2766,5 +3469,19 @@
         // ===== START =====
         init();
     </script>
+
+    <!-- GLOBAL TREE POPUP -->
+    <div id="globalTreePopup" class="tree-dropdown-popup">
+        <div class="tree-dropdown-header">
+            <span id="globalTreePopupTitle">Select</span>
+            <i data-lucide="x" class="tree-dropdown-close" onclick="closeTreePopup()"></i>
+        </div>
+        <div class="tree-search-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="treeSearchInput" class="tree-search-input" placeholder="Search..." oninput="filterTreeSearch(this.value)">
+        </div>
+        <div id="globalTreeContainer"></div>
+    </div>
 </body>
+
 </html>

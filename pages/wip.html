@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>页面优化中</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: transparent;
+    font-family: 'Fira Sans', 'PingFang SC', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    color: var(--text-secondary, #94A3B8);
+  }
+
+  .wip-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 48px;
+    border-radius: 16px;
+    background: rgba(23, 33, 49, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    backdrop-filter: blur(8px);
+    max-width: 420px;
+    text-align: center;
+  }
+
+  .wip-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(59, 130, 246, 0.12);
+    border: 1.5px solid rgba(59, 130, 246, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .wip-icon svg {
+    width: 30px;
+    height: 30px;
+    stroke: #3B82F6;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: spin 3s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  .wip-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #F8FAFC;
+    letter-spacing: 0.02em;
+  }
+
+  .wip-subtitle {
+    font-size: 13px;
+    color: #64748B;
+    line-height: 1.6;
+  }
+
+  .wip-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    font-size: 12px;
+    color: #F59E0B;
+    letter-spacing: 0.03em;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #F59E0B;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wip-container">
+  <div class="wip-icon">
+    <!-- settings / cog icon -->
+    <svg viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33
+               1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4
+               a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15
+               a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9
+               a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68
+               a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51
+               a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9
+               a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  </div>
+
+  <div>
+    <div class="wip-title" id="wipTitle">页面优化中</div>
+    <div class="wip-subtitle" id="wipSubtitle" style="margin-top:8px">
+      当前页面正在持续优化，<br>功能即将上线，敬请期待。
+    </div>
+  </div>
+
+  <div class="wip-badge">
+    <div class="dot"></div>
+    <span id="wipBadge">持续优化中</span>
+  </div>
+</div>
+
+<script>
+  // Support language switching from parent frame
+  const i18n = {
+    zh: {
+      title: '页面优化中',
+      subtitle: '当前页面正在持续优化，<br>功能即将上线，敬请期待。',
+      badge: '持续优化中'
+    },
+    en: {
+      title: 'Page Under Optimization',
+      subtitle: 'This page is being continuously improved.<br>Stay tuned for the upcoming release.',
+      badge: 'In Progress'
+    }
+  };
+
+  function applyLang(lang) {
+    const l = i18n[lang] || i18n.zh;
+    document.getElementById('wipTitle').textContent = l.title;
+    document.getElementById('wipSubtitle').innerHTML = l.subtitle;
+    document.getElementById('wipBadge').textContent = l.badge;
+  }
+
+  window.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'LANGUAGE_CHANGED') {
+      applyLang(e.data.lang);
+    }
+  });
+
+  // Init from parent lang if available
+  try {
+    const parentLang = window.parent.NAVBAR_CONFIG && window.parent.NAVBAR_CONFIG.defaultLang;
+    if (parentLang) applyLang(parentLang);
+  } catch(e) {}
+</script>
+</body>
+</html>
